@@ -1,0 +1,14 @@
+:root{
+  --primaryColor: #103c51;
+  --secondColor:#749acf;
+  --terdColor:#080e1a;
+  --backColor: #243b55;
+  --btnColor:#fb771a;
+}
+*{
+  font-family: 'Overpass', sans-serif;
+}
+.body{
+  color:white;
+  font-size: 5px;
+}
