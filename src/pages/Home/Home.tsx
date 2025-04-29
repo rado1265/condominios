@@ -7,10 +7,10 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-            if (localStorage.getItem("idCondominio")) {
-                //localStorage.setItem(key, value)
-                window.location.href = "/" + localStorage.getItem("idCondominio") + "/comunidad"
-            }
+        if (localStorage.getItem("idCondominio")) {
+            //localStorage.setItem(key, value)
+            window.location.href = "/" + localStorage.getItem("idCondominio") + "/comunidad"
+        }
     }, [])
 
     return (
@@ -21,6 +21,7 @@ const Home = () => {
                     :
                     <div style={{ marginTop: '10rem', textAlignLast: 'center', fontSize: '10rem' }}>
                         Hola Mundo!
+                        <>{localStorage.getItem("idCondominio")}</>
                     </div>
 
             }
