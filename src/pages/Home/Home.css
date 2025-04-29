@@ -1,9 +1,7 @@
 .search-container {
-    max-width: 400px;
-    margin: 55px auto;
-    padding: 24px 32px;
+    margin: 100px auto;
+    padding: 0px 10px;
     background: #fff;
-    border-radius: 14px;
     font-family: 'Segoe UI', Arial, sans-serif;
   }
   
