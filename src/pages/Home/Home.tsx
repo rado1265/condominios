@@ -10,7 +10,7 @@ const Home = () => {
     const handleClick = () => {
         if (guid === 'oqwrma4532')
             window.location.href = "/1/comunidad"
-        else
+        else if (guid === 'oqwrma1454')
             window.location.href = "/2/comunidad"
 
     }
