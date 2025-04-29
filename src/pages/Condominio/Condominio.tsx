@@ -15,6 +15,7 @@ const Condominio = () => {
     const [tipo, setTipo] = useState(0)
 
     useEffect(() => {
+        if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
         if (urlPase[3]) {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
@@ -60,22 +61,30 @@ const Condominio = () => {
             </div>
         </div>
     }
-    const anuncios = (a: any) => {
+    const anuncios = (a: any, i: any) => {
         if (a.idTipo != tipo && tipo != 0)
             return false
         else
-            return <div className="anuncio col-md-6 my-2 pt-5 pb-3">
-                <small>Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}</small>
-                <span className="text-center w-100 d-block mb-2" style={{ fontSize: '1.5rem', lineHeight: '1' }}>{a.cabecera}</span>
-                <div dangerouslySetInnerHTML={{ __html: a.descripcion }} />
-                <div className="d-inline-flex w-100 mt-2" style={{ justifyContent: 'end' }}>
-                    <span>Organizador@: </span>
-                    <span className="ml-1">{a.organizador}</span>
+            return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3">
+                <div className="anuncio-header">
+                    <span className="anuncio-title">{a.cabecera}</span>
                 </div>
-                <span className="d-flex" style={{ justifyContent: 'end' }}>{a.telefono}</span>
-                {a.amedida ?
-                    <img style={{ maxWidth: '100%' }} src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
-                    : ""}
+                <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: a.descripcion }} />
+                <div className="anuncio-footer">
+                    <div className="anuncio-organizador">
+                        <span>Organizado por: </span>
+                        <span className="ml-1">{a.organizador}</span>
+                    </div>
+                    <span className="anuncio-telefono">{a.telefono}</span>
+                </div>
+                {a.amedida && (
+                    <div className="anuncio-img-wrapper">
+                        <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
+                    </div>
+                )}
+                <small className="anuncio-fecha">
+                    Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
+                </small>
             </div>
     }
 
@@ -90,13 +99,11 @@ const Condominio = () => {
                             <img className="w-50 mx-auto" src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" />
                             <h2 className="text-center" style={{ color: '#656565', margin: '0' }}>{dataFull.nombre}</h2>
                         </div>
-                        <div className="container pb-5">
-                            <div className="row px-3">
-                                {dataFull.anuncios.map((a: any) => {
-                                    return (
-                                        anuncios(a)
-                                    );
-                                })}
+                        <div className="container pb-5 mb-3">
+                            <div className="row px-3 justify-content-around">
+                                {dataFull.anuncios.map((a: any, i) => (
+                                    anuncios(a, i)
+                                ))}
                             </div>
                         </div>
                         {navegador()}
