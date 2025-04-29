@@ -98,11 +98,11 @@ const Condominio = () => {
                     <Loading />
                     :
                     <div>
-                        <div className="w-100 pb-3 mb-3" style={{ background: '#E6F4EA', justifyContent: 'center', display: 'grid', boxShadow: '0px 0px 24px 0px #5d8067' }}>
+                        <div className="w-100 pb-3 mb-3" style={{ background: 'linear-gradient(rgb(255, 255, 255), rgb(144 212 164 / 67%))', justifyContent: 'center', display: 'grid', boxShadow: 'rgb(2 109 33 / 24%) 0px 0px 24px 0px' }}>
                             <img className="w-50 mx-auto" src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" />
                             <h2 className="text-center" style={{ color: '#316371', margin: '0' }}>{dataFull.nombre}</h2>
                         </div>
-                        <div className="container pb-5 mb-3">
+                        <div className="container pb-5 mb-5">
                             <div className="row px-3 justify-content-around">
                                 {dataFull.anuncios.map((a: any, i) => (
                                     anuncios(a, i)
