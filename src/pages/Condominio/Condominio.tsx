@@ -14,6 +14,7 @@ const Condominio = () => {
     const urlPase = fullURL.split("/");
 
     useEffect(() => {
+        if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
         if (urlPase[3]) {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
@@ -37,34 +38,38 @@ const Condominio = () => {
                     <Loading />
                     :
                     <div>
-                        <div className="w-100 pb-3 mb-3" style={{background: '#E6F4EA', justifyContent: 'center', display: 'grid', boxShadow: '0px 0px 24px 0px #5d8067'}}>
+                        <div className="w-100 pb-3 mb-3" style={{ background: '#E6F4EA', justifyContent: 'center', display: 'grid', boxShadow: '0px 0px 24px 0px #5d8067' }}>
                             <img className="w-50 mx-auto" src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" />
-                            <h2 className="text-center" style={{color: '#656565', margin: '0'}}>{dataFull.nombre}</h2>
+                            <h2 className="text-center" style={{ color: '#656565', margin: '0' }}>{dataFull.nombre}</h2>
                         </div>
                         <div className="container pb-5">
-                            <div className="row px-3">
-                                {dataFull.anuncios.map((a: any) => {
-                                    return (
-                                        <div className="anuncio col-md-6 my-2 pt-5 pb-3">
-                                            <small>Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}</small>
-                                            <span className="text-center w-100 d-block mb-2" style={{ fontSize: '1.5rem', lineHeight: '1' }}>{a.cabecera}</span>
-                                            <div dangerouslySetInnerHTML={{ __html: a.descripcion }} />
-                                            <div className="d-inline-flex w-100 mt-2" style={{ justifyContent: 'end' }}>
-                                                <span>Organizador@: </span>
+                            <div className="row px-3 justify-content-around">
+                                {dataFull.anuncios.map((a:any, i) => (
+                                    <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3">
+                                        <div className="anuncio-header">
+                                            <span className="anuncio-title">{a.cabecera}</span>
+                                        </div>
+                                        <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: a.descripcion }} />
+                                        <div className="anuncio-footer">
+                                            <div className="anuncio-organizador">
+                                                <span>Organizado por: </span>
                                                 <span className="ml-1">{a.organizador}</span>
                                             </div>
-                                            <span className="d-flex" style={{ justifyContent: 'end' }}>{a.telefono}</span>
-                                            {a.amedida ?
-                                                <img style={{ maxWidth: '100%' }} src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
-                                                : ""}
+                                            <span className="anuncio-telefono">{a.telefono}</span>
                                         </div>
-                                    );
-                                })}
+                                        {a.amedida && (
+                                            <div className="anuncio-img-wrapper">
+                                                <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
+                                            </div>
+                                        )}
+                                        <small className="anuncio-fecha">
+                                            Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
+                                        </small>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
-
-
             }
         </React.Fragment>
     );

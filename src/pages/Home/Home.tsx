@@ -7,20 +7,11 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
-        ObtenerListadoAnuncioLogic(selListadoAnuncios, "1");
+            if (localStorage.getItem("idCondominio")) {
+                //localStorage.setItem(key, value)
+                window.location.href = "/" + localStorage.getItem("idCondominio") + "/comunidad"
+            }
     }, [])
-
-    const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
-        try {
-            setLoading(false);
-            console.log(data);
-            console.log(error);
-            console.log(err);
-        } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error desconocido. Comuníquese con el Administrador.")
-        }
-    }
 
     return (
         <React.Fragment>
@@ -28,7 +19,7 @@ const Home = () => {
                 loading ?
                     <Loading />
                     :
-                    <div style={{marginTop:'10rem', textAlignLast:'center', fontSize:'10rem'}}>
+                    <div style={{ marginTop: '10rem', textAlignLast: 'center', fontSize: '10rem' }}>
                         Hola Mundo!
                     </div>
 

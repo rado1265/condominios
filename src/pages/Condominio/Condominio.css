@@ -1,10 +1,77 @@
-.anuncio{
-    border-radius: 15px;
-    box-shadow: 0px 0px 9px 3px #cecbcb;
-}
-
-.anuncio > small{
+.anuncio {
+    position: relative;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 20px 0 rgba(44, 62, 80, 0.10), 0 1.5px 6px 0 rgba(44, 62, 80, 0.08);
+    max-width: 370px;
+    min-height: 340px;
+    padding: 28px 22px 48px 22px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.17s, box-shadow 0.17s;
+    border: 1px solid #f2f2f2;
+  }
+  
+  .anuncio-header {
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .anuncio-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #2d3a4b;
+    letter-spacing: 0.5px;
+    line-height: 1.15;
+  }
+  
+  .anuncio-body {
+    font-size: 1.05rem;
+    color: #444;
+    margin-bottom: 12px;
+  }
+  
+  .anuncio-img-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 16px 0;
+  }
+  
+  .anuncio-img {
+    max-width: 100%;
+  }
+  
+  .anuncio-footer {
+    display: block;
+    align-items: end;
+    margin-top: auto;
+    font-size: 1rem;
+    color: #5d6d7e;
+  }
+  
+  .anuncio-organizador {
+    font-weight: 500;
+    text-align: end;
+  }
+  
+  .anuncio-telefono {
+    font-weight: 600;
+    color: #2980b9;
+    display: block;
+    text-align: end;
+  }
+  
+  .anuncio-fecha {
     position: absolute;
-    top: 5px;
-    right: 15px;
-}
+    bottom: 18px;
+    right: 22px;
+    font-size: 0.92rem;
+    color: #a0a4b8;
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+
+  
+  
