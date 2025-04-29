@@ -26,16 +26,14 @@ const Condominio = () => {
         try {
             setLoading(false);
             setDataFull(data);
-            console.log(data);
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error desconocido. Comuníquese con el Administrador.")
         }
     }
 
 
 
     const navegador = () => {
-        return <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t mb-3">
+        return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{background: 'white'}}>
                 <button type="button" className={tipo == 0 ? "button btnactive" : "button"} onClick={() => setTipo(0)}>
                     <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -103,7 +101,7 @@ const Condominio = () => {
                             <h2 className="text-center" style={{ color: '#316371', margin: '0' }}>{dataFull.nombre}</h2>
                         </div>
                         <div className="container pb-5 mb-5">
-                            <div className="row px-3 justify-content-around">
+                            <div className="row px-3 px-md-0 justify-content-around">
                                 {dataFull.anuncios.map((a: any, i) => (
                                     anuncios(a, i)
                                 ))}
