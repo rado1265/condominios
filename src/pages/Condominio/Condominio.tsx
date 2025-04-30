@@ -13,7 +13,7 @@ const Condominio = () => {
     });
     const fullURL = window.location.href;
     const urlPase = fullURL.split("/");
-    const [tipo, setTipo] = useState(0)
+    const [tipo, setTipo] = useState(1)
     const [usuario, setUsuario] = useState({
         nombre: ""
     });
@@ -78,12 +78,12 @@ const Condominio = () => {
             if (data) {
                 SuccessMessage("Anuncio eliminado correctamente.")
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                setTipo(0)
+                /* setTipo(1) */
             }
             else {
                 ErrorMessage("Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos")
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                setTipo(0)
+                /* setTipo(1) */
             }
         } catch (er) {
             ErrorMessage("Credenciales incorrectas", "")
@@ -111,7 +111,7 @@ const Condominio = () => {
             setLoading(false);
             if (data.nombre != null) {
                 setUsuario(data);
-                setTipo(0)
+                setTipo(1)
                 setIniciarSesion(false)
             }
             else {
@@ -154,7 +154,7 @@ const Condominio = () => {
         try {
             if (data) {
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                setTipo(0);
+                setTipo(1);
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
@@ -223,17 +223,17 @@ const Condominio = () => {
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
-                <button type="button" className={tipo == 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
-                    <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
-                    </svg>
-                    <span className="text">Home</span>
-                </button>
                 <button type="button" className={tipo == 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
                     <span className="text">Anuncios</span>
+                </button>
+                <button type="button" className={tipo == 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
+                    <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6 2a1 1 0 0 0-1 1v2H3a1 1 0 0 0-1 1v2h20V6a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1H6Zm1 3V4h10v1H7Zm-4 5v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10H3Zm7 3a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Zm4 0a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Z" />
+                    </svg>
+                    <span className="text">Ventas</span>
                 </button>
                 <button type="button" className={tipo == 2 ? "button btnactive" : "button"} onClick={() => changeMenu(2)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
@@ -260,7 +260,7 @@ const Condominio = () => {
         </div >
     }
     const panelAnuncios = (a: any, i: any) => {
-        if (a.idTipo != tipo && tipo != 0)
+        if (a.idTipo != tipo)
             return false
         else
             return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3">
@@ -305,7 +305,7 @@ const Condominio = () => {
         if (e.key === 'Enter') {
             login();
         }
-      };
+    };
 
     const panelInicioSesion = () => {
         return <div className="mx-3 w-100 search-container">
@@ -339,10 +339,10 @@ const Condominio = () => {
         </div>
     }
     const panelCrearAnuncio = () => {
-        return <div key={key} className="w-100" style={{maxWidth: '700px', margin: '0 auto'}}>
+        return <div key={key} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
             <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} Anuncio</h2>
 
-            <div className="login-box py-3 px-3" style={{boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px'}}>
+            <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                 <label htmlFor="textfield" className="search-label-admin">
                     Cabecera
                 </label>
@@ -414,6 +414,7 @@ const Condominio = () => {
                 </label>
                 <select id="miCombo" value={anuncio.idTipo} className="typeDate" name="idTipo" onChange={handleChangeAnuncio}>
                     <option value="1">Anuncio</option>
+                    <option value="0">Ventas</option>
                     <option value="2">Recordatorio</option>
                 </select>
                 <button
