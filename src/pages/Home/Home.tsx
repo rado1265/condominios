@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Home.css';
-import { ObtenerListadoAnuncioLogic } from "../../presentation/view-model/Anuncio.logic";
+import { ObteneCondominioLogic } from "../../presentation/view-model/Anuncio.logic";
 
 const Home = () => {
     const [loading, setLoading] = useState(false);
     const [guid, setGuid] = useState("");
 
     const handleClick = () => {
-        if (guid === 'oqwrma4532')
-            window.location.href = "/1/comunidad"
-        else if (guid === 'oqwrma1454')
-            window.location.href = "/2/comunidad"
-
+        ObteneCondominioLogic(selObteneCondominio, guid);
+    }
+    const selObteneCondominio = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            window.location.href = "/" + data + "/comunidad"
+        } catch (er) {
+            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error desconocido. Comuníquese con el Administrador.")
+        }
     }
     useEffect(() => {
         if (localStorage.getItem("idCondominio"))

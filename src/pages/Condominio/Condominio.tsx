@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { ObtenerListadoAnuncioLogic } from "../../presentation/view-model/Anuncio.logic";
+import { LoginLogic, ObtenerListadoAnuncioLogic } from "../../presentation/view-model/Anuncio.logic";
 
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
@@ -13,6 +13,15 @@ const Condominio = () => {
     const fullURL = window.location.href;
     const urlPase = fullURL.split("/");
     const [tipo, setTipo] = useState(0)
+    const [usuario, setUsuario] = useState({
+        nombre: "asds"
+    });
+    const [loguear, setLoguear] = useState({
+        usuario: "",
+        clave: "",
+        idCondominio: localStorage.getItem("idCondominio")
+    });
+    const [iniciarSesion, setIniciarSesion] = useState(false)
 
     useEffect(() => {
         if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
@@ -21,6 +30,25 @@ const Condominio = () => {
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
     }, [])
+
+    const login = () => {
+        try {
+            setLoading(true);
+            LoginLogic(selLogin, loguear)
+        } catch (er) {
+            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error desconocido. Comuníquese con el Administrador.")
+        }
+    }
+
+    const selLogin = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            setUsuario(data);
+            console.log(data);
+        } catch (er) {
+            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error desconocido. Comuníquese con el Administrador.")
+        }
+    }
 
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
@@ -32,32 +60,53 @@ const Condominio = () => {
         }
     }
     const navegador = () => {
-        return <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t">
+        return <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t text-center">
             <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
-                <button type="button" className="button" onClick={() => setTipo(0)}>
+                <button type="button" className="button" onClick={() => {
+                    setTipo(0)
+                    setIniciarSesion(false)
+                }}>
                     <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
                     </svg>
                     <span className="text">Home</span>
                 </button>
-                <button type="button" className="button" onClick={() => setTipo(1)}>
+                <button type="button" className="button" onClick={() => {
+                    setTipo(1)
+                    setIniciarSesion(false)
+                }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
                     <span className="text">Anuncios</span>
                 </button>
-                <button type="button" className="button" onClick={() => setTipo(2)}>
+                <button type="button" className="button" onClick={() => {
+                    setTipo(2)
+                    setIniciarSesion(false)
+                }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm-.5-9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V7z" />
                     </svg>
                     <span className="text">Recordatorios</span>
                 </button>
-                <button type="button" className="button" onClick={() => setTipo(3)}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
-                        <path d="M10 2a1 1 0 0 1 1 1v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H3a1 1 0 0 1 0-2h6V3a1 1 0 0 1 1-1z" />
-                    </svg>
-                    <span className="text">Otros</span>
-                </button>
+                {
+                    usuario.nombre.length > 0 ? <button type="button" className="button" onClick={() => {
+                        setTipo(3)
+                        setIniciarSesion(false)
+                    }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
+                            <path d="M10 2a1 1 0 0 1 1 1v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H3a1 1 0 0 1 0-2h6V3a1 1 0 0 1 1-1z" />
+                        </svg>
+                        <span className="text">Crear</span>
+                    </button> :
+                        <button type="button" className="button" onClick={() => setIniciarSesion(true)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
+                                <path d="M10 0a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
+                            </svg>
+                            <span className="text">Perfil</span>
+                        </button>
+                }
+
             </div>
         </div>
     }
@@ -101,9 +150,18 @@ const Condominio = () => {
                         </div>
                         <div className="container pb-5 mb-3">
                             <div className="row px-3 justify-content-around">
-                                {dataFull.anuncios.map((a: any, i) => (
-                                    anuncios(a, i)
-                                ))}
+                                {
+                                    iniciarSesion ?
+                                        <>
+                                        </>
+                                        :
+                                        <>
+                                            {dataFull.anuncios.map((a: any, i) => (
+                                                anuncios(a, i)
+                                            ))}
+                                        </>
+                                }
+
                             </div>
                         </div>
                         {navegador()}
