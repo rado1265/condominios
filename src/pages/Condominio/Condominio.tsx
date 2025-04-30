@@ -332,7 +332,7 @@ const Condominio = () => {
         </div>
     }
     const panelCrearAnuncio = () => {
-        return <div key={key} className="w-100">
+        return <div key={key} className="w-100" style={{maxWidth: '700px', margin: '0 auto'}}>
             <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} Anuncio</h2>
 
             <div className="login-box py-3 px-3" style={{boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px'}}>
@@ -391,7 +391,7 @@ const Condominio = () => {
                 <label htmlFor="textfield" className="search-label-admin mt-3">
                     Cargar imagen
                 </label>
-                <input type="file" accept="image/*" onChange={handleImageChange} />
+                <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 {anuncio.amedida && (
                     <div>
                         <h3>Vista previa:</h3>
