@@ -83,10 +83,18 @@ const Condominio = () => {
         }
     }
 
+    const normalizarLogin = (data: any) => {
+        return {
+            usuario: data.usuario ?? "",
+            clave: data.clave ?? "",
+            idCondominio: localStorage.getItem("idCondominio")
+        };
+    };
+
     const login = () => {
         try {
             setLoading(true);
-            LoginLogic(selLogin, loguear)
+            LoginLogic(selLogin, normalizarLogin(loguear))
         } catch (er) {
         }
     }
