@@ -109,11 +109,29 @@ const Condominio = () => {
             ErrorMessage("Credenciales incorrectas", "")
         }
     }
+
+    const normalizarAnuncio = (data: any) => {
+        return {
+            id: data.id ?? 0,
+            idCondominio: data.idCondominio ?? "",
+            cabecera: data.cabecera ?? "",
+            descripcion: data.descripcion ?? "",
+            organizador: data.organizador ?? "",
+            telefono: data.telefono ?? "",
+            amedida: data.amedida ?? "",
+            fechaDesde: data.fechaDesde ? data.fechaDesde.substring(0, 10) : "",
+            fechaHasta: data.fechaHasta ? data.fechaHasta.substring(0, 10) : "",
+            idTipo: data.idTipo ?? 0
+        };
+    };
+
     const CrearAnuncio = () => {
         try {
-            /* setLoading(true);
-            CrearAnuncioLogic(selCrearAnuncio, anuncio) */
-            console.log(anuncio)
+            if (anuncio.cabecera.length > 0) {
+                setLoading(true);
+                CrearAnuncioLogic(selCrearAnuncio, anuncio)
+                console.log(normalizarAnuncio(anuncio))
+            }
         } catch (er) {
         }
     }
@@ -348,7 +366,7 @@ const Condominio = () => {
                 <input
                     type="date"
                     name="fechaHasta"
-                    value={anuncio.fechaHasta.toString()}
+                    value={anuncio.fechaHasta ? anuncio.fechaHasta.toString().substring(0, 10) : ''}
                     onChange={handleChangeAnuncio}
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
