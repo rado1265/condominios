@@ -148,11 +148,7 @@ body {
     background: transparent;
     border: none;
     transition: background-color 0.3s;
-}
-
-.button:hover {
-    background-color: #f3f4f6;
-    /* Gray 50 */
+    outline: 0 !important;
 }
 
 .icon {
@@ -167,11 +163,6 @@ body {
     transition: color 0.3s;
 }
 
-.button:hover .icon {
-    color: #3b82f6;
-    /* Blue 600 */
-}
-
 .text {
     font-size: 0.875rem;
     /* 14px */
@@ -180,7 +171,21 @@ body {
     transition: color 0.3s;
 }
 
-.button:hover .text {
-    color: #3b82f6;
-    /* Blue 600 */
+.btnactive {
+    background: #e2e2e2;
+    outline: 0 !important;
+}
+
+.btnactive>.icon {
+    color: #29a55f !important;
+}
+
+.btnactive:focus {
+    outline: 0 !important;
+}
+
+.login-box {
+    display: grid;
+    align-items: center;
+    gap: 10px;
 }
