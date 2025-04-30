@@ -301,8 +301,14 @@ const Condominio = () => {
             </div>
     }
 
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            login();
+        }
+      };
+
     const panelInicioSesion = () => {
-        return <div className="search-container">
+        return <div className="mx-3 w-100 search-container">
             <label htmlFor="textfield" className="search-label">
                 Inicio de Sesión
             </label>
@@ -320,6 +326,7 @@ const Condominio = () => {
                     className="search-input"
                     value={loguear.clave}
                     onChange={handleChangeLogin}
+                    onKeyDown={handleKeyDown}
                 />
                 <button
                     type="button"
