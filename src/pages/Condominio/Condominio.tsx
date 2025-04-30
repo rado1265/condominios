@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
 import { CrearAnuncioLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic } from "../../presentation/view-model/Anuncio.logic";
-import { ErrorMessage, SuccessMessage } from "../../components/utils/messages";
+import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
@@ -61,9 +61,16 @@ const Condominio = () => {
     }, [])
     const EliminarAnuncio = (a: any) => {
         try {
+            handleConfirmMessage(a)
+        } catch (er) {
+        }
+    }
+    const handleConfirmMessage = async (a: any) => {
+        console.log(a)
+        const msg: any = await ConfirmMessage(`Eliminar anuncio`, `¿Esta seguro de querer eliminar el anuncio?`);
+        if (msg) {
             setLoading(true);
             EliminarAnuncioLogic(selEliminarAnuncio, a)
-        } catch (er) {
         }
     }
     const selEliminarAnuncio = (error: Boolean, err: string, data: any) => {
@@ -147,8 +154,10 @@ const Condominio = () => {
         try {
             if (data) {
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                setTipo(0)
-                limpiarAnuncio()
+                setTipo(0);
+                setCrear(false);
+                setEditar(false);
+                limpiarAnuncio();
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -257,14 +266,14 @@ const Condominio = () => {
             return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3">
                 <div className="anuncio-header">
                     {
-                        usuario.nombre.length > 0 && <div style={{ float: 'right' }} >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon" onClick={() => {
+                        usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon editarInput" onClick={() => {
                                 changeMenu(3, false, false, true)
                                 cargarAnuncioParaEdit(a)
                             }}>
                                 <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
                             </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon" onClick={() => {
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon deleteInput" onClick={() => {
                                 EliminarAnuncio(a.id)
                             }}>
                                 <path d="M5 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h3a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5H1a1 1 0 0 1 0-2h3V3zm1 0v1h8V3H6zm-1 3h10v12H5V6z" />
@@ -323,11 +332,11 @@ const Condominio = () => {
         </div>
     }
     const panelCrearAnuncio = () => {
-        return <div key={key}>
-            <h2 className="mb-4">{crear ? "Crear" : "Editar"} Anuncio</h2>
+        return <div key={key} className="w-100">
+            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} Anuncio</h2>
 
-            <div className="login-box">
-                <label htmlFor="textfield" className="search-label">
+            <div className="login-box py-3 px-3" style={{boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px'}}>
+                <label htmlFor="textfield" className="search-label-admin">
                     Cabecera
                 </label>
                 <input
@@ -337,7 +346,7 @@ const Condominio = () => {
                     value={anuncio.cabecera}
                     onChange={handleChangeAnuncio}
                 />
-                <label htmlFor="textfield" className="search-label">
+                <label htmlFor="textfield" className="search-label-admin">
                     Descripción
                 </label>
                 <textarea
@@ -348,7 +357,7 @@ const Condominio = () => {
                     value={anuncio.descripcion}
                     onChange={handleChangeAnuncio}
                 />
-                <label htmlFor="textfield" className="search-label">
+                <label htmlFor="textfield" className="search-label-admin">
                     Organizador
                 </label>
                 <input
@@ -358,7 +367,7 @@ const Condominio = () => {
                     value={anuncio.organizador}
                     onChange={handleChangeAnuncio}
                 />
-                <label htmlFor="textfield" className="search-label">
+                <label htmlFor="textfield" className="search-label-admin">
                     Teléfono
                 </label>
                 <input
@@ -368,17 +377,18 @@ const Condominio = () => {
                     value={anuncio.telefono}
                     onChange={handleChangeAnuncio}
                 />
-                <label htmlFor="textfield" className="search-label mt-3">
+                <label htmlFor="textfield" className="search-label-admin mt-3">
                     Fecha Hasta
                 </label>
                 <input
                     type="date"
                     name="fechaHasta"
+                    className="typeDate"
                     value={anuncio.fechaHasta ? anuncio.fechaHasta.toString().substring(0, 10) : ''}
                     onChange={handleChangeAnuncio}
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
-                <label htmlFor="textfield" className="search-label mt-3">
+                <label htmlFor="textfield" className="search-label-admin mt-3">
                     Cargar imagen
                 </label>
                 <input type="file" accept="image/*" onChange={handleImageChange} />
@@ -392,9 +402,16 @@ const Condominio = () => {
                         />
                     </div>
                 )}
+                <label htmlFor="textfield" className="search-label mt-3">
+                    Tipo
+                </label>
+                <select id="miCombo" value={anuncio.idTipo} className="typeDate" name="idTipo" onChange={handleChangeAnuncio}>
+                    <option value="1">Anuncio</option>
+                    <option value="2">Recordatorio</option>
+                </select>
                 <button
                     type="button"
-                    className="search-button"
+                    className="search-button mt-2"
                     onClick={CrearAnuncio}
                 >
                     {crear ? "Crear" : "Editar"}

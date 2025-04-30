@@ -7,8 +7,8 @@ export const DeleteConfirm = (mensaje: string) => {
             text: mensaje,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#24a364',
+            cancelButtonColor: '#8b8888',
             confirmButtonText: 'Sí, confirmar',
             cancelButtonText: 'Cancelar'
         }).then((result: any) => {
@@ -24,8 +24,8 @@ export const ConfirmMessage = async (title: string, mensaje: string) => {
             text: mensaje,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#24a364',
+            cancelButtonColor: '#8b8888',
             confirmButtonText: 'Sí, confirmar',
             cancelButtonText: 'Cancelar'
         });
@@ -41,7 +41,7 @@ export const SuccessMessageConfirm = async (mensaje: string) => {
             title: 'Operación exitosa',
             text: mensaje,
             icon: 'success',
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#24a364',
             confirmButtonText: 'Ok'
         });
         return result.isConfirmed;
@@ -55,7 +55,7 @@ export const SuccessMessage = (mensaje: string) => {
         title: 'Operación exitosa',
         text: mensaje,
         icon: 'success',        
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#24a364',
     });
 }
 
@@ -65,7 +65,7 @@ export const ErrorMessage = (title: string, mensaje: string) => {
         title: title,
         text: mensaje,
         icon: 'info',        
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#24a364',
     });
 }
 

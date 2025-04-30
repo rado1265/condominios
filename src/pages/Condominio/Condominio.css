@@ -73,6 +73,15 @@
     border-radius: 8px;
 }
 
+.search-label-admin {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 15px;
+    margin-bottom: 0;
+    display: block;
+    color: #333;
+  }
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -188,4 +197,23 @@ body {
     display: grid;
     align-items: center;
     gap: 10px;
+}
+
+.deleteInput{
+    color: #cd5252 !important;
+    margin-left: 5px;
+}
+
+.editarInput{
+    color: #52cd98 !important;
+    margin-left: 5px;
+}
+
+.typeDate{
+    padding: 10px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    outline: none;
 }
