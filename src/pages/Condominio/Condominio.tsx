@@ -35,7 +35,7 @@ const Condominio = () => {
         amedida: "",
         fechaDesde: new Date(),
         fechaHasta: new Date(),
-        idTipo: 0
+        idTipo: 1
     });
     const limpiarAnuncio = () => {
         setAnuncio({
@@ -48,7 +48,7 @@ const Condominio = () => {
             amedida: "",
             fechaDesde: new Date(),
             fechaHasta: new Date(),
-            idTipo: 0
+            idTipo: 1
         })
     }
     const [key, setKey] = useState(0)
@@ -136,7 +136,7 @@ const Condominio = () => {
             amedida: data.amedida ?? "",
             fechaDesde: data.fechaDesde ? data.fechaDesde.substring(0, 10) : "",
             fechaHasta: data.fechaHasta ? data.fechaHasta.substring(0, 10) : "",
-            idTipo: data.idTipo ?? 0
+            idTipo: data.idTipo ?? 1
         };
     };
 
