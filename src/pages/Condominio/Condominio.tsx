@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import notificacion from './../../components/utils/img/notificacion.png';
 import refresh from './../../components/utils/img/refresh.png';
@@ -77,7 +77,6 @@ const Condominio = () => {
         }
     }
     const handleConfirmMessage = async (a: any) => {
-        console.log(a)
         const msg: any = await ConfirmMessage(`Eliminar anuncio`, `¿Esta seguro de querer eliminar el anuncio?`);
         if (msg) {
             setLoading(true);
@@ -345,10 +344,10 @@ const Condominio = () => {
                         <video src={a.amedida} controls width="300" />
                     </div>
                     : a.amedida && !a.amedida.includes("http") ?
-                    <div className="anuncio-img-wrapper">
-                        <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
-                    </div>
-                    : ""
+                        <div className="anuncio-img-wrapper">
+                            <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
+                        </div>
+                        : ""
                 }
                 <small className="anuncio-fecha">
                     Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
@@ -453,22 +452,22 @@ const Condominio = () => {
                 />
 
                 {(crear || (!crear && !anuncio.amedida)) && (
-                <div>
-                    <label>Subir archivo</label>
-                    <div className="radio-group">
-                        <label className="radio-label">
-                            <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)}/>
-                            <span>🖼️</span>
-                            <span className="text">Imagen</span>
-                        </label>
+                    <div>
+                        <label>Subir archivo</label>
+                        <div className="radio-group">
+                            <label className="radio-label">
+                                <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
+                                <span>🖼️</span>
+                                <span className="text">Imagen</span>
+                            </label>
 
-                        <label className="radio-label">
-                            <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)}/>
-                            <span>🎥</span>
-                            <span className="text">Video</span>
-                        </label>
+                            <label className="radio-label">
+                                <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
+                                <span>🎥</span>
+                                <span className="text">Video</span>
+                            </label>
+                        </div>
                     </div>
-                </div>
                 )}
 
                 {(tipoSubir == 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
@@ -491,12 +490,12 @@ const Condominio = () => {
                 )}
 
 
-                {(tipoSubir == 2  || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir == 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir == 2  || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir == 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
                 {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
@@ -543,6 +542,12 @@ const Condominio = () => {
         try {
             if (data) {
                 SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
+                setUsuario({
+                    nombre: usuario.nombre,
+                    tieneSuscripcion: true,
+                    rol: usuario.rol,
+                    id: usuario.id
+                });
             }
             else {
                 ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
@@ -552,8 +557,27 @@ const Condominio = () => {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    const selDesSuscribir = (error: Boolean, err: string, data: any) => {
+        setLoading(false);
+        try {
+            if (data) {
+                SuccessMessage("Su desuscribipción a las notificaciones fue realizada correctamente.")
+                setUsuario({
+                    nombre: usuario.nombre,
+                    tieneSuscripcion: false,
+                    rol: usuario.rol,
+                    id: usuario.id
+                });
+            }
+            else {
+                ErrorMessage("Error quitar suscripción", "Favor intentarlo nuevamente en unos minutos")
+            }
+        } catch (er) {
+            ErrorMessage("Error quitar suscripción", "Favor comuniquese con el administrador.")
+        }
+    }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <React.Fragment>
             {
@@ -574,7 +598,7 @@ const Condominio = () => {
                                 usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
                                     <img src={notificacion} />
                                 </button>
-                                    : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { }}>
+                                    : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => {setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
                                         <img src={silenciarnotificacion} />
                                     </button>
                                         : ""

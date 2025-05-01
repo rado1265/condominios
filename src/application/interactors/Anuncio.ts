@@ -53,7 +53,7 @@ export const Login = (selListado: any, usuario: any) => {
     });
 }
 
-export const SuscribirNotificaciones = (selListado: any,idCondominio: any, idUsuario: any) => {
+export const SuscribirNotificaciones = (selListado: any, idCondominio: any, idUsuario: any) => {
     SVCAnuncio.SuscribirNotificaciones(idCondominio, idUsuario).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
@@ -63,3 +63,14 @@ export const SuscribirNotificaciones = (selListado: any,idCondominio: any, idUsu
         }
     });
 }
+export const DesscribirNotificaciones = (selListado: any, idUsuario: any) => {
+    SVCAnuncio.DesscribirNotificaciones(idUsuario).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
+

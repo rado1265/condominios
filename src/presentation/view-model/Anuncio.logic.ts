@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -17,4 +17,7 @@ export const LoginLogic = (selListado: any, usuario: any) => {
 }
 export const SuscribirNotificacionesLogic = (selListado: any, idCondominio: any, idUsuario: any) => {
     return SuscribirNotificaciones(selListado, idCondominio, idUsuario);
+}
+export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any) => {
+    return DesscribirNotificaciones(selListado, idUsuario);
 }
