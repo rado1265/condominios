@@ -217,3 +217,11 @@ body {
     transition: border-color 0.2s;
     outline: none;
 }
+
+.iconNotificacion{
+    background: transparent;
+    border: 0;
+    top: 15px;
+    position: absolute;
+    right: 15px;
+}

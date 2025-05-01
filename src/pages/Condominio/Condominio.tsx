@@ -3,6 +3,8 @@ import Loading from "../../components/utils/loading";
 import './Condominio.css';
 import { CrearAnuncioLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
+import notificacion from './../../components/utils/img/notificacion.png';
+import silenciarnotificacion from './../../components/utils/img/silenciar-notificacion.png';
 
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
@@ -443,6 +445,7 @@ const Condominio = () => {
 
 
     const selSuscribir = (error: Boolean, err: string, data: any) => {
+        setLoading(false);
         try {
             if (data) {
                 SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
@@ -470,8 +473,8 @@ const Condominio = () => {
                             {
                                 usuario.nombre.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>Usuario: {usuario.nombre}</h6>
                             }
-                            <button onClick={() => SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}>
-                                Activar notificaciones
+                            <button className="iconNotificacion" onClick={() => {setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}}>
+                                <img src={notificacion}/>
                             </button>
                         </div>
                         <div className="container pb-5 mb-5">
