@@ -223,19 +223,19 @@ const Condominio = () => {
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
-                <button type="button" className={tipo == 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
+                <button aria-label="Anuncios" type="button" className={tipo == 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
                     <span className="text">Anuncios</span>
                 </button>
-                <button type="button" className={tipo == 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
+                <button aria-label="Ventas" type="button" className={tipo == 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
                     <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M6 2a1 1 0 0 0-1 1v2H3a1 1 0 0 0-1 1v2h20V6a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1H6Zm1 3V4h10v1H7Zm-4 5v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10H3Zm7 3a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Zm4 0a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Z" />
                     </svg>
                     <span className="text">Ventas</span>
                 </button>
-                <button type="button" className={tipo == 2 ? "button btnactive" : "button"} onClick={() => changeMenu(2)}>
+                <button aria-label="Recordatorios" type="button" className={tipo == 2 ? "button btnactive" : "button"} onClick={() => changeMenu(2)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm-.5-9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V7z" />
                     </svg>

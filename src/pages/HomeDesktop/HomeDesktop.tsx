@@ -9,12 +9,12 @@ const HomeDesktop = () => {
         <React.Fragment>
             <main className="contenedor-principal">
                 <section className="contenido-izquierdo">
-                    <h1>Conecta tu Comunidad</h1>
-                    <p>Plataforma integral para:</p>
+                    <h1>Este sistema está optimizado para móviles</h1>
+                    <p>Accede desde tu teléfono para disfrutar de:</p>
                     <ul>
-                        <li>Anuncios comunitarios</li>
-                        <li>Ventas entre vecinos</li>
-                        <li>Informaciones de tu comunidad</li>
+                        <li>✅ Anuncios comunitarios: Mantente informado de lo que sucede a tu alrededor.</li>
+                        <li>✅ Ventas entre vecinos: Compra/vende artículos de manera segura y cerca de ti.</li>
+                        <li>✅ Información de tu comunidad: Conoce eventos, servicios y noticias importantes.</li>
                     </ul>
                     <button className="cta-btn">Contactanos</button>
                 </section>

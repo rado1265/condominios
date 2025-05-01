@@ -1,8 +1,7 @@
-.search-container {
+  .search-container {
+    font-family: Segoe UI, Arial, sans-serif;
     margin: 100px auto;
-    padding: 0px 10px;
-    background: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 10px 22px;
   }
   
   .search-label {

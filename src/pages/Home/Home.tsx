@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Home.css';
 import { ObteneCondominioLogic } from "../../presentation/view-model/Anuncio.logic";
+import { ErrorMessage } from "../../components/utils/messages";
 
 const Home = () => {
     const [loading, setLoading] = useState(false);
@@ -13,7 +14,11 @@ const Home = () => {
     const selObteneCondominio = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
-            window.location.href = "/" + data + "/comunidad"
+            if(data == 0){
+                ErrorMessage("Código Incorrecto", "El código ingresado es incorrecto");
+            }else{
+                window.location.href = "/" + data + "/comunidad"
+            }
         } catch (er) {
         }
     }
