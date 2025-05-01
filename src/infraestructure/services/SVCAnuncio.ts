@@ -3,6 +3,12 @@ import { IServiceResult } from "../Interfaces/IServiceResult";
 import { ServiceResult } from "./ServiceResult";
 import axios, { AxiosResponse } from "axios";
 
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+}
 
 export class SVCAnuncio {
     public static async ListadoAnuncios(idCondominio: string): Promise<IServiceResult<any>> {
@@ -124,5 +130,22 @@ export class SVCAnuncio {
             });
 
         return sr;
+    }
+
+    public static async SuscribirNotificaciones() {
+        const registration = await navigator.serviceWorker.ready;
+
+        const response = await axios.get('/publicKey');
+        const vapidPublicKey = response.data;
+        const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedVapidKey,
+        });
+
+        // Enviar suscripción al backend
+        await axios.post('/subscribe', subscription);
+        alert('¡Suscripción a notificaciones completada!');
     }
 }

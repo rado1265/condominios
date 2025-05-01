@@ -52,3 +52,7 @@ export const Login = (selListado: any, usuario: any) => {
         }
     });
 }
+
+export const SuscribirNotificaciones = () => {
+    SVCAnuncio.SuscribirNotificaciones();
+}
