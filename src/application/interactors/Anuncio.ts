@@ -73,4 +73,14 @@ export const DesscribirNotificaciones = (selListado: any, idUsuario: any) => {
         }
     });
 }
+export const DarQuitarLike = (selListado: any, idAnuncio: any, like: any) => {
+    SVCAnuncio.DarQuitarLike(idAnuncio, like).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
 

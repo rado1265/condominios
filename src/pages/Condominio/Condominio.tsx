@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import notificacion from './../../components/utils/img/notificacion.png';
 import refresh from './../../components/utils/img/refresh.png';
@@ -259,6 +259,24 @@ const Condominio = () => {
         }
     });
 
+    const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
+        setLoading(false);
+        try {
+            if (data) {
+                setLoading(true);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+            }
+            else {
+            }
+        } catch (er) {
+            ErrorMessage("Error dar Like", "Favor comuniquese con el administrador.")
+        }
+    }
+
+    const handleLike = (id: any, like: any) => {
+        if (usuario.nombre.length > 0)
+            DarQuitarLikeLogic(selDarQuitarLike, id, like)
+    };
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
@@ -352,6 +370,15 @@ const Condominio = () => {
                 <small className="anuncio-fecha">
                     Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
                 </small>
+                <div className="anuncio-like">
+                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(a.id, true)}>
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
+             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
+             22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span className="like-count">{a.likes === 0 ? "" : a.likes}</span>
+                </div>
             </div>
     }
 
@@ -598,7 +625,7 @@ const Condominio = () => {
                                 usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
                                     <img src={notificacion} />
                                 </button>
-                                    : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => {setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
+                                    : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
                                         <img src={silenciarnotificacion} />
                                     </button>
                                         : ""

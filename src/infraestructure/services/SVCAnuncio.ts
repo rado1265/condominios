@@ -188,4 +188,24 @@ export class SVCAnuncio {
 
         return sr;
     }
+
+    public static async DarQuitarLike(idAnuncio: any, like: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+        
+        const url: string = _ruta + "Condominios/darLike?idAnuncio=" + idAnuncio+ "&like=" + like
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios.post(url)
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
 }

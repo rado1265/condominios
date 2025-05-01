@@ -80,7 +80,7 @@
     margin-bottom: 0;
     display: block;
     color: #333;
-  }
+}
 
 body {
     margin: 0;
@@ -199,17 +199,17 @@ body {
     gap: 10px;
 }
 
-.deleteInput{
+.deleteInput {
     color: #cd5252 !important;
     margin-left: 5px;
 }
 
-.editarInput{
+.editarInput {
     color: #52cd98 !important;
     margin-left: 5px;
 }
 
-.typeDate{
+.typeDate {
     padding: 10px 14px;
     border: 1.5px solid #d1d5db;
     border-radius: 8px;
@@ -218,7 +218,7 @@ body {
     outline: none;
 }
 
-.iconNotificacion{
+.iconNotificacion {
     background: transparent;
     border: 0;
     top: 15px;
@@ -226,7 +226,7 @@ body {
     right: 15px;
 }
 
-.iconRefresh{
+.iconRefresh {
     background: transparent;
     border: 0;
     top: 15px;
@@ -238,7 +238,7 @@ body {
     background: white;
     padding: 2rem;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     width: 100%;
 }
@@ -278,7 +278,7 @@ body {
     transform: translateY(-2px);
 }
 
-.radio-input:checked + .radio-label {
+.radio-input:checked+.radio-label {
     border-color: #4f46e5;
     background: #4f46e510;
     animation: pulse 0.5s ease;
@@ -299,7 +299,7 @@ body {
     transition: all 0.3s ease;
 }
 
-.radio-input:checked + .radio-label::after {
+.radio-input:checked+.radio-label::after {
     opacity: 1;
     transform: scale(1);
 }
@@ -318,7 +318,38 @@ body {
 
 /* Animación de pulso */
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.anuncio-like {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    font-size: 14px;
+    color: red;
+}
+
+.like-icon {
+    width: 24px;
+    height: 24px;
+    fill: red;
+    margin-right: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.like-icon:hover {
+    transform: scale(1.2);
 }
