@@ -18,7 +18,10 @@ const Condominio = () => {
     const urlPase = fullURL.split("/");
     const [tipo, setTipo] = useState(1)
     const [usuario, setUsuario] = useState({
-        nombre: ""
+        nombre: "",
+        tieneSuscripcion: false,
+        rol: "",
+        id: 0
     });
     const [loguear, setLoguear] = useState({
         usuario: "",
@@ -38,7 +41,8 @@ const Condominio = () => {
         amedida: "",
         fechaDesde: new Date(),
         fechaHasta: new Date(),
-        idTipo: 1
+        idTipo: 1,
+        idUsuario: 0
     });
     const limpiarAnuncio = () => {
         setAnuncio({
@@ -51,7 +55,8 @@ const Condominio = () => {
             amedida: "",
             fechaDesde: new Date(),
             fechaHasta: new Date(),
-            idTipo: 1
+            idTipo: 1,
+            idUsuario: 0
         })
     }
     const [key, setKey] = useState(0)
@@ -119,7 +124,10 @@ const Condominio = () => {
             }
             else {
                 setUsuario({
-                    nombre: ""
+                    nombre: "",
+                    tieneSuscripcion: false,
+                    rol: "",
+                    id: 0
                 });
                 ErrorMessage("Credenciales incorrectas", "")
             }
@@ -131,15 +139,16 @@ const Condominio = () => {
     const normalizarAnuncio = (data: any) => {
         return {
             id: data.id ?? 0,
-            idCondominio: data.idCondominio ?? "",
+            idCondominio: localStorage.getItem("idCondominio"),
             cabecera: data.cabecera ?? "",
             descripcion: data.descripcion ?? "",
-            organizador: data.organizador ?? "",
+            organizador: usuario.nombre,
             telefono: data.telefono ?? "",
             amedida: data.amedida ?? "",
-            fechaDesde: data.fechaDesde ? data.fechaDesde.substring(0, 10) : "",
-            fechaHasta: data.fechaHasta ? data.fechaHasta.substring(0, 10) : "",
-            idTipo: data.idTipo ?? 1
+            fechaDesde: data.fechaDesde ?? new Date(),
+            fechaHasta: data.fechaHasta ?? new Date(),
+            idTipo: data.idTipo ?? 1,
+            idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario
         };
     };
 
@@ -147,8 +156,7 @@ const Condominio = () => {
         try {
             if (anuncio.cabecera.length > 0) {
                 setLoading(true);
-                CrearAnuncioLogic(selCrearAnuncio, anuncio)
-                console.log(normalizarAnuncio(anuncio))
+                CrearAnuncioLogic(selCrearAnuncio, normalizarAnuncio(anuncio))
             }
         } catch (er) {
         }
@@ -227,8 +235,8 @@ const Condominio = () => {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-      });
-      
+    });
+
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
@@ -277,17 +285,26 @@ const Condominio = () => {
                 <div className="anuncio-header">
                     {
                         usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon editarInput" onClick={() => {
-                                changeMenu(3, false, false, true)
-                                cargarAnuncioParaEdit(a)
-                            }}>
-                                <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon deleteInput" onClick={() => {
-                                EliminarAnuncio(a.id)
-                            }}>
-                                <path d="M5 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h3a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5H1a1 1 0 0 1 0-2h3V3zm1 0v1h8V3H6zm-1 3h10v12H5V6z" />
-                            </svg>
+
+                            {
+                                usuario.id == a.idUsuario || usuario.rol === "ADMINISTRADOR" ?
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon editarInput" onClick={() => {
+                                            changeMenu(3, false, false, true)
+                                            cargarAnuncioParaEdit(a)
+                                        }}>
+                                            <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
+                                        </svg>
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon deleteInput" onClick={() => {
+                                            EliminarAnuncio(a.id)
+                                        }}>
+                                            <path d="M5 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h3a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5H1a1 1 0 0 1 0-2h3V3zm1 0v1h8V3H6zm-1 3h10v12H5V6z" />
+                                        </svg>
+                                    </>
+                                    : ""
+                            }
+
                         </div>
                     }
                     <span className="anuncio-title">{a.cabecera}</span>
@@ -381,7 +398,8 @@ const Condominio = () => {
                     type="text"
                     name="organizador"
                     className="search-input"
-                    value={anuncio.organizador}
+                    value={usuario.nombre}
+                    disabled
                     onChange={handleChangeAnuncio}
                 />
                 <label htmlFor="textfield" className="search-label-admin">
@@ -481,11 +499,20 @@ const Condominio = () => {
                             {
                                 usuario.nombre.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>Usuario: {usuario.nombre}</h6>
                             }
-                            <button className="iconNotificacion" onClick={() => {setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}}>
-                                <img src={notificacion}/>
-                            </button>
-                            <button className="iconRefresh" onClick={() => {setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);}}>
-                                <img width={35} src={refresh}/>
+                            {
+                                usuario.rol.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>{usuario.rol}</h6>
+                            }
+                            {
+                                usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
+                                    <img src={notificacion} />
+                                </button>
+                                    : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { }}>
+                                        <img src={silenciarnotificacion} />
+                                    </button>
+                                        : ""
+                            }
+                            <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
+                                <img width={35} src={refresh} />
                             </button>
                         </div>
                         <div className="container pb-5 mb-5">
@@ -501,7 +528,7 @@ const Condominio = () => {
                                                 {panelCrearAnuncio()}
                                             </>
                                             : <>
-                                                {dataFull.anuncios.map((a: any, i) => (
+                                                {dataFull.anuncios != null && dataFull.anuncios.map((a: any, i) => (
                                                     panelAnuncios(a, i)
                                                 ))}
                                             </>
