@@ -244,6 +244,13 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            setLoading(true);
+            ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+        }
+      });
+      
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
