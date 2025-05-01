@@ -442,9 +442,18 @@ const Condominio = () => {
     }, []);
 
 
-    const webpush = require("web-push");
-    const vapidKeys = webpush.generateVAPIDKeys();
-    console.log(vapidKeys);
+    const selSuscribir = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
+            }
+            else {
+                ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
+            }
+        } catch (er) {
+            ErrorMessage("Error crear suscripción", "Favor comuniquese con el administrador.")
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -461,7 +470,7 @@ const Condominio = () => {
                             {
                                 usuario.nombre.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>Usuario: {usuario.nombre}</h6>
                             }
-                            <button onClick={() => SuscribirNotificacionesLogic()}>
+                            <button onClick={() => SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}>
                                 Activar notificaciones
                             </button>
                         </div>

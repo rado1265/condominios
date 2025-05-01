@@ -7,7 +7,11 @@ function urlBase64ToUint8Array(base64String: string) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = window.atob(base64);
-    return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }
 
 export class SVCAnuncio {
@@ -132,10 +136,12 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async SuscribirNotificaciones() {
+    public static async SuscribirNotificaciones(idCondominio: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
         const registration = await navigator.serviceWorker.ready;
 
-        const response = await axios.get('/publicKey');
+        const response = await axios.get(_ruta + 'Condominios/obtenerKey');
+        console.log(response.data)
         const vapidPublicKey = response.data;
         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 
@@ -145,7 +151,22 @@ export class SVCAnuncio {
         });
 
         // Enviar suscripción al backend
-        await axios.post('/subscribe', subscription);
-        alert('¡Suscripción a notificaciones completada!');
+
+
+        const url: string = _ruta + "Condominios/guardarSus?idCondominio= " + idCondominio
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios.post(url, subscription)
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
     }
 }

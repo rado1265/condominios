@@ -15,6 +15,6 @@ export const CrearAnuncioLogic = (selListado: any, anuncio: any) => {
 export const LoginLogic = (selListado: any, usuario: any) => {
     return Login(selListado, usuario);
 }
-export const SuscribirNotificacionesLogic = () => {
-    return SuscribirNotificaciones();
+export const SuscribirNotificacionesLogic = (selListado: any, idCondominio: any) => {
+    return SuscribirNotificaciones(selListado, idCondominio);
 }
