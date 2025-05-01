@@ -9,6 +9,7 @@ import silenciarnotificacion from './../../components/utils/img/silenciar-notifi
 
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
+    const [tipoSubir, setTipoSubir] = useState(0);
     const [dataFull, setDataFull] = useState({
         anuncios: [],
         nombre: "",
@@ -40,6 +41,7 @@ const Condominio = () => {
         fechaHasta: new Date(),
         idTipo: 1
     });
+    const [videoUrl, setVideoUrl] = useState("");
     const limpiarAnuncio = () => {
         setAnuncio({
             id: 0,
@@ -53,6 +55,7 @@ const Condominio = () => {
             fechaHasta: new Date(),
             idTipo: 1
         })
+        setVideoUrl("");
     }
     const [key, setKey] = useState(0)
     useEffect(() => {
@@ -92,6 +95,25 @@ const Condominio = () => {
             ErrorMessage("Credenciales incorrectas", "")
         }
     }
+
+    const uploadVideo = (files: any) => {
+        const formData = new FormData();
+        formData.append("file", files[0]);
+        formData.append("upload_preset", "conexionresidencial");
+
+        fetch("https://api.cloudinary.com/v1_1/djphh67ai/video/upload", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setVideoUrl(data.secure_url);
+                setAnuncio(prev => ({
+                    ...prev,
+                    ["amedida"]: data.secure_url
+                }));
+            });
+    };
 
     const normalizarLogin = (data: any) => {
         return {
@@ -293,11 +315,16 @@ const Condominio = () => {
                     </div>
                     <span className="anuncio-telefono">{a.telefono}</span>
                 </div>
-                {a.amedida && (
+                {a.amedida && a.amedida.includes("http") ?
+                    <div className="anuncio-img-wrapper">
+                        <video src={a.amedida} controls width="300" />
+                    </div>
+                    : a.amedida && !a.amedida.includes("http") ?
                     <div className="anuncio-img-wrapper">
                         <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
                     </div>
-                )}
+                    : ""
+                }
                 <small className="anuncio-fecha">
                     Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
                 </small>
@@ -398,11 +425,32 @@ const Condominio = () => {
                     onChange={handleChangeAnuncio}
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
-                <label htmlFor="textfield" className="search-label-admin mt-3">
-                    Cargar imagen
-                </label>
-                <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
-                {anuncio.amedida && (
+
+                <div>
+                    <label>Subir archivo</label>
+                    <div className="radio-group">
+                        <label className="radio-label" onClick={e => setTipoSubir(1)}>
+                            <input type="radio" name="fileType" className="radio-input" value="image" />
+                            <span>🖼️</span>
+                            <span className="text">Imagen</span>
+                        </label>
+
+                        <label className="radio-label" onClick={e => setTipoSubir(2)}>
+                            <input type="radio" name="fileType" className="radio-input" value="video" />
+                            <span>🎥</span>
+                            <span className="text">Video</span>
+                        </label>
+                    </div>
+                </div>
+                {tipoSubir == 1 && (
+                    <label htmlFor="textfield" className="search-label-admin mt-3">
+                        Cargar imagen
+                    </label>
+                )}
+                {tipoSubir == 1 && (
+                    <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
+                )}
+                {anuncio.amedida && !anuncio.amedida.includes("http") && (
                     <div>
                         <h3>Vista previa:</h3>
                         <img
@@ -410,6 +458,22 @@ const Condominio = () => {
                             alt="Vista previa"
                             style={{ maxWidth: '300px', marginTop: '10px' }}
                         />
+                    </div>
+                )}
+
+
+                {tipoSubir == 2 && (
+                    <label htmlFor="textfield" className="search-label-admin mt-3">
+                        Cargar video
+                    </label>
+                )}
+                {tipoSubir == 2 && (
+                    <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
+                )}
+                {videoUrl && anuncio.amedida.includes("http") && (
+                    <div>
+                        <h3>Vista previa:</h3>
+                        <video src={videoUrl} controls width="300" />
                     </div>
                 )}
                 <label htmlFor="textfield" className="search-label mt-3">
@@ -474,11 +538,11 @@ const Condominio = () => {
                             {
                                 usuario.nombre.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>Usuario: {usuario.nombre}</h6>
                             }
-                            <button className="iconNotificacion" onClick={() => {setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}}>
-                                <img src={notificacion}/>
+                            <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3]) }}>
+                                <img src={notificacion} />
                             </button>
-                            <button className="iconRefresh" onClick={() => {setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);}}>
-                                <img width={35} src={refresh}/>
+                            <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
+                                <img width={35} src={refresh} />
                             </button>
                         </div>
                         <div className="container pb-5 mb-5">
