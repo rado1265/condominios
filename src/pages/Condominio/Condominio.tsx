@@ -230,7 +230,8 @@ const Condominio = () => {
             limpiarAnuncio()
     }
     const cargarAnuncioParaEdit = (a: any) => {
-        setAnuncio(a)
+        setTipoSubir(0);
+        setAnuncio(a);
     }
 
     const handleImageChange = (e: any) => {
@@ -334,7 +335,7 @@ const Condominio = () => {
                 <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: a.descripcion }} />
                 <div className="anuncio-footer">
                     <div className="anuncio-organizador">
-                        <span>Organizado por: </span>
+                        <span>Creado por: </span>
                         <span className="ml-1">{a.organizador}</span>
                     </div>
                     <span className="anuncio-telefono">{a.telefono}</span>
@@ -451,33 +452,36 @@ const Condominio = () => {
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
 
+                {(crear || (!crear && !anuncio.amedida)) && (
                 <div>
                     <label>Subir archivo</label>
                     <div className="radio-group">
-                        <label className="radio-label" onClick={e => setTipoSubir(1)}>
-                            <input type="radio" name="fileType" className="radio-input" value="image" />
+                        <label className="radio-label">
+                            <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)}/>
                             <span>🖼️</span>
                             <span className="text">Imagen</span>
                         </label>
 
-                        <label className="radio-label" onClick={e => setTipoSubir(2)}>
-                            <input type="radio" name="fileType" className="radio-input" value="video" />
+                        <label className="radio-label">
+                            <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)}/>
                             <span>🎥</span>
                             <span className="text">Video</span>
                         </label>
                     </div>
                 </div>
-                {tipoSubir == 1 && (
+                )}
+
+                {(tipoSubir == 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>
                 )}
-                {tipoSubir == 1 && (
+                {(tipoSubir == 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 )}
-                {anuncio.amedida && !anuncio.amedida.includes("http") && (
+                {(anuncio.amedida && (anuncio.amedida && !anuncio.amedida.startsWith("http"))) && (
                     <div>
-                        <h3>Vista previa:</h3>
+                        <h3>Vista previa Imagen:</h3>
                         <img
                             src={`data:image/jpeg;base64,${anuncio.amedida}`}
                             alt="Vista previa"
@@ -487,18 +491,18 @@ const Condominio = () => {
                 )}
 
 
-                {tipoSubir == 2 && (
+                {(tipoSubir == 2  || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {tipoSubir == 2 && (
+                {(tipoSubir == 2  || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
-                {videoUrl && anuncio.amedida.includes("http") && (
+                {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
                     <div>
-                        <h3>Vista previa:</h3>
-                        <video src={videoUrl} controls width="300" />
+                        <h3>Vista previa Video:</h3>
+                        <video src={anuncio.amedida} controls width="300" />
                     </div>
                 )}
                 <label htmlFor="textfield" className="search-label mt-3">
