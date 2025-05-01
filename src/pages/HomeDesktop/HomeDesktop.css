@@ -1,0 +1,78 @@
+/* Estilos generales */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f7;
+}
+
+.contenedor-principal {
+    display: flex;
+    height: 100vh;
+    margin: 0 auto;
+    padding: 10% 20%;
+    background: #f0fffb;
+}
+
+/* Sección izquierda */
+.contenido-izquierdo {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 1.2rem;
+    color: #34495e;
+    margin-bottom: 15px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+li {
+    /*background: url('check-icon.svg') no-repeat left center;*/
+    padding-left: 30px;
+    margin: 10px 0;
+    font-size: 1.1rem;
+    color: #34495e;
+}
+
+.cta-btn {
+    background-color: #29b95b;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: fit-content;
+    transition: background-color 0.3s;
+}
+
+.cta-btn:hover {
+    background-color: #30b929;
+}
+
+/* Sección derecha */
+.contenido-derecho {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-mockup {
+    max-width: 100%;
+    height: auto;
+}
