@@ -3,6 +3,16 @@ import { IServiceResult } from "../Interfaces/IServiceResult";
 import { ServiceResult } from "./ServiceResult";
 import axios, { AxiosResponse } from "axios";
 
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
 
 export class SVCAnuncio {
     public static async ListadoAnuncios(idCondominio: string): Promise<IServiceResult<any>> {
@@ -113,6 +123,40 @@ export class SVCAnuncio {
                     'Access-Control-Allow-Origin': '*',
                 }
             })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+
+    public static async SuscribirNotificaciones(idCondominio: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+        const registration = await navigator.serviceWorker.ready;
+
+        const response = await axios.get(_ruta + 'Condominios/obtenerKey');
+        console.log(response.data)
+        const vapidPublicKey = response.data;
+        const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedVapidKey,
+        });
+
+        // Enviar suscripción al backend
+
+
+        const url: string = _ruta + "Condominios/guardarSus?idCondominio= " + idCondominio
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios.post(url, subscription)
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
