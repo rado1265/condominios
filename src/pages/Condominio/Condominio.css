@@ -225,3 +225,11 @@ body {
     position: absolute;
     right: 15px;
 }
+
+.iconRefresh{
+    background: transparent;
+    border: 0;
+    top: 15px;
+    position: absolute;
+    left: 15px;
+}

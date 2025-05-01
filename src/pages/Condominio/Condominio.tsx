@@ -4,6 +4,7 @@ import './Condominio.css';
 import { CrearAnuncioLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import notificacion from './../../components/utils/img/notificacion.png';
+import refresh from './../../components/utils/img/refresh.png';
 import silenciarnotificacion from './../../components/utils/img/silenciar-notificacion.png';
 
 const Condominio = () => {
@@ -475,6 +476,9 @@ const Condominio = () => {
                             }
                             <button className="iconNotificacion" onClick={() => {setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}}>
                                 <img src={notificacion}/>
+                            </button>
+                            <button className="iconRefresh" onClick={() => {setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);}}>
+                                <img width={35} src={refresh}/>
                             </button>
                         </div>
                         <div className="container pb-5 mb-5">
