@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 
 const Condominio = () => {
@@ -428,6 +428,35 @@ const Condominio = () => {
         </div>
     }
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => {
+                    console.log('Service Worker registrado:', reg);
+                })
+                .catch(err => console.error('Error al registrar SW:', err));
+        }
+    }, []);
+
+
+    const selSuscribir = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
+            }
+            else {
+                ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
+            }
+        } catch (er) {
+            ErrorMessage("Error crear suscripción", "Favor comuniquese con el administrador.")
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
     return (
         <React.Fragment>
             {
@@ -441,6 +470,9 @@ const Condominio = () => {
                             {
                                 usuario.nombre.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>Usuario: {usuario.nombre}</h6>
                             }
+                            <button onClick={() => SuscribirNotificacionesLogic(selSuscribir, urlPase[3])}>
+                                Activar notificaciones
+                            </button>
                         </div>
                         <div className="container pb-5 mb-5">
                             <div className="row px-3 px-md-0 justify-content-around">

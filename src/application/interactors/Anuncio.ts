@@ -52,3 +52,14 @@ export const Login = (selListado: any, usuario: any) => {
         }
     });
 }
+
+export const SuscribirNotificaciones = (selListado: any,idCondominio: any) => {
+    SVCAnuncio.SuscribirNotificaciones(idCondominio).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
