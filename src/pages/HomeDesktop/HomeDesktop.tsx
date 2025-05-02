@@ -16,7 +16,7 @@ const HomeDesktop = () => {
                         <li>✅ Ventas entre vecinos: Compra/vende artículos de manera segura y cerca de ti.</li>
                         <li>✅ Información de tu comunidad: Conoce eventos, servicios y noticias importantes.</li>
                     </ul>
-                    <button className="cta-btn">Contactanos</button>
+                    {/*<button className="cta-btn">Contactanos</button>*/}
                 </section>
                 <section className="contenido-derecho">
                     <img src={celApp} alt="Vista previa de la aplicación" className="app-mockup" />
