@@ -3,6 +3,18 @@
   --secondColor: #5ead66;
   --primaryColorHover:#33853b;
   --secondColorHover:#106b2a;
+  --color-bg: #fff;
+      --color-border: #e5e7eb;
+      --color-text: #1f2937;
+      --color-hover-bg: #f1f5f9;
+      --color-hover-text: #2563eb;
+      --color-focus-ring: #2563eb;
+      --color-dark-bg: #374151;
+      --color-dark-border: #4b5563;
+      --color-dark-text: #fff;
+      --color-dark-hover-bg: #4b5563;
+      --color-dark-hover-text: #fff;
+      --color-dark-focus-ring: #6b7280;
 }
 *{
   font-family: 'Overpass', sans-serif;
