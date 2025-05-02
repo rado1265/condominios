@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import notificacion from './../../components/utils/img/notificacion.png';
 import iconmas from './../../components/utils/img/icon-mas.png';
@@ -283,6 +283,43 @@ const Condominio = () => {
             DarQuitarLikeLogic(selDarQuitarLike, id, like)
     };
 
+    const crearVotacion = () => {
+        try {
+            var _opciones: any = [];
+            options.map((e: any) => {
+                _opciones.push({ Descripcion: e.value, IdVotacion: 0 })
+            })
+
+            var votacion: any = {
+                Id: 0,
+                Cabecera: question,
+                Descripcion: questionDesc,
+                Activo: true,
+                IdUsuario: usuario.id,
+                IdCondominio: localStorage.getItem("idCondominio"),
+                OpcionesVotacion: _opciones
+            }
+
+            setLoading(true);
+            CrearVotacionLogic(selCrearVotacion, (votacion))
+        } catch (er) {
+        }
+    }
+    const selCrearVotacion = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            if (data) {
+                SuccessMessage("Votación creada correctamente.")
+            }
+            else {
+                ErrorMessage("Ocurrió un error al crear la Votación", "")
+            }
+        } catch (er) {
+            ErrorMessage("Ocurrió un error al crear la Votación", "")
+        }
+    }
+
+
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
             {usuario.nombre.length > 0 ?
@@ -296,7 +333,7 @@ const Condominio = () => {
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
                         <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
-                        <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, false, false, true); setOpen(false); }}>Encuesta</button>
+                        <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
                     </div>
                 </div>
                 : ""}
@@ -319,13 +356,12 @@ const Condominio = () => {
                     </svg>
                     <span className="text">Recordatorios</span>
                 </button>
-
                 {
-                    usuario.nombre.length > 0 ? <button type="button" className={tipo == 3 ? "button btnactive" : "button"} onClick={() => changeMenu(3, false, true)}>
+                    usuario.nombre.length > 0 ? <button type="button" className={tipo == 5 ? "button btnactive" : "button"} onClick={() => changeMenu(5, false, false)}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
-                            <path d="M10 2a1 1 0 0 1 1 1v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H3a1 1 0 0 1 0-2h6V3a1 1 0 0 1 1-1z" />
+                            <path d="M4 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4zm1 3h10v2H5V6zm0 4h10v2H5v-2zm0 4h6v2H5v-2z" />
                         </svg>
-                        <span className="text">Crear</span>
+                        <span className="text">Votaciones</span>
                     </button> :
                         <button type="button" className={tipo == 4 ? "button btnactive" : "button"} onClick={() => changeMenu(4, true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
@@ -345,7 +381,6 @@ const Condominio = () => {
                 <div className="anuncio-header">
                     {
                         usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
-
                             {
                                 usuario.id == a.idUsuario || usuario.rol === "ADMINISTRADOR" ?
                                     <>
@@ -445,6 +480,7 @@ const Condominio = () => {
     };
 
     const [question, setQuestion] = useState('');
+    const [questionDesc, setQuestionDesc] = useState('');
     const [options, setOptions] = useState<Option[]>([
         { id: 1, value: '' },
         { id: 2, value: '' },
@@ -474,7 +510,7 @@ const Condominio = () => {
     const panelCrearEncuesta = () => {
         return <div key={key} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
             <div className="survey-creator-container">
-                <h2 className="creator-title">Creador de Encuestas</h2>
+                <h2 className="creator-title">Creador de Votaciones</h2>
 
                 <div className="input-group">
                     <label className="h4" htmlFor="question">Pregunta:</label>
@@ -486,7 +522,16 @@ const Condominio = () => {
                         rows={2}
                     />
                 </div>
-
+                <div className="input-group">
+                    <label className="h4" htmlFor="question">Descripción:</label>
+                    <textarea
+                        id="question"
+                        value={questionDesc}
+                        onChange={(e) => setQuestionDesc(e.target.value)}
+                        placeholder="Escribe tu pregunta aquí..."
+                        rows={2}
+                    />
+                </div>
                 <div className="options-section">
                     <h4>Opciones de respuesta:</h4>
                     {options.map((option, index) => (
@@ -519,7 +564,7 @@ const Condominio = () => {
 
                 <button
                     className="create-button"
-                    onClick={() => console.log({ question, options })}
+                    onClick={() => crearVotacion()}
                 >
                     Crear Encuesta
                 </button>
