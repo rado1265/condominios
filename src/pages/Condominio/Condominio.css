@@ -331,8 +331,8 @@ body {
   }
   
   .menu-button {
-    width: 55px;
-    height: 55px;
+    width: 55px !important;
+    height: 55px !important;
     border-radius: 50%;
     background: #0a9833a6;
     color: #fff;
