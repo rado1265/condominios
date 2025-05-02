@@ -4,7 +4,9 @@ import './Condominio.css';
 import { CrearAnuncioLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import notificacion from './../../components/utils/img/notificacion.png';
-import refresh from './../../components/utils/img/refresh.png';
+import iconmas from './../../components/utils/img/icon-mas.png';
+import iconmenos from './../../components/utils/img/icon-menos.png';
+import actualizar from './../../components/utils/img/actualizar-flecha.png';
 import silenciarnotificacion from './../../components/utils/img/silenciar-notificacion.png';
 
 const Condominio = () => {
@@ -290,7 +292,7 @@ const Condominio = () => {
                         onClick={() => setOpen(!open)}
                         aria-label="Abrir menú"
                     >
-                        <span className="plus-icon">+</span>
+                        <img width={50} src={iconmas} />
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
                         <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
@@ -502,7 +504,7 @@ const Condominio = () => {
                                     onClick={() => handleRemoveOption(option.id)}
                                     aria-label="Eliminar opción"
                                 >
-                                    ×
+                                    <img width={25} src={iconmenos} />
                                 </button>
                             )}
                         </div>
@@ -755,7 +757,7 @@ const Condominio = () => {
                                 }
                                 <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
                                 <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
-                                    <img width={25} src={refresh} />
+                                    <img width={25} src={actualizar} />
                                 </button>
                             </div>
                         </div>
