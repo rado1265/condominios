@@ -334,13 +334,13 @@ body {
     width: 55px !important;
     height: 55px !important;
     border-radius: 50%;
-    background: #0a9833a6;
+    background: var(--secondColorHover);
     color: #fff;
     border: none;
     font-size: 2.5rem;
     cursor: pointer;
     outline: none;
-    box-shadow: 0 2px 8px rgba(39, 201, 63, 0.2);
+    box-shadow: 0 2px 8px var(--secondColorHover);
     /*transition: background 0.2s;*/
     z-index: 2;
     position: absolute;
@@ -353,8 +353,8 @@ body {
   }
   
   .menu-button.open {
-    background: #1e8a2a;
-    box-shadow: 0px 0px 9px 0px #349d0c;
+    background: var(--primaryColorHover);
+    box-shadow: 0px 0px 9px 0px var(--primaryColorHover);
   }
   
   .plus-icon {
@@ -380,8 +380,8 @@ body {
     padding: 10px 0;
     border-radius: 24px;
     background: #f3f3f3;
-    color: #19992c;
-    border: 2px solid #19992c;
+    color: var(--primaryColor);
+    border: 2px solid var(--primaryColor);
     font-weight: 600;
     font-size: 1rem;
     opacity: 0;
@@ -538,7 +538,7 @@ body {
   .create-button {
     width: 100%;
     padding: 15px;
-    background-color: #27ae60;
+    background-color: var(--secondColor);
     color: white;
     border: none;
     border-radius: 8px;
@@ -549,7 +549,7 @@ body {
   }
   
   .create-button:hover {
-    background-color: #219653;
+    background-color: var(--primaryColor);
   }
   
   @media (max-width: 480px) {
@@ -579,5 +579,28 @@ body {
       padding: 12px;
       font-size: 16px;
     }
+  }
+
+  .containerImgMenu{
+    background: #ffffff;
+    border-radius: 50%;
+    height: 70px;
+    width: 70px;
+    align-items: center;
+    display: flex;
+    padding: 2px;
+    box-shadow: rgb(154 154 154 / 25%) 0px 5px 10px 0px;
+    margin-top: -5px;
+  }
+
+  .containerMenu{
+    justify-content: center; 
+    display: grid ; 
+    box-shadow: rgb(154 154 154 / 24%) 0px 0px 24px 0px; 
+    height: 55px; 
+    background: white;
+    position: fixed;
+    z-index: 99;
+    margin-top: -77px;
   }
   

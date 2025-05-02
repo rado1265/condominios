@@ -442,7 +442,7 @@ const Condominio = () => {
     };
 
     const panelInicioSesion = () => {
-        return <div className="mx-3 w-100 search-container">
+        return <div className="mx-3 w-100 search-container" style={{marginTop: '35%'}}>
             <label htmlFor="textfield" className="search-label">
                 Inicio de Sesión
             </label>
@@ -763,7 +763,7 @@ const Condominio = () => {
                     <Loading />
                     :
                     <div>
-                        <div className="w-100 pb-3 mb-3" style={{ background: 'linear-gradient(rgb(255, 255, 255), rgb(144 212 164 / 67%))', justifyContent: 'center', display: 'grid', boxShadow: 'rgb(2 109 33 / 24%) 0px 0px 24px 0px' }}>
+                        {/*<div className="w-100 pb-3 mb-3" style={{ background: 'linear-gradient(rgb(255, 255, 255), rgb(144 212 164 / 67%))', justifyContent: 'center', display: 'grid', boxShadow: 'rgb(2 109 33 / 24%) 0px 0px 24px 0px' }}>
                             <img className="w-50 mx-auto" src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" />
                             <h2 className="text-center" style={{ color: '#316371', margin: '0' }}>{dataFull.nombre}</h2>
                             {
@@ -784,6 +784,25 @@ const Condominio = () => {
                             <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
                                 <img width={35} src={refresh} />
                             </button>
+                        </div>*/}
+                        <div className="w-100 pb-3 mb-3 containerMenu">
+                            <div className="containerImgMenu">
+                                {
+                                    usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? 
+                                    <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
+                                        <img width={25} src={notificacion} />
+                                    </button>
+                                        : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? 
+                                        <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
+                                            <img width={25} src={silenciarnotificacion} />
+                                        </button>
+                                            : ""
+                                }
+                                <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
+                                <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
+                                    <img width={25} src={refresh} />
+                                </button>
+                            </div>
                         </div>
                         <div className="container pb-5 mb-5">
                             <div className="row px-3 px-md-0 justify-content-around">

@@ -1,9 +1,8 @@
 :root{
-  --primaryColor: #103c51;
-  --secondColor:#749acf;
-  --terdColor:#080e1a;
-  --backColor: #243b55;
-  --btnColor:#fb771a;
+  --primaryColor: #44a55f;
+  --secondColor: #5ead66;
+  --primaryColorHover:#33853b;
+  --secondColorHover:#106b2a;
 }
 *{
   font-family: 'Overpass', sans-serif;
