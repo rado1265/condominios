@@ -10,6 +10,7 @@ import silenciarnotificacion from './../../components/utils/img/silenciar-notifi
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
     const [tipoSubir, setTipoSubir] = useState(0);
+    const [open, setOpen] = useState(false);
     const [dataFull, setDataFull] = useState({
         anuncios: [],
         nombre: "",
@@ -263,6 +264,21 @@ const Condominio = () => {
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
+            {usuario.nombre.length > 0 ?
+                <div className="circular-menu">
+                    <button
+                        className={`menu-button ${open ? "open" : ""}`}
+                        onClick={() => setOpen(!open)}
+                        aria-label="Abrir menú"
+                    >
+                        <span className="plus-icon">+</span>
+                    </button>
+                    <div className={`menu-items ${open ? "open" : ""}`}>
+                        <button className="menu-item encuesta" onClick={() => {changeMenu(3, false, true); setOpen(false);}}>Anuncio</button>
+                        <button className="menu-item encuesta">Encuesta</button>
+                    </div>
+                </div>
+                : ""}
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
                 <button aria-label="Anuncios" type="button" className={tipo == 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
@@ -345,10 +361,10 @@ const Condominio = () => {
                         <video src={a.amedida} controls width="300" />
                     </div>
                     : a.amedida && !a.amedida.includes("http") ?
-                    <div className="anuncio-img-wrapper">
-                        <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
-                    </div>
-                    : ""
+                        <div className="anuncio-img-wrapper">
+                            <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
+                        </div>
+                        : ""
                 }
                 <small className="anuncio-fecha">
                     Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
@@ -453,22 +469,22 @@ const Condominio = () => {
                 />
 
                 {(crear || (!crear && !anuncio.amedida)) && (
-                <div>
-                    <label>Subir archivo</label>
-                    <div className="radio-group">
-                        <label className="radio-label">
-                            <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)}/>
-                            <span>🖼️</span>
-                            <span className="text">Imagen</span>
-                        </label>
+                    <div>
+                        <label>Subir archivo</label>
+                        <div className="radio-group">
+                            <label className="radio-label">
+                                <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
+                                <span>🖼️</span>
+                                <span className="text">Imagen</span>
+                            </label>
 
-                        <label className="radio-label">
-                            <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)}/>
-                            <span>🎥</span>
-                            <span className="text">Video</span>
-                        </label>
+                            <label className="radio-label">
+                                <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
+                                <span>🎥</span>
+                                <span className="text">Video</span>
+                            </label>
+                        </div>
                     </div>
-                </div>
                 )}
 
                 {(tipoSubir == 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
@@ -491,12 +507,12 @@ const Condominio = () => {
                 )}
 
 
-                {(tipoSubir == 2  || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir == 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir == 2  || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir == 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
                 {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
