@@ -33,6 +33,7 @@ const Condominio = () => {
     const [iniciarSesion, setIniciarSesion] = useState(false)
     const [crear, setCrear] = useState(false)
     const [editar, setEditar] = useState(false)
+    const [encuesta, setEncuesta] = useState(false)
     const [anuncio, setAnuncio] = useState({
         id: 0,
         idCondominio: localStorage.getItem("idCondominio"),
@@ -221,11 +222,12 @@ const Condominio = () => {
             [name]: value
         }));
     };
-    const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false) => {
+    const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false) => {
         setTipo(a)
         setIniciarSesion(b)
         setCrear(c)
         setEditar(d)
+        setEncuesta(e)
         if (c)
             limpiarAnuncio()
     }
@@ -291,8 +293,8 @@ const Condominio = () => {
                         <span className="plus-icon">+</span>
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
-                        <button className="menu-item encuesta" onClick={() => {changeMenu(3, false, true); setOpen(false);}}>Anuncio</button>
-                        <button className="menu-item encuesta">Encuesta</button>
+                        <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
+                        <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, false, false, true); setOpen(false); }}>Encuesta</button>
                     </div>
                 </div>
                 : ""}
@@ -433,6 +435,94 @@ const Condominio = () => {
                     Ingresar
                 </button>
             </div>
+        </div>
+    }
+    type Option = {
+        id: number;
+        value: string;
+    };
+
+    const [question, setQuestion] = useState('');
+    const [options, setOptions] = useState<Option[]>([
+        { id: 1, value: '' },
+        { id: 2, value: '' },
+    ]);
+
+    const handleAddOption = () => {
+        const newOption = {
+            id: options.length + 1,
+            value: '',
+        };
+        setOptions([...options, newOption]);
+    };
+
+    const handleOptionChange = (id: number, value: string) => {
+        const updatedOptions = options.map(opt =>
+            opt.id === id ? { ...opt, value } : opt
+        );
+        setOptions(updatedOptions);
+    };
+
+    const handleRemoveOption = (id: number) => {
+        const filteredOptions = options.filter(opt => opt.id !== id);
+        setOptions(filteredOptions);
+        //setShowAddButton(true);
+    };
+
+    const panelCrearEncuesta = () => {
+        return <div key={key} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <div className="survey-creator-container">
+                <h2 className="creator-title">Creador de Encuestas</h2>
+
+                <div className="input-group">
+                    <label className="h4" htmlFor="question">Pregunta:</label>
+                    <textarea
+                        id="question"
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                        placeholder="Escribe tu pregunta aquí..."
+                        rows={2}
+                    />
+                </div>
+
+                <div className="options-section">
+                    <h4>Opciones de respuesta:</h4>
+                    {options.map((option, index) => (
+                        <div id={option.id.toString()} className="option-item">
+                            <input
+                                id={index.toString()}
+                                type="text"
+                                value={option.value}
+                                onChange={(e) => handleOptionChange(option.id, e.target.value)}
+                                placeholder={`Opción ${index + 1}`}
+                            />
+                            {options.length > 2 && (
+                                <button
+                                    className="remove-option"
+                                    onClick={() => handleRemoveOption(option.id)}
+                                    aria-label="Eliminar opción"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                        <button
+                            className="add-option"
+                            onClick={handleAddOption}
+                        >
+                            + Añadir opción
+                        </button>
+                </div>
+
+                <button
+                    className="create-button"
+                    onClick={() => console.log({ question, options })}
+                >
+                    Crear Encuesta
+                </button>
+            </div>
+
         </div>
     }
     const panelCrearAnuncio = () => {
@@ -662,11 +752,16 @@ const Condominio = () => {
                                             <>
                                                 {panelCrearAnuncio()}
                                             </>
-                                            : <>
-                                                {dataFull.anuncios != null && dataFull.anuncios.map((a: any, i) => (
-                                                    panelAnuncios(a, i)
-                                                ))}
-                                            </>
+                                            : encuesta ?
+                                                <>
+                                                    {panelCrearEncuesta()}
+                                                </>
+                                                :
+                                                <>
+                                                    {dataFull.anuncios != null && dataFull.anuncios.map((a: any, i) => (
+                                                        panelAnuncios(a, i)
+                                                    ))}
+                                                </>
                                 }
                             </div>
                         </div>
