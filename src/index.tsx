@@ -12,11 +12,13 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+const validateMobile = false;
+
 root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/desktop" element={<HomeDesktop />}></Route>
-      { isMobile ?
+      { !validateMobile || isMobile ?
       <Route path="/" element={<Home />}></Route>
       :
       <Route path="/" element={<HomeDesktop />}></Route>
