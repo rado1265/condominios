@@ -83,4 +83,44 @@ export const DarQuitarLike = (selListado: any, idAnuncio: any, like: any) => {
         }
     });
 }
+export const ObtenerVotaciones = (selListado: any, idCondominio: string, idUsuario: any) => {
+    SVCAnuncio.ObtenerVotaciones(idCondominio, idUsuario).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
 
+export const CambiarEstadoVotacion = (selListado: any, idVotacion: any, estado: any) => {
+    SVCAnuncio.CambiarEstadoVotacion( idVotacion, estado).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
+export const Votar = (selListado: any, idOpcionVotacion: any, idUsuario: any) => {
+    SVCAnuncio.Votar( idOpcionVotacion, idUsuario).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
+export const CrearVotacion = (selListado: any, votacion: any) => {
+    SVCAnuncio.CrearVotacion(votacion).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}

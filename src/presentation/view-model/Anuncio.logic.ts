@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -23,4 +23,16 @@ export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any)
 }
 export const DarQuitarLikeLogic = (selListado: any, idAnuncio: any, like: any) => {
     return DarQuitarLike(selListado, idAnuncio, like);
+}
+export const ObtenerVotacionesLogic = (selListado: any, idCondominio: string, idUsuario: any) => {
+    return ObtenerVotaciones(selListado, idCondominio, idUsuario);
+}
+export const CambiarEstadoVotacionLogic = (selListado: any, idVotacion: any, estado: any) => {
+    return CambiarEstadoVotacion(selListado, idVotacion, estado);
+}
+export const VotarLogic = (selListado: any, idOpcionVotacion: any, idUsuario: any) => {
+    return Votar(selListado, idOpcionVotacion, idUsuario);
+}
+export const CrearVotacionLogic = (selListado: any, votacion: any) => {
+    return CrearVotacion(selListado, votacion);
 }
