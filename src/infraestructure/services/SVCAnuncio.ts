@@ -212,10 +212,10 @@ export class SVCAnuncio {
     public static async ObtenerVotaciones(idCondominio: string, idUsuario: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/getVotaciones?idCondominio=" + idCondominio + "&idUsuario=" + idUsuario
+        const url: string = _ruta + "Condominios/getVotaciones?condominio=" + idCondominio + "&idUsuario=" + idUsuario
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url)
+        await axios.get(url)
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;

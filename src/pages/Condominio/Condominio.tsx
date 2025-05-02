@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, SuscribirNotificacionesLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import notificacion from './../../components/utils/img/notificacion.png';
 import iconmas from './../../components/utils/img/icon-mas.png';
@@ -35,7 +35,9 @@ const Condominio = () => {
     const [iniciarSesion, setIniciarSesion] = useState(false)
     const [crear, setCrear] = useState(false)
     const [editar, setEditar] = useState(false)
+    const [votaciones, setVotaciones] = useState(false)
     const [encuesta, setEncuesta] = useState(false)
+    const [dataVotaciones, setDataVotaciones] = useState([{cabecera: "", opcionesVotacion: []}])
     const [anuncio, setAnuncio] = useState({
         id: 0,
         idCondominio: localStorage.getItem("idCondominio"),
@@ -202,6 +204,15 @@ const Condominio = () => {
             ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
     }
+
+    const selListadoVotaciones = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            setDataVotaciones(data);
+            console.log(data);
+        } catch (er) {
+        }
+    }
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
@@ -230,6 +241,14 @@ const Condominio = () => {
         setCrear(c)
         setEditar(d)
         setEncuesta(e)
+        console.log(a);
+        if (a == 5) {
+            setLoading(true);
+            ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
+            setVotaciones(true);
+        } else {
+            setVotaciones(false);
+        }
         if (c)
             limpiarAnuncio()
     }
@@ -444,7 +463,7 @@ const Condominio = () => {
     };
 
     const panelInicioSesion = () => {
-        return <div className="mx-3 w-100 search-container" style={{marginTop: '35%'}}>
+        return <div className="mx-3 w-100 search-container" style={{ marginTop: '35%' }}>
             <label htmlFor="textfield" className="search-label">
                 Inicio de Sesión
             </label>
@@ -506,6 +525,48 @@ const Condominio = () => {
         setOptions(filteredOptions);
         //setShowAddButton(true);
     };
+
+    const cambiarVoto = (ev: any) => {
+        setLoading(true);
+        VotarLogic(selVotar, ev.target.id, usuario.id);
+    }
+
+    const selVotar = (error: Boolean, err: string, data: any) => {
+        try {
+            ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
+        } catch (er) {
+        }
+    }
+
+    const panelVotaciones = () => {
+        console.log(dataVotaciones);
+        return <div style={{ fontFamily: 'Arial, sans-serif' }}>
+            <h2  className="mt-3 mb-4">VOTACIONES ACTIVAS</h2>
+            {dataVotaciones.map((a: any, i: number) => {
+                return (
+                    <div className="cardVotacion">
+                        <h4 className="text-center">{a.cabecera}</h4>
+                        <span className="mb-3 text-center d-block">{a.descripcion}</span>
+                        {a.opcionesVotacion.map((b: any)=>{
+                            console.log(a.total);
+                            console.log(b.votaciones.length);
+                            let percentage = a.total && b.votaciones.length ? (b.votaciones.length / a.total) * 100 : 0;
+                            return (<div key={i} style={{ marginBottom: '10px' }}>
+                            <span>{b.descripcion}</span>
+                            <div id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev)=> {cambiarVoto(ev);}}>
+                                <div style={{ background: '#4caf50', height: '100%', width: `${percentage}%`, borderRadius: '5px', textAlign: 'center' }}>
+                                    {b.votaciones.find((votacion: any) => votacion.idUsuario == usuario.id) ?
+                                    <span style={{color: 'white', display: 'block', width: '55px', margin: '0 auto'}}>Votado</span>
+                                    :""}
+                                </div>
+                            </div>
+                        </div>);
+                        })}
+                    </div>
+                );
+            })}
+        </div>
+    }
 
     const panelCrearEncuesta = () => {
         return <div key={key} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
@@ -790,14 +851,14 @@ const Condominio = () => {
                         <div className="w-100 pb-3 mb-3 containerMenu">
                             <div className="containerImgMenu">
                                 {
-                                    usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? 
-                                    <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
-                                        <img width={25} src={notificacion} />
-                                    </button>
-                                        : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? 
-                                        <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
-                                            <img width={25} src={silenciarnotificacion} />
+                                    usuario.nombre.length > 0 && !usuario.tieneSuscripcion ?
+                                        <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
+                                            <img width={25} src={notificacion} />
                                         </button>
+                                        : usuario.nombre.length > 0 && usuario.tieneSuscripcion ?
+                                            <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
+                                                <img width={25} src={silenciarnotificacion} />
+                                            </button>
                                             : ""
                                 }
                                 <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
@@ -818,16 +879,21 @@ const Condominio = () => {
                                             <>
                                                 {panelCrearAnuncio()}
                                             </>
-                                            : encuesta ?
+                                            : votaciones ?
                                                 <>
-                                                    {panelCrearEncuesta()}
+                                                    {panelVotaciones()}
                                                 </>
                                                 :
-                                                <>
-                                                    {dataFull.anuncios != null && dataFull.anuncios.map((a: any, i) => (
-                                                        panelAnuncios(a, i)
-                                                    ))}
-                                                </>
+                                                encuesta ?
+                                                    <>
+                                                        {panelCrearEncuesta()}
+                                                    </>
+                                                    :
+                                                    <>
+                                                        {dataFull.anuncios != null && dataFull.anuncios.map((a: any, i) => (
+                                                            panelAnuncios(a, i)
+                                                        ))}
+                                                    </>
                                 }
                             </div>
                         </div>
