@@ -71,6 +71,19 @@ const Condominio = () => {
     const [key, setKey] = useState(0)
     useEffect(() => {
         if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
+        if (localStorage.getItem("nombreUsuario") ||
+            localStorage.getItem("tieneSuscripcion") ||
+            localStorage.getItem("rolUsuario") ||
+            localStorage.getItem("idUsuario")) {
+            setUsuario({
+                nombre: localStorage.getItem("nombreUsuario") ?? "",
+                tieneSuscripcion: Boolean(localStorage.getItem("tieneSuscripcion")),
+                rol: localStorage.getItem("rolUsuario") ?? "",
+                id: parseInt(localStorage.getItem("idUsuario") ?? "")
+            })
+
+        }
+
         if (urlPase[3]) {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
@@ -148,6 +161,10 @@ const Condominio = () => {
                 setUsuario(data);
                 setTipo(1)
                 setIniciarSesion(false)
+                localStorage.setItem("nombreUsuario", data.nombre);
+                localStorage.setItem("tieneSuscripcion", data.tieneSuscripcion);
+                localStorage.setItem("rolUsuario", data.rol);
+                localStorage.setItem("idUsuario", data.id);
             }
             else {
                 setUsuario({
