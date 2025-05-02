@@ -67,6 +67,19 @@ const Condominio = () => {
     const [key, setKey] = useState(0)
     useEffect(() => {
         if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
+        if (localStorage.getItem("nombreUsuario") ||
+            localStorage.getItem("tieneSuscripcion") ||
+            localStorage.getItem("rolUsuario") ||
+            localStorage.getItem("idUsuario")) {
+            setUsuario({
+                nombre: localStorage.getItem("nombreUsuario") ?? "",
+                tieneSuscripcion: Boolean(localStorage.getItem("tieneSuscripcion")),
+                rol: localStorage.getItem("rolUsuario") ?? "",
+                id: parseInt(localStorage.getItem("idUsuario") ?? "")
+            })
+
+        }
+
         if (urlPase[3]) {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
@@ -144,6 +157,10 @@ const Condominio = () => {
                 setUsuario(data);
                 setTipo(1)
                 setIniciarSesion(false)
+                localStorage.setItem("nombreUsuario", data.nombre);
+                localStorage.setItem("tieneSuscripcion", data.tieneSuscripcion);
+                localStorage.setItem("rolUsuario", data.rol);
+                localStorage.setItem("idUsuario", data.id);
             }
             else {
                 setUsuario({
@@ -442,7 +459,7 @@ const Condominio = () => {
     };
 
     const panelInicioSesion = () => {
-        return <div className="mx-3 w-100 search-container" style={{marginTop: '35%'}}>
+        return <div className="mx-3 w-100 search-container" style={{ marginTop: '35%' }}>
             <label htmlFor="textfield" className="search-label">
                 Inicio de Sesión
             </label>
@@ -788,14 +805,14 @@ const Condominio = () => {
                         <div className="w-100 pb-3 mb-3 containerMenu">
                             <div className="containerImgMenu">
                                 {
-                                    usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? 
-                                    <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
-                                        <img width={25} src={notificacion} />
-                                    </button>
-                                        : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? 
-                                        <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
-                                            <img width={25} src={silenciarnotificacion} />
+                                    usuario.nombre.length > 0 && !usuario.tieneSuscripcion ?
+                                        <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
+                                            <img width={25} src={notificacion} />
                                         </button>
+                                        : usuario.nombre.length > 0 && usuario.tieneSuscripcion ?
+                                            <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
+                                                <img width={25} src={silenciarnotificacion} />
+                                            </button>
                                             : ""
                                 }
                                 <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
