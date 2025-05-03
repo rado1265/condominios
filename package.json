@@ -1,8 +1,12 @@
 {
-  "name": "condominios-app",
+  "name": "conexionresidencial",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@capacitor/android": "^7.2.0",
+    "@capacitor/cli": "^7.2.0",
+    "@capacitor/core": "^7.2.0",
+    "@capacitor/ios": "^7.2.0",
     "@cloudinary/react": "^1.14.1",
     "@cloudinary/url-gen": "^1.21.0",
     "@testing-library/dom": "^10.4.0",
