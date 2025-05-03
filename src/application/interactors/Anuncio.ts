@@ -145,3 +145,33 @@ export const ObtenerAnuncioPorId = (selListado: any, idAnuncio: string) => {
         }
     });
 };
+export const EditUsuarioPorId = (selListado: any, usuario: any) => {
+    SVCAnuncio.EditUsuarioPorId(usuario).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
+export const ObtenerUsuarioPorId = (selListado: any, idUsuario: string) => {
+    SVCAnuncio.ObtenerUsuarioPorId(idUsuario).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
+export const ObtenerUsuarios = (selListado: any, idCondominio: string) => {
+    SVCAnuncio.ObtenerUsuarios(idCondominio).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};

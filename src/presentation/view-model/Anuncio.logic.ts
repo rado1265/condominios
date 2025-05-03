@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -42,4 +42,16 @@ export const CrearComentarioAnuncioLogic = (selListado: any, comentario: any, id
 
 export const ObtenerAnuncioPorIdLogic = (selListado: any, idAnuncio: string) => {
     return ObtenerAnuncioPorId(selListado, idAnuncio);
+}
+
+export const EditUsuarioPorIdLogic = (selListado: any, usuario: any) => {
+    return EditUsuarioPorId(selListado, usuario);
+}
+
+export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string) => {
+    return ObtenerUsuarioPorId(selListado, idUsuario);
+}
+
+export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {
+    return ObtenerUsuarios(selListado, idCondominio);
 }

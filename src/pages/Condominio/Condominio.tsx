@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerAnuncioPorIdLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObtenerAnuncioPorIdLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -37,6 +37,20 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
+    const [usuarioDetalle, setUsuarioDetalle] = useState({
+        nombre: "",
+        tieneSuscripcionMensajes: false,
+        tieneSuscripcionVotaciones: false,
+        tieneSuscripcionAnuncios: false,
+        rol: "",
+        id: 0,
+        activo: false,
+        direccion: '',
+        telefono: '',
+        fechaCaducidad: new Date(),
+        imagen: '',
+        clave: ''
+    });
     const [loguear, setLoguear] = useState({
         usuario: "",
         clave: "",
@@ -65,6 +79,9 @@ const Condominio = () => {
         idUsuario: 0
     });
     const [newComentario, setNewComentario] = useState('')
+    const [verPerfil, setVerPerfil] = useState(false)
+    const [verReglasNormas, setVerReglasNormas] = useState(false)
+    const [editarPerfil, setEditarPerfil] = useState(false)
 
     /* {
         id: 0,
@@ -272,6 +289,27 @@ const Condominio = () => {
         }
     }
 
+    const EditarPerfil = () => {
+        try {
+            setLoading(true);
+            EditUsuarioPorIdLogic(selEditarPerfil, usuarioDetalle)
+        } catch (er) {
+        }
+    }
+    const selEditarPerfil = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString());
+                setEditarPerfil(false);
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+        }
+    }
+
     const selListadoVotaciones = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
@@ -300,6 +338,13 @@ const Condominio = () => {
             [name]: value
         }));
     };
+    const handleChangePerfil = (e: any) => {
+        const { name, value } = e.target;
+        setUsuarioDetalle(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
     const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false) => {
         setVerDetalle(false);
         setTipo(a)
@@ -307,6 +352,9 @@ const Condominio = () => {
         setCrear(c)
         setEditar(d)
         setEncuesta(e)
+        setVerDetalle(false)
+        setVerPerfil(false)
+        setVerReglasNormas(false)
         if (a === 5) {
             setLoading(true);
             ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
@@ -335,6 +383,26 @@ const Condominio = () => {
                     ...prev,
                     // eslint-disable-next-line
                     ["amedida"]: base64.replace("data:image/jpeg;base64,", "")
+                }));
+            } else {
+                alert('Archivo no válido o no es una imagen.');
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+    const handleImagePerfilChange = (e: any) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event: any) => {
+            const base64 = event.target.result;
+            //console.log(base64.replace("data:image/jpeg;base64,", ""))
+            if (base64.startsWith('data:image')) {
+                setUsuarioDetalle(prev => ({
+                    ...prev,
+                    // eslint-disable-next-line
+                    ["imagen"]: base64.replace("data:image/jpeg;base64,", "")
                 }));
             } else {
                 alert('Archivo no válido o no es una imagen.');
@@ -647,6 +715,16 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    const selObtenerUsuarioPorId = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(false);
+                setUsuarioDetalle(data);
+            }
+        } catch (er) {
+        }
+    }
+
     const panelVotaciones = () => {
         return <div style={{ fontFamily: 'Arial, sans-serif' }}>
             <h2 className="mt-3 mb-4">VOTACIONES ACTIVAS</h2>
@@ -676,7 +754,210 @@ const Condominio = () => {
 
 
     const panelDetalleAnuncio = () => {
-        console.log(dataDetalle);
+        return (
+            <div className="mx-3">
+                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
+                <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
+                <div className="anuncio-footer">
+                    <div className="anuncio-organizador">
+                        <span>Creado por: </span>
+                        <span className="ml-1">{dataDetalle.organizador}</span>
+                    </div>
+                    <span className="anuncio-telefono">{dataDetalle.telefono}</span>
+                </div>
+                {dataDetalle.amedida && dataDetalle.amedida.includes("http") ?
+                    <div className="anuncio-img-wrapper">
+                        <video src={dataDetalle.amedida} controls width="300" />
+                    </div>
+                    : dataDetalle.amedida && !dataDetalle.amedida.includes("http") ?
+                        <div className="anuncio-img-wrapper">
+                            <img className="anuncio-img" src={`data:image/jpeg;base64,${dataDetalle.amedida}`} alt="Foto" />
+                        </div>
+                        : ""
+                }
+                <div className="d-flex align-items-center w-100" style={{ justifyContent: 'space-between' }}>
+                    <small className="anuncio-fecha" style={{ position: 'relative', marginLeft: '20px', bottom: '0' }}>
+                        Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
+                    </small>
+                    <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }}>
+                        <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true, true)}>
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
+             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
+             22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
+                    </div>
+                </div>
+                <div className="comments-container">
+                    <h2 className="comments-title">Comentarios</h2>
+                    {dataDetalle.comentarios.map((j: any) => {
+                        return <div key={j.id} className="comment-box">
+                            <div className="comment-header">
+                                <span className="comment-author">{j.nombreUsuario}</span>
+                                <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
+                            </div>
+                            <p className="comment-content">{j.mensaje}</p>
+                        </div>
+                    })}
+                    <textarea
+                        className="comment-textarea"
+                        placeholder="Escribe tu comentario..."
+                        value={newComentario}
+                        onChange={(e) => setNewComentario(e.target.value)}
+                        rows={3}
+                        maxLength={500}
+                    />
+                    <button
+                        type="button"
+                        className="search-button w-100 mt-1"
+                        onClick={crearComentarioAnuncio}
+                    >
+                        Publicar comentario
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    console.log(usuarioDetalle)
+    const panelPerfil = () => {
+        return (
+            <div className="mx-3">
+                {
+                    editarPerfil ?
+                        <>
+                            <button type="button" className="icon" onClick={() => {
+                                setEditarPerfil(false)
+                            }}>
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
+                                </svg>
+                            </button>
+                            <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                                <div style={{ justifySelf: 'center' }}>
+                                    {
+                                        usuarioDetalle.imagen != null ?
+                                            < img
+                                                src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
+                                                alt="Vista previa"
+                                                style={{ maxWidth: '200px', marginTop: '10px' }}
+                                            /> :
+                                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                                            </svg>
+                                    }
+                                </div>
+
+                                {
+                                    <div>
+                                        <input type="file" accept="image/*" className="w-100" onChange={handleImagePerfilChange} />
+                                    </div>
+                                }
+                                <label htmlFor="textfield" className="search-label-admin">
+                                    Nombre
+                                </label>
+                                <input
+                                    type="text"
+                                    name="cabecera"
+                                    className="search-input"
+                                    value={usuarioDetalle.nombre}
+                                    disabled
+                                />
+                                <label htmlFor="textfield" className="search-label-admin">
+                                    Rol
+                                </label>
+                                <input
+                                    name="descripcion"
+                                    className="search-input"
+                                    value={usuarioDetalle.rol}
+                                    disabled
+                                />
+                                <label htmlFor="textfield" className="search-label-admin">
+                                    Dirección
+                                </label>
+                                <input
+                                    type="text"
+                                    name="direccion"
+                                    className="search-input"
+                                    value={usuarioDetalle.direccion}
+                                    onChange={handleChangePerfil}
+                                />
+                                <label htmlFor="textfield" className="search-label-admin">
+                                    Teléfono
+                                </label>
+                                <input
+                                    type="text"
+                                    name="telefono"
+                                    className="search-input"
+                                    value={usuarioDetalle.telefono}
+                                    onChange={handleChangePerfil}
+                                />
+                                <label htmlFor="textfield" className="search-label-admin">
+                                    Contraseña
+                                </label>
+                                <input
+                                    type="text"
+                                    name="clave"
+                                    className="search-input"
+                                    value={usuarioDetalle.clave}
+                                    onChange={handleChangePerfil}
+                                />
+                                <button
+                                    type="button"
+                                    className="search-button mt-2"
+                                    onClick={EditarPerfil}
+                                >
+                                    Editar
+                                </button>
+                            </div>
+                        </>
+                        :
+                        <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                            <button type="button" className="icon" onClick={() => {
+                                setEditarPerfil(true)
+                            }}>
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75l11-11.03-3.75-3.75L3 17.25zm14.71-9.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                </svg>
+                            </button>
+                            <div style={{ justifySelf: 'center' }}>
+                                {usuarioDetalle.imagen ? < img
+                                    src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
+                                    alt="Vista previa"
+                                    style={{ maxWidth: '200px', marginTop: '10px' }}
+                                /> : <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                                </svg>
+                                }
+                            </div>
+                            <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{usuarioDetalle.nombre}</h4>
+                            <div className="d-flex" style={{ width: '35vh' }}>
+                                <div className="p-20" style={{ width: '50%', boxSizing: 'border-box', }}>
+                                    {usuarioDetalle.rol ? <p>Rol</p> : ""}
+                                    {usuarioDetalle.direccion != null ? <p>Dirección</p> : ""}
+                                    {usuarioDetalle.telefono != null ? <p>Teléfono</p> : ""}
+                                    <p>Notif. Anuncios</p>
+                                    <p>Notif. Mensajes</p>
+                                    <p>Notif. Votaciones</p>
+                                    {usuarioDetalle.fechaCaducidad.toString().length > 0 ? <p>Fecha Caducidad</p> : ""}
+                                </div>
+                                <div className="p-20" style={{ width: '50%', boxSizing: 'border-box' }}>
+                                    <p>{usuarioDetalle.rol}</p>
+                                    <p>{usuarioDetalle.direccion}</p>
+                                    <p>{usuarioDetalle.telefono}</p>
+                                    <p>{usuarioDetalle.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</p>
+                                    <p>{usuarioDetalle.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</p>
+                                    <p>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</p>
+                                    <p>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                }
+            </div>
+        );
+    }
+
+    const panelReglasNormas = () => {
         return (
             <div className="mx-3">
                 <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
@@ -1069,12 +1350,30 @@ const Condominio = () => {
                             </div>
                             {menuOpciones && (
                                 <div className="custom-menu">
-                                    <button type="button">
+                                    <button type="button" onClick={() => {
+                                        setVerReglasNormas(false)
+                                        setVerPerfil(true);
+                                        setEditarPerfil(false)
+                                        setVotaciones(false);
+                                        setLoading(true);
+                                        setMenuOpciones(false)
+                                        ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
+                                    }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                             <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
                                         </svg>
                                         Perfil
                                     </button>
+                                    {
+                                        usuario.rol === "Administrador" && (
+                                            <button type="button" onClick={() => { setVerPerfil(true); setVotaciones(false) }}>
+                                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.05 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z" />
+                                                </svg>
+                                                Comunidad
+                                            </button>
+                                        )
+                                    }
                                     <button type="button" onClick={() => {
                                         setLoading(true);
                                         !usuario.tieneSuscripcionAnuncios ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 1) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 1)
@@ -1106,6 +1405,19 @@ const Condominio = () => {
                                         {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
                                     </button>
                                     <button type="button" onClick={() => {
+                                        setVerPerfil(false)
+                                        setVerReglasNormas(true);
+                                        setVotaciones(false);
+                                        setMenuOpciones(false)
+                                    }}>
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 10-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 9a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4A.75.75 0 0010 9z" clip-rule="evenodd" />
+                                        </svg>
+                                        Reglas y Normas
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        setVerPerfil(false)
+                                        setVerReglasNormas(false)
                                         setMenuOpciones(false)
                                         cerrarSesion()
                                     }}>
@@ -1140,16 +1452,26 @@ const Condominio = () => {
                                                         {panelCrearEncuesta()}
                                                     </>
                                                     :
-                                                    verDetalle && tipo !== 2 ?
+                                                    verPerfil ?
                                                         <>
-                                                            {panelDetalleAnuncio()}
+                                                            {panelPerfil()}
                                                         </>
                                                         :
-                                                        <>
-                                                            {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
-                                                                panelAnuncios(a, i)
-                                                            ))}
-                                                        </>
+                                                        verReglasNormas ?
+                                                            <>
+                                                                {panelReglasNormas()}
+                                                            </>
+                                                            :
+                                                            verDetalle && tipo !== 2 ?
+                                                                <>
+                                                                    {panelDetalleAnuncio()}
+                                                                </>
+                                                                :
+                                                                <>
+                                                                    {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                        panelAnuncios(a, i)
+                                                                    ))}
+                                                                </>
                                 }
                             </div>
                         </div>
