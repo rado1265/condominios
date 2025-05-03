@@ -136,7 +136,7 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async SuscribirNotificaciones(idCondominio: any, idUsuario: any): Promise<IServiceResult<any>> {
+    public static async SuscribirNotificaciones(idCondominio: any, idUsuario: any, tipoSuscripcion: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
         const registration = await navigator.serviceWorker.ready;
 
@@ -153,7 +153,7 @@ export class SVCAnuncio {
         // Enviar suscripción al backend
 
 
-        const url: string = _ruta + "Condominios/guardarSus?idCondominio= " + idCondominio + "&idUsuario=" + idUsuario
+        const url: string = _ruta + "Condominios/guardarSus?idCondominio= " + idCondominio + "&idUsuario=" + idUsuario + "&tipoSuscripcion=" + tipoSuscripcion
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, subscription)
@@ -169,10 +169,10 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async DesscribirNotificaciones(idUsuario: any): Promise<IServiceResult<any>> {
+    public static async DesscribirNotificaciones(idUsuario: any, tipoSuscripcion: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/eliminarSus?idUsuario=" + idUsuario
+        const url: string = _ruta + "Condominios/eliminarSus?idUsuario=" + idUsuario + "&tipoSuscripcion=" + tipoSuscripcion
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url)

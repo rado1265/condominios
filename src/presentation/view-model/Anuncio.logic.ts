@@ -15,11 +15,11 @@ export const CrearAnuncioLogic = (selListado: any, anuncio: any) => {
 export const LoginLogic = (selListado: any, usuario: any) => {
     return Login(selListado, usuario);
 }
-export const SuscribirNotificacionesLogic = (selListado: any, idCondominio: any, idUsuario: any) => {
-    return SuscribirNotificaciones(selListado, idCondominio, idUsuario);
+export const SuscribirNotificacionesLogic = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any) => {
+    return SuscribirNotificaciones(selListado, idCondominio, idUsuario, tipoSuscripcion);
 }
-export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any) => {
-    return DesscribirNotificaciones(selListado, idUsuario);
+export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any, tipoSuscripcion: any) => {
+    return DesscribirNotificaciones(selListado, idUsuario, tipoSuscripcion);
 }
 export const DarQuitarLikeLogic = (selListado: any, idAnuncio: any, like: any) => {
     return DarQuitarLike(selListado, idAnuncio, like);
