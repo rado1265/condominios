@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerAnuncioPorIdLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
 import menuicon from './../../components/utils/img/menuicon.png';
-
+const chileTime = new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+}).format(new Date());
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
     const [tipoSubir, setTipoSubir] = useState(0);
@@ -40,7 +49,7 @@ const Condominio = () => {
     const [encuesta, setEncuesta] = useState(false)
     const [menuOpciones, setMenuOpciones] = useState(false)
     const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
-    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date() })
+    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [] })
     const [verDetalle, setVerDetalle] = useState(false)
     const [anuncio, setAnuncio] = useState({
         id: 0,
@@ -55,6 +64,17 @@ const Condominio = () => {
         idTipo: 1,
         idUsuario: 0
     });
+    const [newComentario, setNewComentario] = useState('')
+
+    /* {
+        id: 0,
+                idUsuario: 0,
+                idAnuncio: 0,
+                mensaje: "",
+                nombreUsuario: "",
+                fecha: new Date()
+            } */
+
     const limpiarAnuncio = () => {
         setAnuncio({
             id: 0,
@@ -266,7 +286,6 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-
     const handleChangeLogin = (e: any) => {
         const { name, value } = e.target;
         setLoguear(prev => ({
@@ -323,12 +342,12 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
-    /*document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    });*/
+    });
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -344,9 +363,14 @@ const Condominio = () => {
         }
     }
 
-    const handleLike = (id: any, like: any) => {
-        if (usuario.nombre.length > 0)
+    const handleLike = (id: any, like: any, esPantallaComentario: boolean) => {
+        if (usuario.nombre.length > 0) {
             DarQuitarLikeLogic(selDarQuitarLike, id, like)
+        }
+        if (esPantallaComentario) {
+            setVerDetalle(true)
+            ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, dataDetalle.id)
+        }
     };
 
     const crearVotacion = () => {
@@ -444,7 +468,12 @@ const Condominio = () => {
         if (a.idTipo !== tipo)
             return false
         else
-            return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3" onClick={() => { setDataDetalle(a); setVerDetalle(true); }}>
+            return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3" onClick={() => {
+                setLoading(true);
+                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id)
+                setDataDetalle(a);
+                setVerDetalle(true);
+            }}>
                 <div className="anuncio-header">
                     {
                         usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
@@ -493,7 +522,7 @@ const Condominio = () => {
                     Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
                 </small>
                 <div className="anuncio-like">
-                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(a.id, true)}>
+                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(a.id, true, false)}>
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
              2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
              C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
@@ -589,7 +618,35 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-
+    const crearComentarioAnuncio = () => {
+        var comentarioAnuncio: any = {
+            Id: 0,
+            IdUsuario: usuario.id,
+            NombreUsuario: usuario.nombre,
+            IdAnuncio: dataDetalle.id,
+            Mensaje: newComentario,
+            Fecha: new Date(chileTime)
+        };
+        CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, comentarioAnuncio, localStorage.getItem("idCondominio")!.toString());
+    }
+    const selcrearComentarioAnuncio = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(true);
+                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, dataDetalle.id);
+            }
+        } catch (er) {
+        }
+    }
+    const selObtenerAnuncioPorId = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(false);
+                setDataDetalle(data);
+            }
+        } catch (er) {
+        }
+    }
     const panelVotaciones = () => {
         return <div style={{ fontFamily: 'Arial, sans-serif' }}>
             <h2 className="mt-3 mb-4">VOTACIONES ACTIVAS</h2>
@@ -617,32 +674,12 @@ const Condominio = () => {
         </div>
     }
 
-    const comments = [
-        {
-            id: 1,
-            author: 'Juan Pérez',
-            date: '2025-05-01',
-            content: 'Me interesa vecina.',
-        },
-        {
-            id: 2,
-            author: 'María López',
-            date: '2025-05-02',
-            content: 'Está muy caro 😥.',
-        },
-        {
-            id: 3,
-            author: 'Carlos Gómez',
-            date: '2025-05-03',
-            content: 'A mi me gustan mucho de esas',
-        },
-    ];
 
     const panelDetalleAnuncio = () => {
         console.log(dataDetalle);
         return (
             <div className="mx-3">
-                <h4 className="mt-3 mb-4 text-center" style={{fontSize: '1.7rem', fontWeight: '700'}}>{dataDetalle.cabecera}</h4>
+                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
                 <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
                 <div className="anuncio-footer">
                     <div className="anuncio-organizador">
@@ -661,43 +698,43 @@ const Condominio = () => {
                         </div>
                         : ""
                 }
-                <div className="d-flex align-items-center w-100" style={{justifyContent: 'space-between'}}>
-                <small className="anuncio-fecha" style={{position: 'relative', marginLeft: '20px', bottom: '0'}}>
-                    Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
-                </small>
-                <div className="anuncio-like" style={{position: 'relative', marginRight: '20px', bottom: '0'}}>
-                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true)}>
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                <div className="d-flex align-items-center w-100" style={{ justifyContent: 'space-between' }}>
+                    <small className="anuncio-fecha" style={{ position: 'relative', marginLeft: '20px', bottom: '0' }}>
+                        Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
+                    </small>
+                    <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }}>
+                        <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true, true)}>
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
              2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
              C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
              22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
-                </div>
+                        </svg>
+                        <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
+                    </div>
                 </div>
                 <div className="comments-container">
                     <h2 className="comments-title">Comentarios</h2>
-                    {comments.map(({ id, author, date, content }) => (
-                        <div key={id} className="comment-box">
+                    {dataDetalle.comentarios.map((j: any) => {
+                        return <div key={j.id} className="comment-box">
                             <div className="comment-header">
-                                <span className="comment-author">{author}</span>
-                                <span className="comment-date">{new Date(date).toLocaleDateString()}</span>
+                                <span className="comment-author">{j.nombreUsuario}</span>
+                                <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
                             </div>
-                            <p className="comment-content">{content}</p>
+                            <p className="comment-content">{j.mensaje}</p>
                         </div>
-                    ))}
+                    })}
                     <textarea
                         className="comment-textarea"
                         placeholder="Escribe tu comentario..."
-                        //value={content}
-                        //onChange={(e) => setContent(e.target.value)}
+                        value={newComentario}
+                        onChange={(e) => setNewComentario(e.target.value)}
                         rows={3}
                         maxLength={500}
                     />
                     <button
                         type="button"
                         className="search-button w-100 mt-1"
-                    //onClick={handleClick}
+                        onClick={crearComentarioAnuncio}
                     >
                         Publicar comentario
                     </button>
@@ -902,7 +939,7 @@ const Condominio = () => {
         </div>
     }
     const iconNotificaciones = (activa: boolean) => {
-        return !activa ?""
+        return !activa ? ""
             :
             <img width={25} src={menuicon} alt="icono abrir menu" />
     }
