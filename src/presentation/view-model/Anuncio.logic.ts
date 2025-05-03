@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -35,4 +35,11 @@ export const VotarLogic = (selListado: any, idOpcionVotacion: any, idUsuario: an
 }
 export const CrearVotacionLogic = (selListado: any, votacion: any) => {
     return CrearVotacion(selListado, votacion);
+}
+export const CrearComentarioAnuncioLogic = (selListado: any, comentario: any, idCondominio: any) => {
+    return CrearComentarioAnuncio(selListado, comentario, idCondominio);
+}
+
+export const ObtenerAnuncioPorIdLogic = (selListado: any, idAnuncio: string) => {
+    return ObtenerAnuncioPorId(selListado, idAnuncio);
 }

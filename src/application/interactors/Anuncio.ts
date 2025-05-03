@@ -124,3 +124,24 @@ export const CrearVotacion = (selListado: any, votacion: any) => {
         }
     });
 }
+
+export const CrearComentarioAnuncio = (selListado: any, comentario: any, idCondominio: any) => {
+    SVCAnuncio.CrearComentarioAnuncio(comentario, idCondominio).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
+export const ObtenerAnuncioPorId = (selListado: any, idAnuncio: string) => {
+    SVCAnuncio.ObtenerAnuncioPorId(idAnuncio).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
