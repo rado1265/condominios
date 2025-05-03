@@ -38,6 +38,8 @@ const Condominio = () => {
     const [encuesta, setEncuesta] = useState(false)
     const [menuOpciones, setMenuOpciones] = useState(false)
     const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
+    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date() })
+    const [verDetalle, setVerDetalle] = useState(false)
     const [anuncio, setAnuncio] = useState({
         id: 0,
         idCondominio: localStorage.getItem("idCondominio"),
@@ -65,6 +67,7 @@ const Condominio = () => {
             idTipo: 1,
             idUsuario: 0
         })
+        setVerDetalle(false);
     }
     useEffect(() => {
         if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
@@ -249,6 +252,7 @@ const Condominio = () => {
         }));
     };
     const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false) => {
+        setVerDetalle(false);
         setTipo(a)
         setIniciarSesion(b)
         setCrear(c)
@@ -289,12 +293,12 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
-    document.addEventListener('visibilitychange', () => {
+    /*document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    });
+    });*/
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -410,7 +414,7 @@ const Condominio = () => {
         if (a.idTipo !== tipo)
             return false
         else
-            return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3">
+            return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3" onClick={() => { setDataDetalle(a); setVerDetalle(true); }}>
                 <div className="anuncio-header">
                     {
                         usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
@@ -570,7 +574,7 @@ const Condominio = () => {
                                 <span>{b.descripcion}</span>
                                 <div id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev) => { cambiarVoto(ev); }}>
                                     <div style={{ background: '#4caf50', height: '100%', width: `${percentage}%`, borderRadius: '5px', textAlign: 'center' }}>
-                                        {b.votaciones.find((votacion: any) => votacion.idUsuario ===usuario.id) ?
+                                        {b.votaciones.find((votacion: any) => votacion.idUsuario === usuario.id) ?
                                             <span style={{ color: 'white', display: 'block', width: '55px', margin: '0 auto' }}>Votado</span>
                                             : ""}
                                     </div>
@@ -581,6 +585,95 @@ const Condominio = () => {
                 );
             })}
         </div>
+    }
+
+    const comments = [
+        {
+            id: 1,
+            author: 'Juan Pérez',
+            date: '2025-05-01',
+            content: 'Me interesa vecina.',
+        },
+        {
+            id: 2,
+            author: 'María López',
+            date: '2025-05-02',
+            content: 'Está muy caro 😥.',
+        },
+        {
+            id: 3,
+            author: 'Carlos Gómez',
+            date: '2025-05-03',
+            content: 'A mi me gustan mucho de esas',
+        },
+    ];
+
+    const panelDetalleAnuncio = () => {
+        console.log(dataDetalle);
+        return (
+            <div className="mx-3">
+                <h4 className="mt-3 mb-4 text-center" style={{fontSize: '1.7rem', fontWeight: '700'}}>{dataDetalle.cabecera}</h4>
+                <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
+                <div className="anuncio-footer">
+                    <div className="anuncio-organizador">
+                        <span>Creado por: </span>
+                        <span className="ml-1">{dataDetalle.organizador}</span>
+                    </div>
+                    <span className="anuncio-telefono">{dataDetalle.telefono}</span>
+                </div>
+                {dataDetalle.amedida && dataDetalle.amedida.includes("http") ?
+                    <div className="anuncio-img-wrapper">
+                        <video src={dataDetalle.amedida} controls width="300" />
+                    </div>
+                    : dataDetalle.amedida && !dataDetalle.amedida.includes("http") ?
+                        <div className="anuncio-img-wrapper">
+                            <img className="anuncio-img" src={`data:image/jpeg;base64,${dataDetalle.amedida}`} alt="Foto" />
+                        </div>
+                        : ""
+                }
+                <div className="d-flex align-items-center w-100" style={{justifyContent: 'space-between'}}>
+                <small className="anuncio-fecha" style={{position: 'relative', marginLeft: '20px', bottom: '0'}}>
+                    Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
+                </small>
+                <div className="anuncio-like" style={{position: 'relative', marginRight: '20px', bottom: '0'}}>
+                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true)}>
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
+             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
+             22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
+                </div>
+                </div>
+                <div className="comments-container">
+                    <h2 className="comments-title">Comentarios</h2>
+                    {comments.map(({ id, author, date, content }) => (
+                        <div key={id} className="comment-box">
+                            <div className="comment-header">
+                                <span className="comment-author">{author}</span>
+                                <span className="comment-date">{new Date(date).toLocaleDateString()}</span>
+                            </div>
+                            <p className="comment-content">{content}</p>
+                        </div>
+                    ))}
+                    <textarea
+                        className="comment-textarea"
+                        placeholder="Escribe tu comentario..."
+                        //value={content}
+                        //onChange={(e) => setContent(e.target.value)}
+                        rows={3}
+                        maxLength={500}
+                    />
+                    <button
+                        type="button"
+                        className="search-button w-100 mt-1"
+                    //onClick={handleClick}
+                    >
+                        Publicar comentario
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     const panelCrearEncuesta = () => {
@@ -726,12 +819,12 @@ const Condominio = () => {
                     </div>
                 )}
 
-                {(tipoSubir ===1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>
                 )}
-                {(tipoSubir ===1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 )}
                 {(anuncio.amedida && (anuncio.amedida && !anuncio.amedida.startsWith("http"))) && (
@@ -746,12 +839,12 @@ const Condominio = () => {
                 )}
 
 
-                {(tipoSubir ===2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir ===2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
                 {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
@@ -878,7 +971,7 @@ const Condominio = () => {
                                             </button>
                                             : ""
                                 */}
-                                <button className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones);}}>
+                                <button className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
                                     <img width={25} src={menuicon} alt="icono abrir menu" />
                                 </button>
                                 <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
@@ -886,35 +979,35 @@ const Condominio = () => {
                                     <img width={25} src={actualizar} alt="icono actualizar" />
                                 </button>
                             </div>
-                            { menuOpciones && (
-                            <div className="custom-menu">
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                                    </svg>
-                                    Profile
-                                </button>
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.75 4H19M7.75 4a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 4h2.25m13.5 6H19m-2.25 0a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 10h11.25m-4.5 6H19M7.75 16a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 16h2.25" />
-                                    </svg>
-                                    Settings
-                                </button>
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" fill="currentColor">
-                                        <path d="M18 4H16V9C16 10.0609 15.5786 11.0783 14.8284 11.8284C14.0783 12.5786 13.0609 13 12 13H9L6.846 14.615C7.17993 14.8628 7.58418 14.9977 8 15H11.667L15.4 17.8C15.5731 17.9298 15.7836 18 16 18C16.2652 18 16.5196 17.8946 16.7071 17.7071C16.8946 17.5196 17 17.2652 17 17V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4Z" fill="currentColor" />
-                                        <path d="M12 0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2V9C0 9.53043 0.210714 10.0391 0.585786 10.4142C0.960859 10.7893 1.46957 11 2 11H3V13C3 13.1857 3.05171 13.3678 3.14935 13.5257C3.24698 13.6837 3.38668 13.8114 3.55279 13.8944C3.71889 13.9775 3.90484 14.0126 4.08981 13.996C4.27477 13.9793 4.45143 13.9114 4.6 13.8L8.333 11H12C12.5304 11 13.0391 10.7893 13.4142 10.4142C13.7893 10.0391 14 9.53043 14 9V2C14 1.46957 13.7893 0.960859 13.4142 0.585786C13.0391 0.210714 12.5304 0 12 0Z" fill="currentColor" />
-                                    </svg>
-                                    Messages
-                                </button>
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
-                                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
-                                    </svg>
-                                    Cerrar Sesión
-                                </button>
-                            </div>
+                            {menuOpciones && (
+                                <div className="custom-menu">
+                                    <button type="button">
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                        </svg>
+                                        Profile
+                                    </button>
+                                    <button type="button">
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.75 4H19M7.75 4a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 4h2.25m13.5 6H19m-2.25 0a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 10h11.25m-4.5 6H19M7.75 16a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 16h2.25" />
+                                        </svg>
+                                        Settings
+                                    </button>
+                                    <button type="button">
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" fill="currentColor">
+                                            <path d="M18 4H16V9C16 10.0609 15.5786 11.0783 14.8284 11.8284C14.0783 12.5786 13.0609 13 12 13H9L6.846 14.615C7.17993 14.8628 7.58418 14.9977 8 15H11.667L15.4 17.8C15.5731 17.9298 15.7836 18 16 18C16.2652 18 16.5196 17.8946 16.7071 17.7071C16.8946 17.5196 17 17.2652 17 17V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4Z" fill="currentColor" />
+                                            <path d="M12 0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2V9C0 9.53043 0.210714 10.0391 0.585786 10.4142C0.960859 10.7893 1.46957 11 2 11H3V13C3 13.1857 3.05171 13.3678 3.14935 13.5257C3.24698 13.6837 3.38668 13.8114 3.55279 13.8944C3.71889 13.9775 3.90484 14.0126 4.08981 13.996C4.27477 13.9793 4.45143 13.9114 4.6 13.8L8.333 11H12C12.5304 11 13.0391 10.7893 13.4142 10.4142C13.7893 10.0391 14 9.53043 14 9V2C14 1.46957 13.7893 0.960859 13.4142 0.585786C13.0391 0.210714 12.5304 0 12 0Z" fill="currentColor" />
+                                        </svg>
+                                        Messages
+                                    </button>
+                                    <button type="button">
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
+                                            <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+                                        </svg>
+                                        Cerrar Sesión
+                                    </button>
+                                </div>
                             )}
                         </div>
                         <div className="container pb-5 mb-5">
@@ -939,11 +1032,16 @@ const Condominio = () => {
                                                         {panelCrearEncuesta()}
                                                     </>
                                                     :
-                                                    <>
-                                                        {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
-                                                            panelAnuncios(a, i)
-                                                        ))}
-                                                    </>
+                                                    verDetalle && tipo !== 2 ?
+                                                        <>
+                                                            {panelDetalleAnuncio()}
+                                                        </>
+                                                        :
+                                                        <>
+                                                            {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                panelAnuncios(a, i)
+                                                            ))}
+                                                        </>
                                 }
                             </div>
                         </div>

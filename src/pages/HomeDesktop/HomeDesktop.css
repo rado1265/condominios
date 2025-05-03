@@ -1,7 +1,7 @@
 /* Estilos generales */
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
+    font-family: var(--fuenteWeb);
     background-color: #f5f5f7;
 }
 
