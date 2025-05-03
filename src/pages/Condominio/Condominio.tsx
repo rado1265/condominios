@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -22,7 +22,9 @@ const Condominio = () => {
     const [tipo, setTipo] = useState(1)
     const [usuario, setUsuario] = useState({
         nombre: "",
-        tieneSuscripcion: false,
+        tieneSuscripcionMensajes: false,
+        tieneSuscripcionVotaciones: false,
+        tieneSuscripcionAnuncios: false,
         rol: "",
         id: 0
     });
@@ -68,17 +70,23 @@ const Condominio = () => {
     }
     useEffect(() => {
         if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
-        if (localStorage.getItem("nombreUsuario") ||
-            localStorage.getItem("tieneSuscripcion") ||
-            localStorage.getItem("rolUsuario") ||
+        if (localStorage.getItem("nombreUsuario") &&
+            localStorage.getItem("tieneSuscripcionMensajes") &&
+            localStorage.getItem("tieneSuscripcionVotaciones") &&
+            localStorage.getItem("tieneSuscripcionAnuncios") &&
+            localStorage.getItem("rolUsuario") &&
             localStorage.getItem("idUsuario")) {
             setUsuario({
                 nombre: localStorage.getItem("nombreUsuario") ?? "",
-                tieneSuscripcion: Boolean(localStorage.getItem("tieneSuscripcion")),
+                tieneSuscripcionMensajes: localStorage.getItem("tieneSuscripcionMensajes") === "true",
+                tieneSuscripcionVotaciones: localStorage.getItem("tieneSuscripcionVotaciones") === "true",
+                tieneSuscripcionAnuncios: localStorage.getItem("tieneSuscripcionAnuncios") === "true",
                 rol: localStorage.getItem("rolUsuario") ?? "",
                 id: parseInt(localStorage.getItem("idUsuario") ?? "")
             })
-
+        }
+        else {
+            cerrarSesion()
         }
 
         if (urlPase[3]) {
@@ -86,6 +94,24 @@ const Condominio = () => {
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    const cerrarSesion = () => {
+        localStorage.removeItem("nombreUsuario");
+        localStorage.removeItem("tieneSuscripcionMensajes");
+        localStorage.removeItem("tieneSuscripcionVotaciones");
+        localStorage.removeItem("tieneSuscripcionAnuncios");
+        localStorage.removeItem("rolUsuario");
+        localStorage.removeItem("idUsuario");
+        setUsuario({
+            nombre: "",
+            tieneSuscripcionMensajes: false,
+            tieneSuscripcionVotaciones: false,
+            tieneSuscripcionAnuncios: false,
+            rol: "",
+            id: 0
+        });
+    }
+
     const EliminarAnuncio = (a: any) => {
         try {
             handleConfirmMessage(a)
@@ -159,14 +185,18 @@ const Condominio = () => {
                 setTipo(1)
                 setIniciarSesion(false)
                 localStorage.setItem("nombreUsuario", data.nombre);
-                localStorage.setItem("tieneSuscripcion", data.tieneSuscripcion);
+                localStorage.setItem("tieneSuscripcionMensajes", data.tieneSuscripcionMensajes);
+                localStorage.setItem("tieneSuscripcionVotaciones", data.tieneSuscripcionVotaciones);
+                localStorage.setItem("tieneSuscripcionAnuncios", data.tieneSuscripcionAnuncios);
                 localStorage.setItem("rolUsuario", data.rol);
                 localStorage.setItem("idUsuario", data.id);
             }
             else {
                 setUsuario({
                     nombre: "",
-                    tieneSuscripcion: false,
+                    tieneSuscripcionMensajes: false,
+                    tieneSuscripcionVotaciones: false,
+                    tieneSuscripcionAnuncios: false,
                     rol: "",
                     id: 0
                 });
@@ -570,7 +600,7 @@ const Condominio = () => {
                                 <span>{b.descripcion}</span>
                                 <div id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev) => { cambiarVoto(ev); }}>
                                     <div style={{ background: '#4caf50', height: '100%', width: `${percentage}%`, borderRadius: '5px', textAlign: 'center' }}>
-                                        {b.votaciones.find((votacion: any) => votacion.idUsuario ===usuario.id) ?
+                                        {b.votaciones.find((votacion: any) => votacion.idUsuario === usuario.id) ?
                                             <span style={{ color: 'white', display: 'block', width: '55px', margin: '0 auto' }}>Votado</span>
                                             : ""}
                                     </div>
@@ -726,12 +756,12 @@ const Condominio = () => {
                     </div>
                 )}
 
-                {(tipoSubir ===1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>
                 )}
-                {(tipoSubir ===1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 )}
                 {(anuncio.amedida && (anuncio.amedida && !anuncio.amedida.startsWith("http"))) && (
@@ -746,12 +776,12 @@ const Condominio = () => {
                 )}
 
 
-                {(tipoSubir ===2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir ===2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
                 {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
@@ -778,7 +808,11 @@ const Condominio = () => {
             </div>
         </div>
     }
-
+    const iconNotificaciones = (activa: boolean) => {
+        return !activa ?""
+            :
+            <img width={25} src={menuicon} alt="icono abrir menu" />
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -801,10 +835,14 @@ const Condominio = () => {
                 SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
                 setUsuario({
                     nombre: usuario.nombre,
-                    tieneSuscripcion: true,
+                    tieneSuscripcionMensajes: err === "2" ? true : usuario.tieneSuscripcionMensajes,
+                    tieneSuscripcionVotaciones: err === "3" ? true : usuario.tieneSuscripcionVotaciones,
+                    tieneSuscripcionAnuncios: err === "1" ? true : usuario.tieneSuscripcionAnuncios,
                     rol: usuario.rol,
                     id: usuario.id
                 });
+                let campo = err === "2" ? "tieneSuscripcionMensajes" : err === "3" ? "tieneSuscripcionVotaciones" : "tieneSuscripcionAnuncios";
+                localStorage.setItem(campo, "true");
             }
             else {
                 ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
@@ -822,10 +860,14 @@ const Condominio = () => {
                 SuccessMessage("Su desuscribipción a las notificaciones fue realizada correctamente.")
                 setUsuario({
                     nombre: usuario.nombre,
-                    tieneSuscripcion: false,
+                    tieneSuscripcionMensajes: err === "2" ? false : usuario.tieneSuscripcionMensajes,
+                    tieneSuscripcionVotaciones: err === "3" ? false : usuario.tieneSuscripcionVotaciones,
+                    tieneSuscripcionAnuncios: err === "1" ? false : usuario.tieneSuscripcionAnuncios,
                     rol: usuario.rol,
                     id: usuario.id
                 });
+                let campo = err === "2" ? "tieneSuscripcionMensajes" : err === "3" ? "tieneSuscripcionVotaciones" : "tieneSuscripcionAnuncios";
+                localStorage.setItem(campo, "false");
             }
             else {
                 ErrorMessage("Error quitar suscripción", "Favor intentarlo nuevamente en unos minutos")
@@ -878,43 +920,65 @@ const Condominio = () => {
                                             </button>
                                             : ""
                                 */}
-                                <button className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones);}}>
-                                    <img width={25} src={menuicon} alt="icono abrir menu" />
-                                </button>
+                                {
+                                    usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
+                                        <img width={25} src={menuicon} alt="icono abrir menu" />
+                                    </button>
+                                }
                                 <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
                                 <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
                                     <img width={25} src={actualizar} alt="icono actualizar" />
                                 </button>
                             </div>
-                            { menuOpciones && (
-                            <div className="custom-menu">
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                                    </svg>
-                                    Profile
-                                </button>
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.75 4H19M7.75 4a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 4h2.25m13.5 6H19m-2.25 0a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 10h11.25m-4.5 6H19M7.75 16a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 16h2.25" />
-                                    </svg>
-                                    Settings
-                                </button>
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" fill="currentColor">
-                                        <path d="M18 4H16V9C16 10.0609 15.5786 11.0783 14.8284 11.8284C14.0783 12.5786 13.0609 13 12 13H9L6.846 14.615C7.17993 14.8628 7.58418 14.9977 8 15H11.667L15.4 17.8C15.5731 17.9298 15.7836 18 16 18C16.2652 18 16.5196 17.8946 16.7071 17.7071C16.8946 17.5196 17 17.2652 17 17V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4Z" fill="currentColor" />
-                                        <path d="M12 0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2V9C0 9.53043 0.210714 10.0391 0.585786 10.4142C0.960859 10.7893 1.46957 11 2 11H3V13C3 13.1857 3.05171 13.3678 3.14935 13.5257C3.24698 13.6837 3.38668 13.8114 3.55279 13.8944C3.71889 13.9775 3.90484 14.0126 4.08981 13.996C4.27477 13.9793 4.45143 13.9114 4.6 13.8L8.333 11H12C12.5304 11 13.0391 10.7893 13.4142 10.4142C13.7893 10.0391 14 9.53043 14 9V2C14 1.46957 13.7893 0.960859 13.4142 0.585786C13.0391 0.210714 12.5304 0 12 0Z" fill="currentColor" />
-                                    </svg>
-                                    Messages
-                                </button>
-                                <button type="button">
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
-                                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
-                                    </svg>
-                                    Cerrar Sesión
-                                </button>
-                            </div>
+                            {menuOpciones && (
+                                <div className="custom-menu">
+                                    <button type="button">
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                        </svg>
+                                        Perfil
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        setLoading(true);
+                                        !usuario.tieneSuscripcionAnuncios ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 1) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 1)
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                        </svg>
+                                        Notif. Anuncios
+                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        setLoading(true);
+                                        !usuario.tieneSuscripcionMensajes ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 2) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 2)
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                        </svg>
+                                        Notif. Mensajes
+                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        setLoading(true);
+                                        !usuario.tieneSuscripcionVotaciones ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 3) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 3)
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                        </svg>
+                                        Notif. Votaciones
+                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        setMenuOpciones(false)
+                                        cerrarSesion()
+                                    }}>
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
+                                            <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+                                        </svg>
+                                        Cerrar Sesión
+                                    </button>
+                                </div>
                             )}
                         </div>
                         <div className="container pb-5 mb-5">
