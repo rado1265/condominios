@@ -323,12 +323,13 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
-    /*document.addEventListener('visibilitychange', () => {
+
+    document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    });*/
+    });
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -642,7 +643,7 @@ const Condominio = () => {
         console.log(dataDetalle);
         return (
             <div className="mx-3">
-                <h4 className="mt-3 mb-4 text-center" style={{fontSize: '1.7rem', fontWeight: '700'}}>{dataDetalle.cabecera}</h4>
+                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
                 <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
                 <div className="anuncio-footer">
                     <div className="anuncio-organizador">
@@ -661,19 +662,19 @@ const Condominio = () => {
                         </div>
                         : ""
                 }
-                <div className="d-flex align-items-center w-100" style={{justifyContent: 'space-between'}}>
-                <small className="anuncio-fecha" style={{position: 'relative', marginLeft: '20px', bottom: '0'}}>
-                    Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
-                </small>
-                <div className="anuncio-like" style={{position: 'relative', marginRight: '20px', bottom: '0'}}>
-                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true)}>
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                <div className="d-flex align-items-center w-100" style={{ justifyContent: 'space-between' }}>
+                    <small className="anuncio-fecha" style={{ position: 'relative', marginLeft: '20px', bottom: '0' }}>
+                        Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
+                    </small>
+                    <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }}>
+                        <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true)}>
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
              2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
              C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
              22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
-                </div>
+                        </svg>
+                        <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
+                    </div>
                 </div>
                 <div className="comments-container">
                     <h2 className="comments-title">Comentarios</h2>
@@ -902,9 +903,24 @@ const Condominio = () => {
         </div>
     }
     const iconNotificaciones = (activa: boolean) => {
-        return !activa ?""
+        return !activa ?
+            <label className="switch">
+                <input
+                    type="checkbox"
+                    checked={false}
+                    className="switch-checkbox"
+                />
+                <span className="switch-slider" />
+            </label>
             :
-            <img width={25} src={menuicon} alt="icono abrir menu" />
+            <label className="switch">
+                <input
+                    type="checkbox"
+                    checked={true}
+                    className="switch-checkbox"
+                />
+                <span className="switch-slider" />
+            </label>
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
