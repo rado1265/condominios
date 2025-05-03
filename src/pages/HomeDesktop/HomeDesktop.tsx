@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import './HomeDesktop.css';
 import celApp from './../../components/utils/img/celApp.png';
-import { ObteneCondominioLogic } from "../../presentation/view-model/Anuncio.logic";
 
 const HomeDesktop = () => {
 

@@ -15,7 +15,7 @@ const Home = () => {
     const selObteneCondominio = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
-            if(data == 0){
+            if(data === 0){
                 ErrorMessage("Código Incorrecto", "El código ingresado es incorrecto");
             }else{
                 window.location.href = "/" + data + "/comunidad"

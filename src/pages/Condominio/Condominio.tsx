@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, EliminarAnuncioLogic, LoginLogic, ObtenerListadoAnuncioLogic, ObtenerVotacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
-import notificacion from './../../components/utils/img/notificacion.png';
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
 import menuicon from './../../components/utils/img/menuicon.png';
-import silenciarnotificacion from './../../components/utils/img/silenciar-notificacion.png';
 
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
@@ -53,7 +51,6 @@ const Condominio = () => {
         idTipo: 1,
         idUsuario: 0
     });
-    const [videoUrl, setVideoUrl] = useState("");
     const limpiarAnuncio = () => {
         setAnuncio({
             id: 0,
@@ -68,9 +65,7 @@ const Condominio = () => {
             idTipo: 1,
             idUsuario: 0
         })
-        setVideoUrl("");
     }
-    const [key, setKey] = useState(0)
     useEffect(() => {
         if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
         if (localStorage.getItem("nombreUsuario") ||
@@ -90,7 +85,7 @@ const Condominio = () => {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    }, [])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
     const EliminarAnuncio = (a: any) => {
         try {
             handleConfirmMessage(a)
@@ -132,9 +127,9 @@ const Condominio = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                setVideoUrl(data.secure_url);
                 setAnuncio(prev => ({
                     ...prev,
+                    // eslint-disable-next-line
                     ["amedida"]: data.secure_url
                 }));
             });
@@ -159,7 +154,7 @@ const Condominio = () => {
     const selLogin = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
-            if (data.nombre != null) {
+            if (data.nombre !== null) {
                 setUsuario(data);
                 setTipo(1)
                 setIniciarSesion(false)
@@ -259,7 +254,7 @@ const Condominio = () => {
         setCrear(c)
         setEditar(d)
         setEncuesta(e)
-        if (a == 5) {
+        if (a === 5) {
             setLoading(true);
             ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
             setVotaciones(true);
@@ -285,6 +280,7 @@ const Condominio = () => {
             if (base64.startsWith('data:image')) {
                 setAnuncio(prev => ({
                     ...prev,
+                    // eslint-disable-next-line
                     ["amedida"]: base64.replace("data:image/jpeg;base64,", "")
                 }));
             } else {
@@ -322,6 +318,7 @@ const Condominio = () => {
     const crearVotacion = () => {
         try {
             var _opciones: any = [];
+            // eslint-disable-next-line
             options.map((e: any) => {
                 _opciones.push({ Descripcion: e.value, IdVotacion: 0 })
             })
@@ -365,7 +362,7 @@ const Condominio = () => {
                         onClick={() => setOpen(!open)}
                         aria-label="Abrir menú"
                     >
-                        <img width={50} src={iconmas} />
+                        <img width={50} src={iconmas} alt="icono de menu" />
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
                         <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
@@ -374,32 +371,32 @@ const Condominio = () => {
                 </div>
                 : ""}
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
-                <button aria-label="Anuncios" type="button" className={tipo == 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
+                <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
                     <span className="text">Anuncios</span>
                 </button>
-                <button aria-label="Ventas" type="button" className={tipo == 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
+                <button aria-label="Ventas" type="button" className={tipo === 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
                     <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M6 2a1 1 0 0 0-1 1v2H3a1 1 0 0 0-1 1v2h20V6a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1H6Zm1 3V4h10v1H7Zm-4 5v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10H3Zm7 3a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Zm4 0a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Z" />
                     </svg>
                     <span className="text">Ventas</span>
                 </button>
-                <button aria-label="Recordatorios" type="button" className={tipo == 2 ? "button btnactive" : "button"} onClick={() => changeMenu(2)}>
+                <button aria-label="Recordatorios" type="button" className={tipo === 2 ? "button btnactive" : "button"} onClick={() => changeMenu(2)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm-.5-9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V7z" />
                     </svg>
                     <span className="text">Recordatorios</span>
                 </button>
                 {
-                    usuario.nombre.length > 0 ? <button type="button" className={tipo == 5 ? "button btnactive" : "button"} onClick={() => changeMenu(5, false, false)}>
+                    usuario.nombre.length > 0 ? <button type="button" className={tipo === 5 ? "button btnactive" : "button"} onClick={() => changeMenu(5, false, false)}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                             <path d="M4 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4zm1 3h10v2H5V6zm0 4h10v2H5v-2zm0 4h6v2H5v-2z" />
                         </svg>
                         <span className="text">Votaciones</span>
                     </button> :
-                        <button type="button" className={tipo == 4 ? "button btnactive" : "button"} onClick={() => changeMenu(4, true)}>
+                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => changeMenu(4, true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                                 <path d="M10 0a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
                             </svg>
@@ -410,7 +407,7 @@ const Condominio = () => {
         </div >
     }
     const panelAnuncios = (a: any, i: any) => {
-        if (a.idTipo != tipo)
+        if (a.idTipo !== tipo)
             return false
         else
             return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3">
@@ -418,7 +415,7 @@ const Condominio = () => {
                     {
                         usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
                             {
-                                usuario.id == a.idUsuario || usuario.rol === "ADMINISTRADOR" ?
+                                usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR" ?
                                     <>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon editarInput" onClick={() => {
                                             changeMenu(3, false, false, true)
@@ -573,7 +570,7 @@ const Condominio = () => {
                                 <span>{b.descripcion}</span>
                                 <div id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev) => { cambiarVoto(ev); }}>
                                     <div style={{ background: '#4caf50', height: '100%', width: `${percentage}%`, borderRadius: '5px', textAlign: 'center' }}>
-                                        {b.votaciones.find((votacion: any) => votacion.idUsuario == usuario.id) ?
+                                        {b.votaciones.find((votacion: any) => votacion.idUsuario ===usuario.id) ?
                                             <span style={{ color: 'white', display: 'block', width: '55px', margin: '0 auto' }}>Votado</span>
                                             : ""}
                                     </div>
@@ -587,7 +584,7 @@ const Condominio = () => {
     }
 
     const panelCrearEncuesta = () => {
-        return <div key={key} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
+        return <div key={1} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
             <div className="survey-creator-container">
                 <h2 className="creator-title">Creador de Votaciones</h2>
 
@@ -628,7 +625,7 @@ const Condominio = () => {
                                     onClick={() => handleRemoveOption(option.id)}
                                     aria-label="Eliminar opción"
                                 >
-                                    <img width={25} src={iconmenos} />
+                                    <img width={25} src={iconmenos} alt="icono de eliminar" />
                                 </button>
                             )}
                         </div>
@@ -652,7 +649,7 @@ const Condominio = () => {
         </div>
     }
     const panelCrearAnuncio = () => {
-        return <div key={key} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
+        return <div key={2} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
             <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} Anuncio</h2>
 
             <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
@@ -729,12 +726,12 @@ const Condominio = () => {
                     </div>
                 )}
 
-                {(tipoSubir == 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir ===1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>
                 )}
-                {(tipoSubir == 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir ===1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 )}
                 {(anuncio.amedida && (anuncio.amedida && !anuncio.amedida.startsWith("http"))) && (
@@ -749,12 +746,12 @@ const Condominio = () => {
                 )}
 
 
-                {(tipoSubir == 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir ===2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir == 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir ===2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
                 {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
@@ -796,6 +793,7 @@ const Condominio = () => {
     }, []);
 
 
+    // eslint-disable-next-line
     const selSuscribir = (error: Boolean, err: string, data: any) => {
         setLoading(false);
         try {
@@ -816,6 +814,7 @@ const Condominio = () => {
         }
     }
 
+    // eslint-disable-next-line
     const selDesSuscribir = (error: Boolean, err: string, data: any) => {
         setLoading(false);
         try {
@@ -880,11 +879,11 @@ const Condominio = () => {
                                             : ""
                                 */}
                                 <button className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones);}}>
-                                    <img width={25} src={menuicon} />
+                                    <img width={25} src={menuicon} alt="icono abrir menu" />
                                 </button>
                                 <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
                                 <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
-                                    <img width={25} src={actualizar} />
+                                    <img width={25} src={actualizar} alt="icono actualizar" />
                                 </button>
                             </div>
                             { menuOpciones && (
@@ -941,7 +940,7 @@ const Condominio = () => {
                                                     </>
                                                     :
                                                     <>
-                                                        {dataFull.anuncios != null && dataFull.anuncios.map((a: any, i) => (
+                                                        {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
                                                             panelAnuncios(a, i)
                                                         ))}
                                                     </>
