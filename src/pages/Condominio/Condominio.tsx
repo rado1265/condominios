@@ -826,14 +826,14 @@ const Condominio = () => {
                 {
                     editarPerfil ?
                         <>
-                            <button type="button" className="icon" onClick={() => {
-                                setEditarPerfil(false)
-                            }}>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
-                                </svg>
-                            </button>
                             <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                                <button type="button" className="icon" onClick={() => {
+                                    setEditarPerfil(false)
+                                }}>
+                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
+                                    </svg>
+                                </button>
                                 <div style={{ justifySelf: 'center' }}>
                                     {
                                         usuarioDetalle.imagen != null ?
@@ -924,6 +924,7 @@ const Condominio = () => {
                                 {usuarioDetalle.imagen ? < img
                                     src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
                                     alt="Vista previa"
+                                    className="contenedor-circular"
                                     style={{ maxWidth: '200px', marginTop: '10px' }}
                                 /> : <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
@@ -959,67 +960,9 @@ const Condominio = () => {
 
     const panelReglasNormas = () => {
         return (
-            <div className="mx-3">
-                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
-                <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
-                <div className="anuncio-footer">
-                    <div className="anuncio-organizador">
-                        <span>Creado por: </span>
-                        <span className="ml-1">{dataDetalle.organizador}</span>
-                    </div>
-                    <span className="anuncio-telefono">{dataDetalle.telefono}</span>
-                </div>
-                {dataDetalle.amedida && dataDetalle.amedida.includes("http") ?
-                    <div className="anuncio-img-wrapper">
-                        <video src={dataDetalle.amedida} controls width="300" />
-                    </div>
-                    : dataDetalle.amedida && !dataDetalle.amedida.includes("http") ?
-                        <div className="anuncio-img-wrapper">
-                            <img className="anuncio-img" src={`data:image/jpeg;base64,${dataDetalle.amedida}`} alt="Foto" />
-                        </div>
-                        : ""
-                }
-                <div className="d-flex align-items-center w-100" style={{ justifyContent: 'space-between' }}>
-                    <small className="anuncio-fecha" style={{ position: 'relative', marginLeft: '20px', bottom: '0' }}>
-                        Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString()}
-                    </small>
-                    <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }}>
-                        <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true, true)}>
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
-             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
-             22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
-                    </div>
-                </div>
-                <div className="comments-container">
-                    <h2 className="comments-title">Comentarios</h2>
-                    {dataDetalle.comentarios.map((j: any) => {
-                        return <div key={j.id} className="comment-box">
-                            <div className="comment-header">
-                                <span className="comment-author">{j.nombreUsuario}</span>
-                                <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
-                            </div>
-                            <p className="comment-content">{j.mensaje}</p>
-                        </div>
-                    })}
-                    <textarea
-                        className="comment-textarea"
-                        placeholder="Escribe tu comentario..."
-                        value={newComentario}
-                        onChange={(e) => setNewComentario(e.target.value)}
-                        rows={3}
-                        maxLength={500}
-                    />
-                    <button
-                        type="button"
-                        className="search-button w-100 mt-1"
-                        onClick={crearComentarioAnuncio}
-                    >
-                        Publicar comentario
-                    </button>
-                </div>
+            <div className="login-box py-3 px-3 " style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>Reglas y Normas</h4>
+
             </div>
         );
     }

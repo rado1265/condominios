@@ -848,4 +848,16 @@ body {
     transform: translateX(16px);
   }
 }
+.contenedor-circular {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+}
 
+.contenedor-circular img {
+  width: 100%; 
+  height: 100%;
+  object-fit: cover;
+}
