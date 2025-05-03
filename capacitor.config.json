@@ -1,0 +1,6 @@
+{
+    "appId": "cl.conexionresidencial",
+    "appName": "conexionresidencial",
+    "webDir": "www",
+    "bundledWebRuntime": false
+  }
