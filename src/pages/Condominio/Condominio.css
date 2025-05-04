@@ -861,3 +861,81 @@ body {
   height: 100%;
   object-fit: cover;
 }
+
+.calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: #ccc;
+  margin-top: 20px;
+}
+
+.dia, .encabezado {
+  background-color: #f9f9f9;
+  padding: 6px;
+  min-height: 80px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.encabezado {
+  background-color: #e0e0e0;
+  font-weight: bold;
+  text-align: center;
+}
+
+.fecha {
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+
+.mensaje {
+  font-size: 11px;
+  margin-top: 4px;
+  padding: 3px;
+  background-color: #d9edf7;
+  border-left: 4px solid #31708f;
+  word-break: break-word;
+}
+
+@media (max-width: 600px) {
+  .calendario {
+    grid-template-columns: repeat(7, minmax(30px, 1fr));
+  }
+
+  .dia, .encabezado {
+    min-height: 60px;
+    padding: 4px;
+    font-size: 10px;
+  }
+
+  .mensaje {
+    font-size: 9px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+}
+
+.section {
+  background-color: #ffffff;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+h2 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 10px;
+}

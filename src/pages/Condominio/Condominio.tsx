@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObtenerAnuncioPorIdLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -24,7 +24,8 @@ const Condominio = () => {
     const [dataFull, setDataFull] = useState({
         anuncios: [],
         nombre: "",
-        logo: ""
+        logo: "",
+        normas: '',
     });
     const fullURL = window.location.href;
     const urlPase = fullURL.split("/");
@@ -34,6 +35,7 @@ const Condominio = () => {
         tieneSuscripcionMensajes: false,
         tieneSuscripcionVotaciones: false,
         tieneSuscripcionAnuncios: false,
+        tieneSuscripcionAvisos: false,
         rol: "",
         id: 0
     });
@@ -42,6 +44,7 @@ const Condominio = () => {
         tieneSuscripcionMensajes: false,
         tieneSuscripcionVotaciones: false,
         tieneSuscripcionAnuncios: false,
+        tieneSuscripcionAvisos: false,
         rol: "",
         id: 0,
         activo: false,
@@ -82,7 +85,31 @@ const Condominio = () => {
     const [verPerfil, setVerPerfil] = useState(false)
     const [verReglasNormas, setVerReglasNormas] = useState(false)
     const [editarPerfil, setEditarPerfil] = useState(false)
+    const [verAvisos, setVerAvisos] = useState(false)
+    const [editarAvisos, setEditarAvisos] = useState(false)
+    const [verEmergencia, setVerEmergencia] = useState(false)
+    const [editarEmergencia, setEditarEmergencia] = useState(false)
 
+    const [verPuntosInteres, setVerPuntosInteres] = useState(false)
+    const [days, setDays] = useState([]);
+    const [monthTitle, setMonthTitle] = useState('');
+
+    // Simulación de tus datos desde SQL
+    const [avisos, setAvisos] = useState([]);
+
+    const año = new Date().getFullYear();
+    const mes = new Date().getMonth();
+
+    const [mensajeAviso, setMensajeAviso] = useState([]);
+    const [fechaAviso, setFechaAviso] = useState(new Date());
+    const [emergenciaDetalle, setEmergenciaDetalle] = useState([]);
+    const [emergencia, setEmergencia] = useState({
+        id: 0,
+        descripcion: '',
+        telefono: '',
+        idcondominio: 0,
+        direccion: ''
+    })
     /* {
         id: 0,
                 idUsuario: 0,
@@ -114,6 +141,7 @@ const Condominio = () => {
             localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
             localStorage.getItem("tieneSuscripcionAnuncios") &&
+            localStorage.getItem("tieneSuscripcionAvisos") &&
             localStorage.getItem("rolUsuario") &&
             localStorage.getItem("idUsuario")) {
             setUsuario({
@@ -121,6 +149,7 @@ const Condominio = () => {
                 tieneSuscripcionMensajes: localStorage.getItem("tieneSuscripcionMensajes") === "true",
                 tieneSuscripcionVotaciones: localStorage.getItem("tieneSuscripcionVotaciones") === "true",
                 tieneSuscripcionAnuncios: localStorage.getItem("tieneSuscripcionAnuncios") === "true",
+                tieneSuscripcionAvisos: localStorage.getItem("tieneSuscripcionAvisos") === "true",
                 rol: localStorage.getItem("rolUsuario") ?? "",
                 id: parseInt(localStorage.getItem("idUsuario") ?? "")
             })
@@ -140,6 +169,7 @@ const Condominio = () => {
         localStorage.removeItem("tieneSuscripcionMensajes");
         localStorage.removeItem("tieneSuscripcionVotaciones");
         localStorage.removeItem("tieneSuscripcionAnuncios");
+        localStorage.removeItem("tieneSuscripcionAvisos");
         localStorage.removeItem("rolUsuario");
         localStorage.removeItem("idUsuario");
         setUsuario({
@@ -147,6 +177,7 @@ const Condominio = () => {
             tieneSuscripcionMensajes: false,
             tieneSuscripcionVotaciones: false,
             tieneSuscripcionAnuncios: false,
+            tieneSuscripcionAvisos: false,
             rol: "",
             id: 0
         });
@@ -228,6 +259,7 @@ const Condominio = () => {
                 localStorage.setItem("tieneSuscripcionMensajes", data.tieneSuscripcionMensajes);
                 localStorage.setItem("tieneSuscripcionVotaciones", data.tieneSuscripcionVotaciones);
                 localStorage.setItem("tieneSuscripcionAnuncios", data.tieneSuscripcionAnuncios);
+                localStorage.setItem("tieneSuscripcionAvisos", data.tieneSuscripcionAvisos);
                 localStorage.setItem("rolUsuario", data.rol);
                 localStorage.setItem("idUsuario", data.id);
             }
@@ -237,6 +269,7 @@ const Condominio = () => {
                     tieneSuscripcionMensajes: false,
                     tieneSuscripcionVotaciones: false,
                     tieneSuscripcionAnuncios: false,
+                    tieneSuscripcionAvisos: false,
                     rol: "",
                     id: 0
                 });
@@ -262,6 +295,15 @@ const Condominio = () => {
             idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario
         };
     };
+    const normalizarEmergencia = (data: any) => {
+        return {
+            id: data.id,
+            descripcion: data.descripcion,
+            telefono: data.telefono,
+            idcondominio: localStorage.getItem("idCondominio"),
+            direccion: data.direccion
+        };
+    };
 
     const CrearAnuncio = () => {
         try {
@@ -280,6 +322,28 @@ const Condominio = () => {
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+        }
+    }
+    const CrearEmergencia = () => {
+        try {
+            if (emergencia.descripcion.length > 0) {
+                setLoading(true);
+                CrearEmergenciaLogic(selCrearEmergencia, normalizarEmergencia(emergencia))
+            }
+        } catch (er) {
+        }
+    }
+    const selCrearEmergencia = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString());
+                setEditarEmergencia(true)
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -324,6 +388,13 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    const selListadoAvisos = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            setAvisos(data);
+        } catch (er) {
+        }
+    }
     const handleChangeLogin = (e: any) => {
         const { name, value } = e.target;
         setLoguear(prev => ({
@@ -334,6 +405,13 @@ const Condominio = () => {
     const handleChangeAnuncio = (e: any) => {
         const { name, value } = e.target;
         setAnuncio(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+    const handleChangeEmergencia = (e: any) => {
+        const { name, value } = e.target;
+        setEmergencia(prev => ({
             ...prev,
             [name]: value
         }));
@@ -491,38 +569,38 @@ const Condominio = () => {
                         <img width={50} src={iconmas} alt="icono de menu" />
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
-                        <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
-                        <button className="menu-item encuesta" onClick={() => { changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
+                        <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
+                        <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
                     </div>
                 </div>
                 : ""}
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
-                <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => changeMenu(1)}>
+                <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(1) }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
                     <span className="text">Anuncios</span>
                 </button>
-                <button aria-label="Ventas" type="button" className={tipo === 0 ? "button btnactive" : "button"} onClick={() => changeMenu(0)}>
+                <button aria-label="Ventas" type="button" className={tipo === 0 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(0) }}>
                     <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M6 2a1 1 0 0 0-1 1v2H3a1 1 0 0 0-1 1v2h20V6a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1H6Zm1 3V4h10v1H7Zm-4 5v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10H3Zm7 3a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Zm4 0a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Z" />
                     </svg>
                     <span className="text">Ventas</span>
                 </button>
-                <button aria-label="Recordatorios" type="button" className={tipo === 2 ? "button btnactive" : "button"} onClick={() => changeMenu(2)}>
+                <button aria-label="Recordatorios" type="button" className={tipo === 2 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(2) }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm-.5-9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V7z" />
                     </svg>
                     <span className="text">Recordatorios</span>
                 </button>
                 {
-                    usuario.nombre.length > 0 ? <button type="button" className={tipo === 5 ? "button btnactive" : "button"} onClick={() => changeMenu(5, false, false)}>
+                    usuario.nombre.length > 0 ? <button type="button" className={tipo === 5 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(5, false, false) }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                             <path d="M4 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4zm1 3h10v2H5V6zm0 4h10v2H5v-2zm0 4h6v2H5v-2z" />
                         </svg>
                         <span className="text">Votaciones</span>
                     </button> :
-                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => changeMenu(4, true)}>
+                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(4, true) }}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                                 <path d="M10 0a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
                             </svg>
@@ -665,6 +743,7 @@ const Condominio = () => {
         setOptions(updatedOptions);
     };
 
+
     const handleRemoveOption = (id: number) => {
         const filteredOptions = options.filter(opt => opt.id !== id);
         setOptions(filteredOptions);
@@ -720,6 +799,27 @@ const Condominio = () => {
             if (data) {
                 setLoading(false);
                 setUsuarioDetalle(data);
+            }
+        } catch (er) {
+        }
+    }
+    const selObtenerEmergencia = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(false);
+                setEmergenciaDetalle(data);
+            }
+        } catch (er) {
+        }
+    }
+
+    const selObteneCondominio = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            if (data === 0) {
+                ErrorMessage("Código Incorrecto", "El código ingresado es incorrecto");
+            } else {
+                window.location.href = "/" + data + "/comunidad"
             }
         } catch (er) {
         }
@@ -940,6 +1040,7 @@ const Condominio = () => {
                                     <p>Notif. Anuncios</p>
                                     <p>Notif. Mensajes</p>
                                     <p>Notif. Votaciones</p>
+                                    <p>Notif. Avisos</p>
                                     {usuarioDetalle.fechaCaducidad.toString().length > 0 ? <p>Fecha Caducidad</p> : ""}
                                 </div>
                                 <div className="p-20" style={{ width: '50%', boxSizing: 'border-box' }}>
@@ -949,6 +1050,7 @@ const Condominio = () => {
                                     <p>{usuarioDetalle.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</p>
                                     <p>{usuarioDetalle.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</p>
                                     <p>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</p>
+                                    <p>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</p>
                                     <p>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</p>
                                 </div>
                             </div>
@@ -962,8 +1064,209 @@ const Condominio = () => {
         return (
             <div className="login-box py-3 px-3 " style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                 <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>Reglas y Normas</h4>
+                <div>
+                    <div
+                        dangerouslySetInnerHTML={{ __html: dataFull.normas }}
+                    />
+                </div>
+            </div>
+        );
+    }
+    useEffect(() => {
+        generarCalendario();
+    }, [avisos]);
+
+    const generarCalendario = () => {
+        const nombresDias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+        const primerDia = new Date(año, mes, 1);
+        const diasEnMes = new Date(año, mes + 1, 0).getDate();
+
+        let diaSemana = primerDia.getDay(); // domingo = 0
+        diaSemana = diaSemana === 0 ? 6 : diaSemana - 1; // lunes = 0
+
+        const fechaActual = new Date(año, mes);
+        const nombreMes = fechaActual.toLocaleString('es-ES', {
+            month: 'long',
+            year: 'numeric',
+        });
+        setMonthTitle(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1));
+
+        const celdas: any = [];
+
+        // Encabezados
+        for (let i = 0; i < 7; i++) {
+            celdas.push(<div key={`head-${i}`} className="encabezado">{nombresDias[i]}</div>);
+        }
+
+        // Vacíos antes del 1
+        for (let i = 0; i < diaSemana; i++) {
+            celdas.push(<div key={`empty-${i}`} className="dia"></div>);
+        }
+
+        const formatoFecha = (fecha: any) => {
+            let _fecha: Date = new Date(fecha);
+            const _año = _fecha.getFullYear();
+            const _mes = _fecha.getMonth();
+            const _dia = _fecha.getDate();
+            return `${_año}-${(_mes + 1).toString().padStart(2, '0')}-${_dia.toString().padStart(2, '0')}`;
+        }
+        // Días con avisos
+        for (let dia = 1; dia <= diasEnMes; dia++) {
+            const fechaTexto = `${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+            avisos.map((a: any) => console.log(formatoFecha(a.fecha)))
+            const avisosDelDia = avisos.filter((a: any) => formatoFecha(a.fecha) === fechaTexto);
+
+            celdas.push(
+                <div key={`dia-${dia}`} className="dia">
+                    <div className="fecha">{dia}</div>
+                    {avisosDelDia.map((a: any, i: any) => (
+                        <div key={i} className="mensaje">{a.mensaje}</div>
+                    ))}
+                </div>
+            );
+        }
+
+        setDays(celdas);
+    };
+
+    const panelEmergencia = () => {
+        return (
+            editarEmergencia ?
+                <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+                    <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                        <button type="button" className="icon" onClick={() => {
+                            setEditarEmergencia(false)
+                        }}>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
+                            </svg>
+                        </button>
+                        <label htmlFor="textfield" className="search-label-admin">
+                            Descripción
+                        </label>
+                        <input
+                            name="descripcion"
+                            className="search-input"
+                            value={emergencia.descripcion}
+                            onChange={(e: any) => handleChangeEmergencia(e)}
+                        />
+                        <label htmlFor="textfield" className="search-label-admin">
+                            Dirección
+                        </label>
+                        <input
+                            name="direccion"
+                            className="search-input"
+                            value={emergencia.direccion}
+                            onChange={(e: any) => handleChangeEmergencia(e)}
+                        />
+                        <label htmlFor="textfield" className="search-label-admin">
+                            Teléfono
+                        </label>
+                        <input
+                            name="telefono"
+                            className="search-input"
+                            value={emergencia.telefono}
+                            onChange={(e: any) => handleChangeEmergencia(e)}
+                        />
+                        <button
+                            type="button"
+                            className="search-button mt-2"
+                            onClick={CrearEmergencia}
+                        >
+                            {crear ? "Crear" : "Editar"}
+                        </button>
+                    </div>
+                </div>
+                :
+                <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                    <button type="button" onClick={() => {
+                        setEditarEmergencia(true)
+                        setCrear(false)
+                    }}>
+                        Crear nuevo número de emergencia
+                    </button>
+                    <h1 style={{ textAlign: 'center' }}>Números de Emergencia</h1>
+                    <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                        {
+                            emergenciaDetalle.map((e: any) => {
+                                return (
+                                    <div>
+                                        <span><strong>{e.descripcion}</strong></span><br />
+                                        <span>{e.direccion}</span> - <span>{e.telefono}</span>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+        );
+    }
+    const panelPuntosInteres = () => {
+        return (
+
+            <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                <h1 style={{ textAlign: 'center' }}>Puntos de Interes</h1>
 
             </div>
+        );
+    }
+
+    const panelAvisos = () => {
+        return (
+            editarAvisos ?
+                <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+                    <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                        <button type="button" className="icon" onClick={() => {
+                            setEditarAvisos(false)
+                        }}>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
+                            </svg>
+                        </button>
+                        <label htmlFor="textfield" className="search-label-admin">
+                            Mensaje Aviso
+                        </label>
+                        <textarea
+                            rows={4}
+                            cols={50}
+                            name="descripcion"
+                            className="search-input"
+                            value={mensajeAviso}
+                            onChange={(e: any) => setMensajeAviso(e.target.values)}
+                        />
+                        <label htmlFor="textfield" className="search-label-admin mt-3">
+                            Fecha Aviso
+                        </label>
+                        <input
+                            type="datetime-local"
+                            name="fechaAviso"
+                            className="typeDate"
+                            value={fechaAviso ? fechaAviso.toString().substring(0, 10) : ''}
+                            onChange={(e: any) => setFechaAviso(e.target.values)}
+                            style={{ padding: '8px', fontSize: '16px' }}
+                        />
+                        <button
+                            type="button"
+                            className="search-button mt-2"
+                            onClick={CrearAnuncio}
+                        >
+                            {crear ? "Crear" : "Editar"}
+                        </button>
+                    </div>
+                </div>
+                :
+                <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                    <button type="button" onClick={() => {
+                        setEditarAvisos(true)
+                        setCrear(false)
+                    }}>
+                        Crear nuevo aviso
+                    </button>
+                    <h1 style={{ textAlign: 'center' }}>Calendario de {monthTitle}</h1>
+                    <div className="calendario">
+                        {days}
+                    </div>
+                </div>
         );
     }
 
@@ -1163,16 +1466,14 @@ const Condominio = () => {
         </div>
     }
     const iconNotificaciones = (activa: boolean) => {
-        return !activa ? ""
-            :
-            <label className="switch">
-                <input
-                    type="checkbox"
-                    checked={true}
-                    className="switch-checkbox"
-                />
-                <span className="switch-slider" />
-            </label>
+        return <label className="switch">
+            <input
+                type="checkbox"
+                checked={activa}
+                className="switch-checkbox"
+            />
+            <span className="switch-slider" />
+        </label>
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1187,7 +1488,16 @@ const Condominio = () => {
         }
     }, []);
 
-
+    const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
+        setMenuOpciones(a)
+        setVerPerfil(b)
+        setVerReglasNormas(c);
+        setVerAvisos(d)
+        setEditarAvisos(e)
+        setVerPuntosInteres(f)
+        setVerEmergencia(g)
+        setVotaciones(h);
+    }
     // eslint-disable-next-line
     const selSuscribir = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -1199,6 +1509,7 @@ const Condominio = () => {
                     tieneSuscripcionMensajes: err === "2" ? true : usuario.tieneSuscripcionMensajes,
                     tieneSuscripcionVotaciones: err === "3" ? true : usuario.tieneSuscripcionVotaciones,
                     tieneSuscripcionAnuncios: err === "1" ? true : usuario.tieneSuscripcionAnuncios,
+                    tieneSuscripcionAvisos: err === "4" ? true : usuario.tieneSuscripcionAvisos,
                     rol: usuario.rol,
                     id: usuario.id
                 });
@@ -1224,6 +1535,7 @@ const Condominio = () => {
                     tieneSuscripcionMensajes: err === "2" ? false : usuario.tieneSuscripcionMensajes,
                     tieneSuscripcionVotaciones: err === "3" ? false : usuario.tieneSuscripcionVotaciones,
                     tieneSuscripcionAnuncios: err === "1" ? false : usuario.tieneSuscripcionAnuncios,
+                    tieneSuscripcionAvisos: err === "4" ? false : usuario.tieneSuscripcionAvisos,
                     rol: usuario.rol,
                     id: usuario.id
                 });
@@ -1294,12 +1606,8 @@ const Condominio = () => {
                             {menuOpciones && (
                                 <div className="custom-menu">
                                     <button type="button" onClick={() => {
-                                        setVerReglasNormas(false)
-                                        setVerPerfil(true);
-                                        setEditarPerfil(false)
-                                        setVotaciones(false);
+                                        cerrarMenu(false, true)
                                         setLoading(true);
-                                        setMenuOpciones(false)
                                         ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
                                     }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -1348,10 +1656,17 @@ const Condominio = () => {
                                         {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
                                     </button>
                                     <button type="button" onClick={() => {
-                                        setVerPerfil(false)
-                                        setVerReglasNormas(true);
-                                        setVotaciones(false);
-                                        setMenuOpciones(false)
+                                        setLoading(true);
+                                        !usuario.tieneSuscripcionAvisos ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 4) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 4)
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                        </svg>
+                                        Notif. Avisos
+                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        cerrarMenu(false, false, true)
                                     }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 10-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 9a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4A.75.75 0 0010 9z" clip-rule="evenodd" />
@@ -1359,9 +1674,36 @@ const Condominio = () => {
                                         Reglas y Normas
                                     </button>
                                     <button type="button" onClick={() => {
-                                        setVerPerfil(false)
-                                        setVerReglasNormas(false)
-                                        setMenuOpciones(false)
+                                        cerrarMenu(false, false, false, true)
+                                        setLoading(true)
+                                        ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString())
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#5bc0de" viewBox="0 0 24 24">
+                                            <path d="M20 2H4C2.897 2 2 2.897 2 4v14c0 1.103.897 2 2 2h14l4 4V4c0-1.103-.897-2-2-2z" />
+                                        </svg>
+                                        Avisos
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        cerrarMenu(false, false, false, false, false, true)
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="red" width="24" height="24" viewBox="0 0 24 24">
+                                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
+                                        </svg>
+                                        Puntos de Interes
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        cerrarMenu(false, false, false, false, false, false, true)
+                                        setLoading(true)
+                                        ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                                d="M10.29 3.86L1.82 18a1 1 0 00.86 1.5h18.64a1 1 0 00.86-1.5L13.71 3.86a1 1 0 00-1.72 0zM12 9v4m0 4h.01" />
+                                        </svg>
+                                        Núm. Emergencias
+                                    </button>
+                                    <button type="button" onClick={() => {
+                                        cerrarMenu(false)
                                         cerrarSesion()
                                     }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -1389,32 +1731,46 @@ const Condominio = () => {
                                                 <>
                                                     {panelVotaciones()}
                                                 </>
-                                                :
-                                                encuesta ?
+                                                : verEmergencia ?
                                                     <>
-                                                        {panelCrearEncuesta()}
+                                                        {panelEmergencia()}
                                                     </>
                                                     :
-                                                    verPerfil ?
+                                                    verPuntosInteres ?
                                                         <>
-                                                            {panelPerfil()}
+                                                            {panelPuntosInteres()}
                                                         </>
                                                         :
-                                                        verReglasNormas ?
+                                                        encuesta ?
                                                             <>
-                                                                {panelReglasNormas()}
+                                                                {panelCrearEncuesta()}
                                                             </>
                                                             :
-                                                            verDetalle && tipo !== 2 ?
+                                                            verAvisos ?
                                                                 <>
-                                                                    {panelDetalleAnuncio()}
+                                                                    {panelAvisos()}
                                                                 </>
                                                                 :
-                                                                <>
-                                                                    {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
-                                                                        panelAnuncios(a, i)
-                                                                    ))}
-                                                                </>
+                                                                verPerfil ?
+                                                                    <>
+                                                                        {panelPerfil()}
+                                                                    </>
+                                                                    :
+                                                                    verReglasNormas ?
+                                                                        <>
+                                                                            {panelReglasNormas()}
+                                                                        </>
+                                                                        :
+                                                                        verDetalle && tipo !== 2 ?
+                                                                            <>
+                                                                                {panelDetalleAnuncio()}
+                                                                            </>
+                                                                            :
+                                                                            <>
+                                                                                {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                                    panelAnuncios(a, i)
+                                                                                ))}
+                                                                            </>
                                 }
                             </div>
                         </div>

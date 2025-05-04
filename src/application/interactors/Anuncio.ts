@@ -175,3 +175,47 @@ export const ObtenerUsuarios = (selListado: any, idCondominio: string) => {
         }
     });
 };
+
+export const ObtenerAvisos = (selListado: any, mes: any) => {
+    SVCAnuncio.ObtenerAvisos(mes).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
+
+export const CrearAvisos = (selListado: any, aviso: string) => {
+    SVCAnuncio.CrearAvisos(aviso).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
+
+export const ObtenerEmergencias = (selListado: any, idcondominio: any) => {
+    SVCAnuncio.ObtenerEmergencias(idcondominio).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
+
+export const CrearEmergencia = (selListado: any, emergencia: string) => {
+    SVCAnuncio.CrearEmergencia(emergencia).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};

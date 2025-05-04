@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios, ObtenerAvisos, CrearAvisos, ObtenerEmergencias, CrearEmergencia } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -54,4 +54,17 @@ export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string) => 
 
 export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {
     return ObtenerUsuarios(selListado, idCondominio);
+}
+
+export const ObtenerAvisosLogic = (selListado: any, mes: string) => {
+    return ObtenerAvisos(selListado, mes);
+}
+export const CrearAvisosLogic = (selListado: any, aviso: any) => {
+    return CrearAvisos(selListado, aviso);
+}
+export const ObtenerEmergenciasLogic = (selListado: any, idcondominio: string) => {
+    return ObtenerEmergencias(selListado, idcondominio);
+}
+export const CrearEmergenciaLogic = (selListado: any, emergencia: any) => {
+    return CrearEmergencia(selListado, emergencia);
 }

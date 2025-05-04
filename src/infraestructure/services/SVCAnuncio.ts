@@ -408,4 +408,102 @@ export class SVCAnuncio {
 
         return sr;
     }
+
+
+    public static async CrearAvisos(aviso: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/crearAviso";
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .post(url, aviso, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+    public static async ObtenerAvisos(mes: string): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/getAvisos?mes=" + mes;
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .get(url, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+    public static async CrearEmergencia(emergencia: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/crearEmergencia";
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .post(url, emergencia, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+    public static async ObtenerEmergencias(idCondominio: string): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/getEmergencias?idCondominio=" + idCondominio;
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .get(url, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
 }
