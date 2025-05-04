@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -287,6 +287,11 @@ const Condominio = () => {
                 });
                 ErrorMessage("Credenciales incorrectas", "")
             }
+            setLoguear({
+                usuario: "",
+                clave: "",
+                idCondominio: localStorage.getItem("idCondominio")
+            })
         } catch (er) {
             ErrorMessage("Credenciales incorrectas", "")
         }
@@ -350,6 +355,29 @@ const Condominio = () => {
             }
             CrearAvisosLogic(selCrearAvisos, aviso, false)
         } catch (er) {
+        }
+    }
+    const EnviarNotifAviso = (a: any) => {
+        try {
+            var aviso: any = {
+                mensaje: a,
+                idCondominio:  localStorage.getItem("idCondominio")!.toString(),
+                usuario: usuario.nombre
+            }
+            EnviarNotifAvisoLogic(selEnviarNotifAviso, aviso)
+        } catch (er) {
+        }
+    }
+    const selEnviarNotifAviso = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                SuccessMessage("Aviso enviado correctamente.")
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
     }
     const selCrearAvisos = (error: Boolean, err: string, data: any) => {
@@ -1150,50 +1178,78 @@ const Condominio = () => {
         );
     }
 
-    const editorRef = useRef(null);
+    const editorRef = useRef<HTMLDivElement>(null);
 
     const handleInput = (ev: any) => {
         //setNewTextRich(ev.target.children[0].outerHTML);
         setTextRichEditado(true);
     };
-
+    const handleBlur = (ev: any) => {
+        if (editorRef.current) {
+            setNewTextRich(editorRef.current.innerHTML);
+        }
+    };
+    const cambiarNormas = () => {
+        console.log(newTextRich)
+        CambiarNormasLogic(selCambiarNormas, newTextRich, urlPase[3])
+    }
+    const selCambiarNormas = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(true);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+        }
+    }
     const panelReglasNormas = () => {
         return (
             <div className="login-box py-3 px-3 ">
                 <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>Reglas y Normas</h4>
                 <div className="containerReglas">
-                    {!editarTextRich ?
-                        <div
-                            dangerouslySetInnerHTML={{ __html: dataFull.normas }}
-                        />
-                        :
-                        <div>
+                    {
+                        usuario.rol !== "ADMINISTRADOR" ?
                             <div
-                                className="rich-text-input"
-                                contentEditable
-                                ref={editorRef}
-                                onInput={handleInput}
-                                suppressContentEditableWarning={true}
-                                dangerouslySetInnerHTML={{ __html: newTextRich }}
-                                spellCheck={true}
-                                aria-label="Editor de texto enriquecido"
-                            />
-                            {textRichEditado ?
-                                <button type="button" className="search-button mt-2 w-100" onClick={() => {
-                                    setTextRichEditado(false);
-                                }}>
-                                    Guardar cambios
-                                </button>
-                                : ""}
-                            {textRichEditado ?
-                                <button type="button" className="search-button mt-2 w-100" onClick={() => {
-                                    setNewTextRich(dataFull.normas);
-                                    setTextRichEditado(false);
-                                }}>
-                                    Descartar cambios
-                                </button>
-                                : ""}
-                        </div>
+                                dangerouslySetInnerHTML={{ __html: dataFull.normas }}
+                            /> :
+                            editarTextRich ?
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: dataFull.normas }}
+                                />
+                                :
+                                <div>
+                                    <div
+                                        className="rich-text-input"
+                                        contentEditable
+                                        ref={editorRef}
+                                        onInput={handleInput}
+                                        onBlur={handleBlur}
+                                        suppressContentEditableWarning={true}
+                                        dangerouslySetInnerHTML={{ __html: newTextRich }}
+                                        spellCheck={true}
+                                        aria-label="Editor de texto enriquecido"
+                                    />
+                                    {textRichEditado ?
+                                        <button type="button" className="search-button mt-2 w-100" onClick={() => {
+                                            setTextRichEditado(false);
+                                            cambiarNormas();
+                                        }}>
+                                            Guardar cambios
+                                        </button>
+                                        : ""}
+                                    {textRichEditado ?
+                                        <button type="button" className="search-button mt-2 w-100" onClick={() => {
+                                            setNewTextRich(dataFull.normas);
+                                            setTextRichEditado(false);
+                                        }}>
+                                            Descartar cambios
+                                        </button>
+                                        : ""}
+                                </div>
                     }
 
                 </div>
@@ -1479,7 +1535,7 @@ const Condominio = () => {
                                             usuario.rol === "ADMINISTRADOR" &&
                                             <>
                                                 <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                                    //setEditarPerfil(true)
+                                                    EnviarNotifAviso(e.mensaje)
                                                 }}>
                                                     <img src={notificar} />
                                                 </button>
