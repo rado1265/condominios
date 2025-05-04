@@ -59,12 +59,12 @@ export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {
 export const ObtenerAvisosLogic = (selListado: any, mes: string) => {
     return ObtenerAvisos(selListado, mes);
 }
-export const CrearAvisosLogic = (selListado: any, aviso: any) => {
-    return CrearAvisos(selListado, aviso);
+export const CrearAvisosLogic = (selListado: any, aviso: any, eliminar: boolean) => {
+    return CrearAvisos(selListado, aviso, eliminar);
 }
 export const ObtenerEmergenciasLogic = (selListado: any, idcondominio: string) => {
     return ObtenerEmergencias(selListado, idcondominio);
 }
-export const CrearEmergenciaLogic = (selListado: any, emergencia: any) => {
-    return CrearEmergencia(selListado, emergencia);
+export const CrearEmergenciaLogic = (selListado: any, emergencia: any, eliminar: boolean) => {
+    return CrearEmergencia(selListado, emergencia, eliminar);
 }

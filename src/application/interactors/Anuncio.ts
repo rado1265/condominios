@@ -187,8 +187,8 @@ export const ObtenerAvisos = (selListado: any, mes: any) => {
     });
 };
 
-export const CrearAvisos = (selListado: any, aviso: string) => {
-    SVCAnuncio.CrearAvisos(aviso).then((res: IServiceResult<any>) => {
+export const CrearAvisos = (selListado: any, aviso: string, eliminar: boolean) => {
+    SVCAnuncio.CrearAvisos(aviso, eliminar).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);
@@ -209,8 +209,8 @@ export const ObtenerEmergencias = (selListado: any, idcondominio: any) => {
     });
 };
 
-export const CrearEmergencia = (selListado: any, emergencia: string) => {
-    SVCAnuncio.CrearEmergencia(emergencia).then((res: IServiceResult<any>) => {
+export const CrearEmergencia = (selListado: any, emergencia: string, eliminar: boolean) => {
+    SVCAnuncio.CrearEmergencia(emergencia, eliminar).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);

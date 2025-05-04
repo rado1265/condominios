@@ -410,10 +410,10 @@ export class SVCAnuncio {
     }
 
 
-    public static async CrearAvisos(aviso: any): Promise<IServiceResult<any>> {
+    public static async CrearAvisos(aviso: any, eliminar: boolean): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/crearAviso";
+        const url: string = _ruta + "Condominios/crearAviso?eliminar=" + eliminar;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios
@@ -458,10 +458,11 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async CrearEmergencia(emergencia: any): Promise<IServiceResult<any>> {
+    public static async CrearEmergencia(emergencia: any, eliminar: boolean): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/crearEmergencia";
+        const url: string = _ruta + "Condominios/crearEmergencia?eliminar=" + eliminar;
+
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios

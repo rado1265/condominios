@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -110,9 +110,10 @@ const Condominio = () => {
     const año = new Date().getFullYear();
     const mes = new Date().getMonth();
 
-    const [mensajeAviso, setMensajeAviso] = useState([]);
-    const [fechaAviso, setFechaAviso] = useState(new Date());
+    const [mensajeAviso, setMensajeAviso] = useState('');
+    const [fechaAviso, setFechaAviso] = useState('');
     const [horaAviso, setHoraAviso] = useState(new Date().toLocaleTimeString());
+    const [idAviso, setIdAviso] = useState(0);
     const [emergenciaDetalle, setEmergenciaDetalle] = useState([]);
     const [emergencia, setEmergencia] = useState({
         id: 0,
@@ -325,10 +326,47 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    const EliminarAviso = (a: any, b: any, c: any) => {
+        try {
+            let fecha: Date = new Date(b)
+            var aviso: any = {
+                id: a,
+                fecha: b,
+                mensaje: c,
+                idUsuario: usuario.id
+            }
+            CrearAvisosLogic(selCrearAvisos, aviso, true)
+        } catch (er) {
+        }
+    }
     const CrearAviso = () => {
         try {
-
+            let fecha: Date = new Date(fechaAviso)
+            var aviso: any = {
+                id: idAviso,
+                fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
+                mensaje: mensajeAviso,
+                idUsuario: usuario.id
+            }
+            CrearAvisosLogic(selCrearAvisos, aviso, false)
         } catch (er) {
+        }
+    }
+    const selCrearAvisos = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString());
+                setEditarAvisos(false);
+                setMensajeAviso('');
+                setFechaAviso('');
+                setHoraAviso(new Date().toLocaleTimeString());
+                setIdAviso(0);
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
     }
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
@@ -351,20 +389,36 @@ const Condominio = () => {
         try {
             if (emergencia.descripcion.length > 0) {
                 setLoading(true);
-                CrearEmergenciaLogic(selCrearEmergencia, normalizarEmergencia(emergencia))
+                CrearEmergenciaLogic(selCrearEmergencia, normalizarEmergencia(emergencia), false)
             }
         } catch (er) {
+        }
+    }
+    const EliminarEmergencia = () => {
+        try {
+            handleConfirmMessageEliminarEmergencia()
+        } catch (er) {
+        }
+    }
+    const handleConfirmMessageEliminarEmergencia = async () => {
+        const msg: any = await ConfirmMessage(`Eliminar número de emergencia`, `¿Esta seguro de querer eliminar el número de emergencia?`);
+        if (msg) {
+            if (emergencia.descripcion.length > 0) {
+                setLoading(true);
+                CrearEmergenciaLogic(selCrearEmergencia, normalizarEmergencia(emergencia), true)
+            }
         }
     }
     const selCrearEmergencia = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
                 ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString());
-                setEditarEmergencia(true)
+                setEditarEmergencia(false)
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             }
+            setLoading(false)
         } catch (er) {
             ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
@@ -1246,7 +1300,7 @@ const Condominio = () => {
                         className="search-button mt-2"
                         onClick={CrearEmergencia}
                     >
-                        {crear ? "Crear" : "Editar"}
+                        Aceptar
                     </button>
                 </div>
             </div>
@@ -1260,31 +1314,40 @@ const Condominio = () => {
                                 <div className="container-emergencia">
                                     <span><strong>{e.descripcion}</strong></span><br />
                                     <span>{e.direccion}</span>
-                                    {/*<span className="d-block">{e.telefono}</span>*/}
                                     <a href={`tel:${e.telefono}`} className="d-block">{e.telefono}</a>
+                                    {
+                                        usuario.rol === "ADMINISTRADOR" &&
+                                        <>
+                                            {/*<span className="d-block">{e.telefono}</span>*/}
 
-                                    <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => {
-                                        //setEditarPerfil(true)
-                                    }}>
-                                        <img src={iconeditar} />
-                                    </button>
-                                    <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={() => {
-                                        //setEditarPerfil(true)
-                                    }}>
-                                        <img src={iconborrar} />
-                                    </button>
+                                            <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => {
+                                                //setEditarPerfil(true)
+                                            }}>
+                                                <img src={iconeditar} />
+                                            </button>
+                                            <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={() => {
+                                                setEmergencia(e)
+                                                EliminarEmergencia()
+                                            }}>
+                                                <img src={iconborrar} />
+                                            </button>
+                                        </>
+                                    }
                                 </div>
                             )
                         })
                     }
-                    <button type="button" className="search-button mt-2" onClick={() => {
-                        setEditarEmergencia(true)
-                        setCrear(false)
-                    }}>
-                        Crear número de emergencia
-                    </button>
+                    {
+                        usuario.rol === "ADMINISTRADOR" &&
+                        <button type="button" className="search-button mt-2" onClick={() => {
+                            setEditarEmergencia(true)
+                            setCrear(false)
+                        }}>
+                            Crear número de emergencia
+                        </button>
+                    }
                 </div>
-            </div>
+            </div >
     }
 
     const anuncios = [
@@ -1409,39 +1472,51 @@ const Condominio = () => {
                                         <span>{new Date(e.fecha).toLocaleTimeString()}</span>
                                     </div>
                                     <div style={{ position: 'absolute', right: '25px' }}>
-                                        <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                            //setEditarPerfil(true)
-                                        }}>
-                                            <img src={notificar} />
-                                        </button>
+                                        {
+                                            usuario.rol === "ADMINISTRADOR" &&
+                                            <>
+                                                <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
+                                                    //setEditarPerfil(true)
+                                                }}>
+                                                    <img src={notificar} />
+                                                </button>
 
-                                        <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                            setEditarAvisos(true);
-                                            setCrear(false);
-                                            setVerDetalleAvisos(false);
-                                            setFechaAviso(e.fecha.toString().substring(0, 10));
-                                            setHoraAviso(e.fecha.toString().substring(11));
-                                            setMensajeAviso(e.mensaje);
-                                        }}>
-                                            <img src={iconeditar} />
-                                        </button>
-                                        <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                            //setEditarPerfil(true)
-                                        }}>
-                                            <img src={iconborrar} />
-                                        </button>
+                                                <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
+                                                    setEditarAvisos(true);
+                                                    setCrear(false);
+                                                    setVerDetalleAvisos(false);
+                                                    setFechaAviso(e.fecha.toString().substring(0, 10));
+                                                    setHoraAviso(e.fecha.toString().substring(11));
+                                                    setMensajeAviso(e.mensaje);
+                                                    setIdAviso(e.id)
+                                                }}>
+                                                    <img src={iconeditar} />
+                                                </button>
+                                                <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
+                                                    EliminarAviso(e.id, e.fecha, e.mensaje)
+                                                }}>
+                                                    <img src={iconborrar} />
+                                                </button>
+                                            </>
+                                        }
                                     </div>
                                 </div>
                             )
                         })
                     }
-                    <button type="button" className="search-button mt-2" onClick={() => {
-                        setEditarAvisos(true)
-                        setCrear(true)
-                        setVerDetalleAvisos(false);
-                    }}>
-                        Crear aviso
-                    </button>
+                    {
+                        usuario.rol === "ADMINISTRADOR" &&
+                        <button type="button" className="search-button mt-2" onClick={() => {
+                            setEditarAvisos(true)
+                            setVerDetalleAvisos(false);
+                            setFechaAviso(new Date(diaMesSelect.anio, diaMesSelect.mes - 1, diaMesSelect.dia).toISOString().substring(0, 10));
+                            setHoraAviso("");
+                            setMensajeAviso('');
+                            setIdAviso(0)
+                        }}>
+                            Crear aviso
+                        </button>
+                    }
                 </div>
             </div> : editarAvisos ?
                 <div className="px-2">
@@ -1490,7 +1565,7 @@ const Condominio = () => {
                             className="search-button mt-2"
                             onClick={CrearAviso}
                         >
-                            {crear ? "Crear" : "Editar"}
+                            Aceptar
                         </button>
                     </div>
                 </div>
