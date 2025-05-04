@@ -409,8 +409,8 @@ body {
   display: flex;
   align-items: center;
   position: absolute;
-  bottom: 10px;
-  left: 15px;
+  bottom: 20px;
+  left: 20px;
   font-size: 14px;
   color: red;
 }
@@ -682,7 +682,6 @@ body {
   margin: 0 auto;
   padding: 16px;
   font-family: var(--fuenteWeb);
-  background-color: #fafafa;
 }
 
 .comments-title {

@@ -510,12 +510,13 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
-    /*document.addEventListener('visibilitychange', () => {
+    
+    document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    });*/
+    });
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -569,6 +570,7 @@ const Condominio = () => {
             setLoading(false);
             if (data) {
                 SuccessMessage("Votación creada correctamente.")
+                changeMenu(5);
             }
             else {
                 ErrorMessage("Ocurrió un error al crear la Votación", "")
@@ -637,10 +639,12 @@ const Condominio = () => {
             return false
         else
             return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3" onClick={() => {
+                if(a.idTipo !== 2){
                 setLoading(true);
                 ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id)
                 setDataDetalle(a);
                 setVerDetalle(true);
+                }
             }}>
                 <div className="anuncio-header">
                     {
@@ -649,7 +653,7 @@ const Condominio = () => {
                                 usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR" ?
                                     <>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon editarInput" onClick={() => {
-                                            changeMenu(3, false, false, true)
+                                            changeMenu(a.idTipo, false, false, true)
                                             cargarAnuncioParaEdit(a)
                                         }}>
                                             <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
@@ -852,7 +856,7 @@ const Condominio = () => {
             <h2 className="mt-3 mb-4">VOTACIONES ACTIVAS</h2>
             {dataVotaciones.map((a: any, i: number) => {
                 return (
-                    <div className="cardVotacion">
+                    <div className="cardVotacion my-4">
                         <h4 className="text-center">{a.cabecera}</h4>
                         <span className="mb-3 text-center d-block">{a.descripcion}</span>
                         {a.opcionesVotacion.map((b: any, o: number) => {
@@ -878,6 +882,11 @@ const Condominio = () => {
     const panelDetalleAnuncio = () => {
         return (
             <div className="mx-3">
+                <button type="button" className="iconoVolver" onClick={() => {
+                    setVerDetalle(false)
+                }}>
+                    <img width={35} src={volver} alt="Icono volver" />
+                </button>
                 <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
                 <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
                 <div className="anuncio-footer">
@@ -913,7 +922,7 @@ const Condominio = () => {
                 </div>
                 <div className="comments-container">
                     <h2 className="comments-title">Comentarios</h2>
-                    {dataDetalle.comentarios.map((j: any) => {
+                    {dataDetalle.comentarios ? dataDetalle.comentarios.map((j: any) => {
                         return <div key={j.id} className="comment-box">
                             <div className="comment-header">
                                 <span className="comment-author">{j.nombreUsuario}</span>
@@ -921,7 +930,7 @@ const Condominio = () => {
                             </div>
                             <p className="comment-content">{j.mensaje}</p>
                         </div>
-                    })}
+                    }) : ""}
                     <textarea
                         className="comment-textarea"
                         placeholder="Escribe tu comentario..."
@@ -941,7 +950,7 @@ const Condominio = () => {
             </div>
         );
     }
-    console.log(usuarioDetalle)
+
     const panelPerfil = () => {
         return (
             <div className="w-100 px-3">
@@ -1322,27 +1331,27 @@ const Condominio = () => {
     function AnuncioCard({ titulo, descripcion, imagen, url }: { titulo: string, descripcion: string, imagen: string, url: string }) {
         const ref = useRef(null);
         const visible = useVisible(ref);
-      
+
         return (
-          <a
-            href={url}
-            className={`anuncio-card ${visible ? "visible" : ""}`}
-            ref={ref}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div
-              className="anuncio-imagen"
-              style={{ backgroundImage: `url(${imagen})` }}
-              aria-label={titulo}
-            />
-            <div className="anuncio-texto">
-              <h3>{titulo}</h3>
-              <p>{descripcion}</p>
-            </div>
-          </a>
+            <a
+                href={url}
+                className={`anuncio-card ${visible ? "visible" : ""}`}
+                ref={ref}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <div
+                    className="anuncio-imagen"
+                    style={{ backgroundImage: `url(${imagen})` }}
+                    aria-label={titulo}
+                />
+                <div className="anuncio-texto">
+                    <h3>{titulo}</h3>
+                    <p>{descripcion}</p>
+                </div>
+            </a>
         );
-      }
+    }
 
     const panelPuntosInteres = () => {
         return (
@@ -1561,7 +1570,14 @@ const Condominio = () => {
     }
     const panelCrearAnuncio = () => {
         return <div key={2} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} Anuncio</h2>
+            <button type="button" className="iconoVolver" onClick={() => {
+                setCrear(false);
+                setEditar(false);
+                setVerDetalle(false);
+            }}>
+                <img width={35} src={volver} alt="Icono volver" />
+            </button>
+            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} { tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio"}</h2>
 
             <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                 <label htmlFor="textfield" className="search-label-admin">
@@ -1792,12 +1808,12 @@ const Condominio = () => {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <React.Fragment>
-            {
-                loading ?
-                    <Loading />
-                    :
-                    <div>
-                        {/*<div className="w-100 pb-3 mb-3" style={{ background: 'linear-gradient(rgb(255, 255, 255), rgb(144 212 164 / 67%))', justifyContent: 'center', display: 'grid', boxShadow: 'rgb(2 109 33 / 24%) 0px 0px 24px 0px' }}>
+            <div>
+                {
+                    loading ?
+                        <Loading />
+                        : ""}
+                {/*<div className="w-100 pb-3 mb-3" style={{ background: 'linear-gradient(rgb(255, 255, 255), rgb(144 212 164 / 67%))', justifyContent: 'center', display: 'grid', boxShadow: 'rgb(2 109 33 / 24%) 0px 0px 24px 0px' }}>
                             <img className="w-50 mx-auto" src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" />
                             <h2 className="text-center" style={{ color: '#316371', margin: '0' }}>{dataFull.nombre}</h2>
                             {
@@ -1819,9 +1835,9 @@ const Condominio = () => {
                                 <img width={35} src={refresh} />
                             </button>
                         </div>*/}
-                        <div className="w-100 pb-3 mb-3 containerMenu">
-                            <div className="containerImgMenu">
-                                {/*
+                <div className="w-100 pb-3 mb-3 containerMenu">
+                    <div className="containerImgMenu">
+                        {/*
                                     usuario.nombre.length > 0 && !usuario.tieneSuscripcion ?
                                         <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
                                             <img width={25} src={notificacion} />
@@ -1832,191 +1848,190 @@ const Condominio = () => {
                                             </button>
                                             : ""
                                 */}
-                                {
-                                    usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(true); }}>
-                                        <img width={25} src={menuicon} alt="icono abrir menu" />
-                                    </button>
-                                }
-                                <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
-                                <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
-                                    <img width={25} src={actualizar} alt="icono actualizar" />
-                                </button>
-                            </div>
-                            {menuOpciones && (
-                                <div ref={menuRef} className="custom-menu">
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu(false, true)
-                                        setLoading(true);
-                                        ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
-                                    }}>
-                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                            <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                        {
+                            usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(true); }}>
+                                <img width={25} src={menuicon} alt="icono abrir menu" />
+                            </button>
+                        }
+                        <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
+                        <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
+                            <img width={25} src={actualizar} alt="icono actualizar" />
+                        </button>
+                    </div>
+                    {menuOpciones && (
+                        <div ref={menuRef} className="custom-menu">
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false, true)
+                                setLoading(true);
+                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
+                            }}>
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                                </svg>
+                                Perfil
+                            </button>
+                            {
+                                usuario.rol === "Administrador" && (
+                                    <button type="button" onClick={() => { setVerPerfil(true); setVotaciones(false) }}>
+                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.05 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z" />
                                         </svg>
-                                        Perfil
+                                        Comunidad
                                     </button>
-                                    {
-                                        usuario.rol === "Administrador" && (
-                                            <button type="button" onClick={() => { setVerPerfil(true); setVotaciones(false) }}>
-                                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.05 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z" />
-                                                </svg>
-                                                Comunidad
-                                            </button>
-                                        )
-                                    }
-                                    <button type="button" onClick={() => {
-                                        setLoading(true);
-                                        !usuario.tieneSuscripcionAnuncios ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 1) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 1)
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                        </svg>
-                                        Notif. Anuncios
-                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        setLoading(true);
-                                        !usuario.tieneSuscripcionMensajes ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 2) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 2)
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                        </svg>
-                                        Notif. Mensajes
-                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        setLoading(true);
-                                        !usuario.tieneSuscripcionVotaciones ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 3) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 3)
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                        </svg>
-                                        Notif. Votaciones
-                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        setLoading(true);
-                                        !usuario.tieneSuscripcionAvisos ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 4) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 4)
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                        </svg>
-                                        Notif. Avisos
-                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu(false, false, true);
-                                        setNewTextRich(dataFull.normas);
-                                    }}>
-                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 10-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 9a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4A.75.75 0 0010 9z" clip-rule="evenodd" />
-                                        </svg>
-                                        Reglas y Normas
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu(false, false, false, true)
-                                        setLoading(true)
-                                        ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString())
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#5bc0de" viewBox="0 0 24 24">
-                                            <path d="M20 2H4C2.897 2 2 2.897 2 4v14c0 1.103.897 2 2 2h14l4 4V4c0-1.103-.897-2-2-2z" />
-                                        </svg>
-                                        Avisos
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu(false, false, false, false, false, true)
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="red" width="24" height="24" viewBox="0 0 24 24">
-                                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-                                        </svg>
-                                        Puntos de Interes
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu(false, false, false, false, false, false, true)
-                                        setLoading(true)
-                                        ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                                d="M10.29 3.86L1.82 18a1 1 0 00.86 1.5h18.64a1 1 0 00.86-1.5L13.71 3.86a1 1 0 00-1.72 0zM12 9v4m0 4h.01" />
-                                        </svg>
-                                        Núm. Emergencias
-                                    </button>
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu(false)
-                                        cerrarSesion()
-                                    }}>
-                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                            <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
-                                            <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
-                                        </svg>
-                                        Cerrar Sesión
-                                    </button>
-                                </div>
-                            )}
+                                )
+                            }
+                            <button type="button" onClick={() => {
+                                setLoading(true);
+                                !usuario.tieneSuscripcionAnuncios ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 1) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 1)
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                </svg>
+                                Notif. Anuncios
+                                {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                            </button>
+                            <button type="button" onClick={() => {
+                                setLoading(true);
+                                !usuario.tieneSuscripcionMensajes ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 2) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 2)
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                </svg>
+                                Notif. Mensajes
+                                {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                            </button>
+                            <button type="button" onClick={() => {
+                                setLoading(true);
+                                !usuario.tieneSuscripcionVotaciones ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 3) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 3)
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                </svg>
+                                Notif. Votaciones
+                                {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                            </button>
+                            <button type="button" onClick={() => {
+                                setLoading(true);
+                                !usuario.tieneSuscripcionAvisos ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 4) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 4)
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                </svg>
+                                Notif. Avisos
+                                {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                            </button>
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false, false, true);
+                                setNewTextRich(dataFull.normas);
+                            }}>
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 10-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 9a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4A.75.75 0 0010 9z" clip-rule="evenodd" />
+                                </svg>
+                                Reglas y Normas
+                            </button>
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false, false, false, true)
+                                setLoading(true)
+                                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString())
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#5bc0de" viewBox="0 0 24 24">
+                                    <path d="M20 2H4C2.897 2 2 2.897 2 4v14c0 1.103.897 2 2 2h14l4 4V4c0-1.103-.897-2-2-2z" />
+                                </svg>
+                                Avisos
+                            </button>
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false, false, false, false, false, true)
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="red" width="24" height="24" viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
+                                </svg>
+                                Puntos de Interes
+                            </button>
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false, false, false, false, false, false, true)
+                                setLoading(true)
+                                ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M10.29 3.86L1.82 18a1 1 0 00.86 1.5h18.64a1 1 0 00.86-1.5L13.71 3.86a1 1 0 00-1.72 0zM12 9v4m0 4h.01" />
+                                </svg>
+                                Núm. Emergencias
+                            </button>
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false)
+                                cerrarSesion()
+                            }}>
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
+                                    <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+                                </svg>
+                                Cerrar Sesión
+                            </button>
                         </div>
-                        <div className="container pb-5 mb-5">
-                            <div className="row px-3 px-md-0 justify-content-around">
-                                {
-                                    iniciarSesion ?
+                    )}
+                </div>
+                <div className="container pb-5 mb-5">
+                    <div className="row px-3 px-md-0 justify-content-around">
+                        {
+                            iniciarSesion ?
+                                <>
+                                    {panelInicioSesion()}
+                                </>
+                                :
+                                crear || editar ?
+                                    <>
+                                        {panelCrearAnuncio()}
+                                    </>
+                                    : votaciones ?
                                         <>
-                                            {panelInicioSesion()}
+                                            {panelVotaciones()}
                                         </>
-                                        :
-                                        crear || editar ?
+                                        : verEmergencia ?
                                             <>
-                                                {panelCrearAnuncio()}
+                                                {panelEmergencia()}
                                             </>
-                                            : votaciones ?
+                                            :
+                                            verPuntosInteres ?
                                                 <>
-                                                    {panelVotaciones()}
+                                                    {panelPuntosInteres()}
                                                 </>
-                                                : verEmergencia ?
+                                                :
+                                                encuesta ?
                                                     <>
-                                                        {panelEmergencia()}
+                                                        {panelCrearEncuesta()}
                                                     </>
                                                     :
-                                                    verPuntosInteres ?
+                                                    verAvisos ?
                                                         <>
-                                                            {panelPuntosInteres()}
+                                                            {panelAvisos()}
                                                         </>
                                                         :
-                                                        encuesta ?
+                                                        verPerfil ?
                                                             <>
-                                                                {panelCrearEncuesta()}
+                                                                {panelPerfil()}
                                                             </>
                                                             :
-                                                            verAvisos ?
+                                                            verReglasNormas ?
                                                                 <>
-                                                                    {panelAvisos()}
+                                                                    {panelReglasNormas()}
                                                                 </>
                                                                 :
-                                                                verPerfil ?
+                                                                verDetalle && tipo !== 2 ?
                                                                     <>
-                                                                        {panelPerfil()}
+                                                                        {panelDetalleAnuncio()}
                                                                     </>
                                                                     :
-                                                                    verReglasNormas ?
-                                                                        <>
-                                                                            {panelReglasNormas()}
-                                                                        </>
-                                                                        :
-                                                                        verDetalle && tipo !== 2 ?
-                                                                            <>
-                                                                                {panelDetalleAnuncio()}
-                                                                            </>
-                                                                            :
-                                                                            <>
-                                                                                {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
-                                                                                    panelAnuncios(a, i)
-                                                                                ))}
-                                                                            </>
-                                }
-                            </div>
-                        </div>
-                        {navegador()}
+                                                                    <>
+                                                                        {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                            panelAnuncios(a, i)
+                                                                        ))}
+                                                                    </>
+                        }
                     </div>
-            }
+                </div>
+                {navegador()}
+            </div>
         </React.Fragment>
     );
 }
