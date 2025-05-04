@@ -1251,7 +1251,8 @@ const Condominio = () => {
                                 <div className="container-emergencia">
                                     <span><strong>{e.descripcion}</strong></span><br />
                                     <span>{e.direccion}</span>
-                                    <span className="d-block">{e.telefono}</span>
+                                    {/*<span className="d-block">{e.telefono}</span>*/}
+                                    <a href={`tel:${e.telefono}`} className="d-block">{e.telefono}</a>
 
                                     <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => {
                                         //setEditarPerfil(true)
@@ -1277,12 +1278,88 @@ const Condominio = () => {
             </div>
     }
 
+    const anuncios = [
+        {
+            id: 1,
+            titulo: "Ferretería El Tornillo",
+            descripcion: "Todo en herramientas y materiales para tu hogar.",
+            imagen: "https://plus.unsplash.com/premium_photo-1682089012647-14ff235735c1?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZmVycmV0ZXIlQzMlQURhfGVufDB8fDB8fHww",
+            url: "#"
+        },
+        {
+            id: 2,
+            titulo: "Ropa Urbana",
+            descripcion: "Moda joven con estilo único y precios accesibles.",
+            imagen: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80",
+            url: "#"
+        },
+        {
+            id: 3,
+            titulo: "Verdulería La Huerta",
+            descripcion: "Frutas y verduras frescas de la mejor calidad.",
+            imagen: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=400&q=80",
+            url: "#"
+        }
+    ];
+
+    function useVisible(ref: any) {
+        const [visible, setVisible] = useState(false);
+
+        useEffect(() => {
+            const observer = new IntersectionObserver(
+                ([entry]) => setVisible(entry.isIntersecting),
+                { threshold: 0.1 }
+            );
+            if (ref.current) observer.observe(ref.current);
+            return () => {
+                if (ref.current) observer.unobserve(ref.current);
+            };
+        }, [ref]);
+
+        return visible;
+    }
+
+    function AnuncioCard({ titulo, descripcion, imagen, url }: { titulo: string, descripcion: string, imagen: string, url: string }) {
+        const ref = useRef(null);
+        const visible = useVisible(ref);
+      
+        return (
+          <a
+            href={url}
+            className={`anuncio-card ${visible ? "visible" : ""}`}
+            ref={ref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div
+              className="anuncio-imagen"
+              style={{ backgroundImage: `url(${imagen})` }}
+              aria-label={titulo}
+            />
+            <div className="anuncio-texto">
+              <h3>{titulo}</h3>
+              <p>{descripcion}</p>
+            </div>
+          </a>
+        );
+      }
+
     const panelPuntosInteres = () => {
         return (
 
-            <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+            <div className="login-box w-100">
                 <h1 style={{ textAlign: 'center' }}>Puntos de Interes</h1>
-
+                <div className="anuncios-lista-container">
+                    {anuncios.map(({ id, titulo, descripcion, imagen, url }) => (
+                        <AnuncioCard
+                            key={id}
+                            titulo={titulo}
+                            descripcion={descripcion}
+                            imagen={imagen}
+                            url={url}
+                        />
+                    ))}
+                </div>
             </div>
         );
     }
@@ -1699,18 +1776,18 @@ const Condominio = () => {
 
     useEffect(() => {
         if (!menuOpciones) return;
-    
+
         const handleClickOutside = (event: any) => {
-          if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
-            setMenuOpciones(false);
-          }
+            if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
+                setMenuOpciones(false);
+            }
         };
-    
+
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
-          document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
-      }, [menuOpciones]);
+    }, [menuOpciones]);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
