@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios, ObtenerAvisos, CrearAvisos, ObtenerEmergencias, CrearEmergencia } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios, ObtenerAvisos, CrearAvisos, ObtenerEmergencias, CrearEmergencia, SuscribirNotificaciones2 } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -15,8 +15,11 @@ export const CrearAnuncioLogic = (selListado: any, anuncio: any) => {
 export const LoginLogic = (selListado: any, usuario: any) => {
     return Login(selListado, usuario);
 }
-export const SuscribirNotificacionesLogic = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any) => {
-    return SuscribirNotificaciones(selListado, idCondominio, idUsuario, tipoSuscripcion);
+export const SuscribirNotificacionesLogic = (selListado: any, tipoSuscripcion: any) => {
+    return SuscribirNotificaciones(selListado, tipoSuscripcion);
+}
+export const SuscribirNotificaciones2Logic = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any) => {
+    return SuscribirNotificaciones2(selListado, idCondominio, idUsuario, tipoSuscripcion, subscription);
 }
 export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any, tipoSuscripcion: any) => {
     return DesscribirNotificaciones(selListado, idUsuario, tipoSuscripcion);

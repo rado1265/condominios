@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -564,7 +564,7 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
-    
+
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
@@ -648,7 +648,10 @@ const Condominio = () => {
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
                         <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
-                        <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
+                        {
+                            usuario.rol === "ADMINISTRADOR" &&
+                            <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
+                        }
                     </div>
                 </div>
                 : ""}
@@ -693,11 +696,11 @@ const Condominio = () => {
             return false
         else
             return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3" onClick={() => {
-                if(a.idTipo !== 2){
-                setLoading(true);
-                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id)
-                setDataDetalle(a);
-                setVerDetalle(true);
+                if (a.idTipo !== 2) {
+                    setLoading(true);
+                    ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id)
+                    setDataDetalle(a);
+                    setVerDetalle(true);
                 }
             }}>
                 <div className="anuncio-header">
@@ -1652,7 +1655,7 @@ const Condominio = () => {
             }}>
                 <img width={35} src={volver} alt="Icono volver" />
             </button>
-            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} { tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio"}</h2>
+            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio"}</h2>
 
             <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                 <label htmlFor="textfield" className="search-label-admin">
@@ -1818,6 +1821,19 @@ const Condominio = () => {
         setLoading(false);
         try {
             if (data) {
+                SuscribirNotificaciones2Logic(selSuscribir2, urlPase[3], usuario.id, err, data)
+            }
+            else {
+                ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
+            }
+        } catch (er) {
+            ErrorMessage("Error crear suscripción", "Favor comuniquese con el administrador.")
+        }
+    }
+    const selSuscribir2 = (error: Boolean, err: string, data: any) => {
+        setLoading(false);
+        try {
+            if (data) {
                 SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
                 setUsuario({
                     nombre: usuario.nombre,
@@ -1880,6 +1896,15 @@ const Condominio = () => {
         };
     }, [menuOpciones]);
 
+    const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any) => {
+        setLoading(true);
+        if (tieneSuscripcion) {
+            DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
+        } else {
+            SuscribirNotificacionesLogic(selSuscribir, tipoSuscripcion)
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <React.Fragment>
@@ -1888,41 +1913,8 @@ const Condominio = () => {
                     loading ?
                         <Loading />
                         : ""}
-                {/*<div className="w-100 pb-3 mb-3" style={{ background: 'linear-gradient(rgb(255, 255, 255), rgb(144 212 164 / 67%))', justifyContent: 'center', display: 'grid', boxShadow: 'rgb(2 109 33 / 24%) 0px 0px 24px 0px' }}>
-                            <img className="w-50 mx-auto" src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" />
-                            <h2 className="text-center" style={{ color: '#316371', margin: '0' }}>{dataFull.nombre}</h2>
-                            {
-                                usuario.nombre.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>Usuario: {usuario.nombre}</h6>
-                            }
-                            {
-                                usuario.rol.length > 0 && <h6 className="text-center" style={{ color: '#316371', margin: '0' }}>{usuario.rol}</h6>
-                            }
-                            {
-                                usuario.nombre.length > 0 && !usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
-                                    <img src={notificacion} />
-                                </button>
-                                    : usuario.nombre.length > 0 && usuario.tieneSuscripcion ? <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
-                                        <img src={silenciarnotificacion} />
-                                    </button>
-                                        : ""
-                            }
-                            <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
-                                <img width={35} src={refresh} />
-                            </button>
-                        </div>*/}
                 <div className="w-100 pb-3 mb-3 containerMenu">
                     <div className="containerImgMenu">
-                        {/*
-                                    usuario.nombre.length > 0 && !usuario.tieneSuscripcion ?
-                                        <button className="iconNotificacion" onClick={() => { setLoading(true); SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id) }}>
-                                            <img width={25} src={notificacion} />
-                                        </button>
-                                        : usuario.nombre.length > 0 && usuario.tieneSuscripcion ?
-                                            <button className="iconNotificacion" onClick={() => { setLoading(true); DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id) }}>
-                                                <img width={25} src={silenciarnotificacion} />
-                                            </button>
-                                            : ""
-                                */}
                         {
                             usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(true); }}>
                                 <img width={25} src={menuicon} alt="icono abrir menu" />
@@ -1956,8 +1948,7 @@ const Condominio = () => {
                                 )
                             }
                             <button type="button" onClick={() => {
-                                setLoading(true);
-                                !usuario.tieneSuscripcionAnuncios ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 1) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 1)
+                                createSuscripcion(usuario.tieneSuscripcionMensajes, 1)
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
@@ -1966,8 +1957,7 @@ const Condominio = () => {
                                 {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
                             </button>
                             <button type="button" onClick={() => {
-                                setLoading(true);
-                                !usuario.tieneSuscripcionMensajes ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 2) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 2)
+                                createSuscripcion(usuario.tieneSuscripcionMensajes, 2)
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
@@ -1976,8 +1966,7 @@ const Condominio = () => {
                                 {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
                             </button>
                             <button type="button" onClick={() => {
-                                setLoading(true);
-                                !usuario.tieneSuscripcionVotaciones ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 3) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 3)
+                                createSuscripcion(usuario.tieneSuscripcionMensajes, 3)
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
@@ -1986,8 +1975,7 @@ const Condominio = () => {
                                 {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
                             </button>
                             <button type="button" onClick={() => {
-                                setLoading(true);
-                                !usuario.tieneSuscripcionAvisos ? SuscribirNotificacionesLogic(selSuscribir, urlPase[3], usuario.id, 4) : DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, 4)
+                                createSuscripcion(usuario.tieneSuscripcionMensajes, 4)
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />

@@ -53,8 +53,18 @@ export const Login = (selListado: any, usuario: any) => {
     });
 }
 
-export const SuscribirNotificaciones = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any) => {
-    SVCAnuncio.SuscribirNotificaciones(idCondominio, idUsuario, tipoSuscripcion).then((res: IServiceResult<any>) => {
+export const SuscribirNotificaciones = (selListado: any, tipoSuscripcion: any) => {
+    SVCAnuncio.SuscribirNotificaciones().then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, tipoSuscripcion.toString(), data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+}
+export const SuscribirNotificaciones2 = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any) => {
+    SVCAnuncio.SuscribirNotificaciones2(idCondominio, idUsuario, tipoSuscripcion, subscription).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, tipoSuscripcion.toString(), data);
