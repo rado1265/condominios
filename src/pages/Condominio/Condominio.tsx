@@ -76,6 +76,7 @@ const Condominio = () => {
     const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
     const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [] })
     const [verDetalle, setVerDetalle] = useState(false)
+    const menuRef = useRef(null);
     const [anuncio, setAnuncio] = useState({
         id: 0,
         idCondominio: localStorage.getItem("idCondominio"),
@@ -943,17 +944,15 @@ const Condominio = () => {
     console.log(usuarioDetalle)
     const panelPerfil = () => {
         return (
-            <div className="mx-3">
+            <div className="w-100 px-3">
                 {
                     editarPerfil ?
                         <>
-                            <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                                <button type="button" className="icon" onClick={() => {
+                            <div className="login-box py-3 w-100">
+                                <button type="button" className="iconoVolver" onClick={() => {
                                     setEditarPerfil(false)
                                 }}>
-                                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
-                                    </svg>
+                                    <img width={30} src={volver} alt="Icono volver" />
                                 </button>
                                 <div style={{ justifySelf: 'center' }}>
                                     {
@@ -1033,46 +1032,50 @@ const Condominio = () => {
                             </div>
                         </>
                         :
-                        <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                            <button type="button" className="icon" onClick={() => {
-                                setEditarPerfil(true)
-                            }}>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M3 17.25V21h3.75l11-11.03-3.75-3.75L3 17.25zm14.71-9.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                                </svg>
+                        <div className="perfil-box w-100">
+                            <button
+                                type="button"
+                                className="perfil-edit-btn"
+                                onClick={() => setEditarPerfil(true)}
+                                aria-label="Editar perfil"
+                            >
+                                <img src={iconeditar} />
                             </button>
-                            <div style={{ justifySelf: 'center' }}>
-                                {usuarioDetalle.imagen ? < img
-                                    src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
-                                    alt="Vista previa"
-                                    className="contenedor-circular"
-                                    style={{ maxWidth: '200px', marginTop: '10px' }}
-                                /> : <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-                                </svg>
-                                }
+                            <div className="perfil-avatar">
+                                {usuarioDetalle.imagen ? (
+                                    <img
+                                        src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
+                                        alt="Vista previa"
+                                    />
+                                ) : (
+                                    <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                                    </svg>
+                                )}
                             </div>
-                            <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{usuarioDetalle.nombre}</h4>
-                            <div className="d-flex" style={{ width: '35vh' }}>
-                                <div className="p-20" style={{ width: '50%', boxSizing: 'border-box', }}>
-                                    {usuarioDetalle.rol ? <p>Rol</p> : ""}
-                                    {usuarioDetalle.direccion != null ? <p>Dirección</p> : ""}
-                                    {usuarioDetalle.telefono != null ? <p>Teléfono</p> : ""}
-                                    <p>Notif. Anuncios</p>
-                                    <p>Notif. Mensajes</p>
-                                    <p>Notif. Votaciones</p>
-                                    <p>Notif. Avisos</p>
-                                    {usuarioDetalle.fechaCaducidad.toString().length > 0 ? <p>Fecha Caducidad</p> : ""}
+                            <h4 className="perfil-nombre">{usuarioDetalle.nombre}</h4>
+                            <div className="perfil-info">
+                                <div>
+                                    {usuarioDetalle.rol && <span>Rol</span>}
+                                    {usuarioDetalle.direccion && <span>Dirección</span>}
+                                    {usuarioDetalle.telefono && <span>Teléfono</span>}
+                                    <span>Notif. Anuncios</span>
+                                    <span>Notif. Mensajes</span>
+                                    <span>Notif. Votaciones</span>
+                                    <span>Notif. Avisos</span>
+                                    {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
                                 </div>
-                                <div className="p-20" style={{ width: '50%', boxSizing: 'border-box' }}>
-                                    <p>{usuarioDetalle.rol}</p>
-                                    <p>{usuarioDetalle.direccion}</p>
-                                    <p>{usuarioDetalle.telefono}</p>
-                                    <p>{usuarioDetalle.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</p>
-                                    <p>{usuarioDetalle.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</p>
-                                    <p>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</p>
-                                    <p>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</p>
-                                    <p>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</p>
+                                <div>
+                                    {usuarioDetalle.rol && <span>{usuarioDetalle.rol}</span>}
+                                    {usuarioDetalle.direccion && <span>{usuarioDetalle.direccion}</span>}
+                                    {usuarioDetalle.telefono && <span>{usuarioDetalle.telefono}</span>}
+                                    <span>{usuarioDetalle.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                    <span>{usuarioDetalle.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                    <span>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                    <span>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                    {usuarioDetalle.fechaCaducidad && (
+                                        <span>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</span>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1286,19 +1289,19 @@ const Condominio = () => {
 
     function obtenerNombreMes(numeroMes: any) {
         const nombresMeses = [
-          "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-          "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ];
-      
+
         if (numeroMes >= 1 && numeroMes <= 12) {
-          return nombresMeses[numeroMes - 1];
+            return nombresMeses[numeroMes - 1];
         } else {
-          return "Mes inválido";
+            return "Mes inválido";
         }
-      }
+    }
 
     const changeFechaTime = (ev: any) => {
-       setHoraAviso(ev.target.value);
+        setHoraAviso(ev.target.value);
     }
 
     const panelAvisos = () => {
@@ -1376,25 +1379,25 @@ const Condominio = () => {
                         <label htmlFor="textfield" className="search-label-admin mt-3">
                             Fecha Aviso
                         </label>
-                        <div className="d-inline-flex" style={{justifyContent: 'space-between'}}>
-                        <input
-                            type="date"
-                            name="fechaAviso"
-                            className="typeDate"
-                            disabled
-                            value={fechaAviso ? fechaAviso.toString() : ""}
-                            style={{ padding: '8px', fontSize: '16px', width: '48%' }}
-                        />
+                        <div className="d-inline-flex" style={{ justifyContent: 'space-between' }}>
+                            <input
+                                type="date"
+                                name="fechaAviso"
+                                className="typeDate"
+                                disabled
+                                value={fechaAviso ? fechaAviso.toString() : ""}
+                                style={{ padding: '8px', fontSize: '16px', width: '48%' }}
+                            />
 
-                        <input
-                            type="time"
-                            name="fechaAviso"
-                            className="typeDate"
-                            value={horaAviso ? horaAviso.toString() : ""}
-                            //onChange={(e: any) => {setFechaAviso(e.target.value);}}
-                            onChange={(e: any) => {changeFechaTime(e)}}
-                            style={{ padding: '8px', fontSize: '16px', width: '48%' }}
-                        />
+                            <input
+                                type="time"
+                                name="fechaAviso"
+                                className="typeDate"
+                                value={horaAviso ? horaAviso.toString() : ""}
+                                //onChange={(e: any) => {setFechaAviso(e.target.value);}}
+                                onChange={(e: any) => { changeFechaTime(e) }}
+                                style={{ padding: '8px', fontSize: '16px', width: '48%' }}
+                            />
                         </div>
                         <button
                             type="button"
@@ -1406,7 +1409,7 @@ const Condominio = () => {
                     </div>
                 </div>
                 :
-                <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                <div className="login-box py-3 px-3">
                     <h1 style={{ textAlign: 'center' }}>Calendario de {monthTitle}</h1>
                     <div className="calendario">
                         {days}
@@ -1694,6 +1697,21 @@ const Condominio = () => {
         }
     }
 
+    useEffect(() => {
+        if (!menuOpciones) return;
+    
+        const handleClickOutside = (event: any) => {
+          if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
+            setMenuOpciones(false);
+          }
+        };
+    
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, [menuOpciones]);
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <React.Fragment>
@@ -1738,7 +1756,7 @@ const Condominio = () => {
                                             : ""
                                 */}
                                 {
-                                    usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
+                                    usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(true); }}>
                                         <img width={25} src={menuicon} alt="icono abrir menu" />
                                     </button>
                                 }
@@ -1748,7 +1766,7 @@ const Condominio = () => {
                                 </button>
                             </div>
                             {menuOpciones && (
-                                <div className="custom-menu">
+                                <div ref={menuRef} className="custom-menu">
                                     <button type="button" onClick={() => {
                                         cerrarMenu(false, true)
                                         setLoading(true);

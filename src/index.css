@@ -35,3 +35,7 @@ div,
 a {
   font-family: var(--fuenteWeb) !important;
 }
+
+button {
+  outline: none !important;
+}
