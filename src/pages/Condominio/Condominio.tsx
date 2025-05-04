@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
 import { CrearAnuncioLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
@@ -7,6 +7,10 @@ import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
 import menuicon from './../../components/utils/img/menuicon.png';
+import volver from './../../components/utils/img/volver.png';
+import iconeditar from './../../components/utils/img/editar.png';
+import iconborrar from './../../components/utils/img/iconborrar.png';
+import notificar from './../../components/utils/img/notificar.png';
 const chileTime = new Intl.DateTimeFormat("es-CL", {
     timeZone: "America/Santiago",
     hour12: false,
@@ -19,6 +23,10 @@ const chileTime = new Intl.DateTimeFormat("es-CL", {
 }).format(new Date());
 const Condominio = () => {
     const [loading, setLoading] = useState(false);
+    const [editarTextRich, setEditarTextRich] = useState(false);
+    const [newTextRich, setNewTextRich] = useState("");
+    const [textRichEditado, setTextRichEditado] = useState(false);
+    const [verDetalleAvisos, setVerDetalleAvisos] = useState(false);
     const [tipoSubir, setTipoSubir] = useState(0);
     const [open, setOpen] = useState(false);
     const [dataFull, setDataFull] = useState({
@@ -83,6 +91,7 @@ const Condominio = () => {
     });
     const [newComentario, setNewComentario] = useState('')
     const [verPerfil, setVerPerfil] = useState(false)
+    const [diaMesSelect, setDiaMesSelect] = useState({ dia: 0, mes: 0, anio: 0 })
     const [verReglasNormas, setVerReglasNormas] = useState(false)
     const [editarPerfil, setEditarPerfil] = useState(false)
     const [verAvisos, setVerAvisos] = useState(false)
@@ -102,6 +111,7 @@ const Condominio = () => {
 
     const [mensajeAviso, setMensajeAviso] = useState([]);
     const [fechaAviso, setFechaAviso] = useState(new Date());
+    const [horaAviso, setHoraAviso] = useState(new Date().toLocaleTimeString());
     const [emergenciaDetalle, setEmergenciaDetalle] = useState([]);
     const [emergencia, setEmergencia] = useState({
         id: 0,
@@ -314,6 +324,12 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    const CrearAviso = () => {
+        try {
+
+        } catch (er) {
+        }
+    }
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -392,6 +408,7 @@ const Condominio = () => {
         try {
             setLoading(false);
             setAvisos(data);
+            console.log(data);
         } catch (er) {
         }
     }
@@ -431,8 +448,12 @@ const Condominio = () => {
         setEditar(d)
         setEncuesta(e)
         setVerDetalle(false)
-        setVerPerfil(false)
-        setVerReglasNormas(false)
+        setVerPerfil(false);
+        setEditarPerfil(false);
+        setEditarAvisos(false);
+        setEditarEmergencia(false);
+        setVerReglasNormas(false);
+        setVerDetalleAvisos(false);
         if (a === 5) {
             setLoading(true);
             ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
@@ -488,12 +509,12 @@ const Condominio = () => {
         };
         reader.readAsDataURL(file);
     };
-    document.addEventListener('visibilitychange', () => {
+    /*document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    });
+    });*/
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -1060,14 +1081,52 @@ const Condominio = () => {
         );
     }
 
+    const editorRef = useRef(null);
+
+    const handleInput = (ev: any) => {
+        //setNewTextRich(ev.target.children[0].outerHTML);
+        setTextRichEditado(true);
+    };
+
     const panelReglasNormas = () => {
         return (
-            <div className="login-box py-3 px-3 " style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+            <div className="login-box py-3 px-3 ">
                 <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>Reglas y Normas</h4>
-                <div>
-                    <div
-                        dangerouslySetInnerHTML={{ __html: dataFull.normas }}
-                    />
+                <div className="containerReglas">
+                    {!editarTextRich ?
+                        <div
+                            dangerouslySetInnerHTML={{ __html: dataFull.normas }}
+                        />
+                        :
+                        <div>
+                            <div
+                                className="rich-text-input"
+                                contentEditable
+                                ref={editorRef}
+                                onInput={handleInput}
+                                suppressContentEditableWarning={true}
+                                dangerouslySetInnerHTML={{ __html: newTextRich }}
+                                spellCheck={true}
+                                aria-label="Editor de texto enriquecido"
+                            />
+                            {textRichEditado ?
+                                <button type="button" className="search-button mt-2 w-100" onClick={() => {
+                                    setTextRichEditado(false);
+                                }}>
+                                    Guardar cambios
+                                </button>
+                                : ""}
+                            {textRichEditado ?
+                                <button type="button" className="search-button mt-2 w-100" onClick={() => {
+                                    setNewTextRich(dataFull.normas);
+                                    setTextRichEditado(false);
+                                }}>
+                                    Descartar cambios
+                                </button>
+                                : ""}
+                        </div>
+                    }
+
                 </div>
             </div>
         );
@@ -1113,11 +1172,10 @@ const Condominio = () => {
         // Días con avisos
         for (let dia = 1; dia <= diasEnMes; dia++) {
             const fechaTexto = `${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
-            avisos.map((a: any) => console.log(formatoFecha(a.fecha)))
             const avisosDelDia = avisos.filter((a: any) => formatoFecha(a.fecha) === fechaTexto);
 
             celdas.push(
-                <div key={`dia-${dia}`} className="dia">
+                <div key={`dia-${dia}`} className="dia" onClick={() => { getObtenerAvisosDia(dia, mes + 1) }}>
                     <div className="fecha">{dia}</div>
                     {avisosDelDia.map((a: any, i: any) => (
                         <div key={i} className="mensaje">{a.mensaje}</div>
@@ -1129,78 +1187,93 @@ const Condominio = () => {
         setDays(celdas);
     };
 
+    const getObtenerAvisosDia = (dia: number, mes: number) => {
+        setDiaMesSelect({ dia: dia, mes: mes, anio: año })
+        setVerDetalleAvisos(true);
+    }
+
     const panelEmergencia = () => {
-        return (
-            editarEmergencia ?
-                <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-                    <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                        <button type="button" className="icon" onClick={() => {
-                            setEditarEmergencia(false)
-                        }}>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
-                            </svg>
-                        </button>
-                        <label htmlFor="textfield" className="search-label-admin">
-                            Descripción
-                        </label>
-                        <input
-                            name="descripcion"
-                            className="search-input"
-                            value={emergencia.descripcion}
-                            onChange={(e: any) => handleChangeEmergencia(e)}
-                        />
-                        <label htmlFor="textfield" className="search-label-admin">
-                            Dirección
-                        </label>
-                        <input
-                            name="direccion"
-                            className="search-input"
-                            value={emergencia.direccion}
-                            onChange={(e: any) => handleChangeEmergencia(e)}
-                        />
-                        <label htmlFor="textfield" className="search-label-admin">
-                            Teléfono
-                        </label>
-                        <input
-                            name="telefono"
-                            className="search-input"
-                            value={emergencia.telefono}
-                            onChange={(e: any) => handleChangeEmergencia(e)}
-                        />
-                        <button
-                            type="button"
-                            className="search-button mt-2"
-                            onClick={CrearEmergencia}
-                        >
-                            {crear ? "Crear" : "Editar"}
-                        </button>
-                    </div>
+        return editarEmergencia ?
+            <div className="w-100 px-3">
+                <div className="login-box py-3">
+                    <button type="button" className="iconoVolver" onClick={() => {
+                        setEditarEmergencia(false)
+                    }}>
+                        <img width={35} src={volver} alt="Icono volver" />
+                    </button>
+                    <h4 className="mt-3 text-center">Crear número de emergencia</h4>
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Descripción
+                    </label>
+                    <input
+                        name="descripcion"
+                        className="search-input"
+                        value={emergencia.descripcion}
+                        onChange={(e: any) => handleChangeEmergencia(e)}
+                    />
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Dirección
+                    </label>
+                    <input
+                        name="direccion"
+                        className="search-input"
+                        value={emergencia.direccion}
+                        onChange={(e: any) => handleChangeEmergencia(e)}
+                    />
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Teléfono
+                    </label>
+                    <input
+                        name="telefono"
+                        className="search-input"
+                        value={emergencia.telefono}
+                        onChange={(e: any) => handleChangeEmergencia(e)}
+                    />
+                    <button
+                        type="button"
+                        className="search-button mt-2"
+                        onClick={CrearEmergencia}
+                    >
+                        {crear ? "Crear" : "Editar"}
+                    </button>
                 </div>
-                :
-                <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                    <button type="button" onClick={() => {
+            </div>
+            :
+            <div className="w-100 login-box py-3">
+                <h3 style={{ textAlign: 'center' }}>Números de Emergencia</h3>
+                <div className="login-box py-3">
+                    {
+                        emergenciaDetalle.map((e: any) => {
+                            return (
+                                <div className="container-emergencia">
+                                    <span><strong>{e.descripcion}</strong></span><br />
+                                    <span>{e.direccion}</span>
+                                    <span className="d-block">{e.telefono}</span>
+
+                                    <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => {
+                                        //setEditarPerfil(true)
+                                    }}>
+                                        <img src={iconeditar} />
+                                    </button>
+                                    <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={() => {
+                                        //setEditarPerfil(true)
+                                    }}>
+                                        <img src={iconborrar} />
+                                    </button>
+                                </div>
+                            )
+                        })
+                    }
+                    <button type="button" className="search-button mt-2" onClick={() => {
                         setEditarEmergencia(true)
                         setCrear(false)
                     }}>
-                        Crear nuevo número de emergencia
+                        Crear número de emergencia
                     </button>
-                    <h1 style={{ textAlign: 'center' }}>Números de Emergencia</h1>
-                    <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                        {
-                            emergenciaDetalle.map((e: any) => {
-                                return (
-                                    <div>
-                                        <span><strong>{e.descripcion}</strong></span><br />
-                                        <span>{e.direccion}</span> - <span>{e.telefono}</span>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
                 </div>
-        );
+            </div>
     }
+
     const panelPuntosInteres = () => {
         return (
 
@@ -1211,17 +1284,83 @@ const Condominio = () => {
         );
     }
 
+    function obtenerNombreMes(numeroMes: any) {
+        const nombresMeses = [
+          "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+          "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+      
+        if (numeroMes >= 1 && numeroMes <= 12) {
+          return nombresMeses[numeroMes - 1];
+        } else {
+          return "Mes inválido";
+        }
+      }
+
+    const changeFechaTime = (ev: any) => {
+       setHoraAviso(ev.target.value);
+    }
+
     const panelAvisos = () => {
-        return (
-            editarAvisos ?
-                <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-                    <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                        <button type="button" className="icon" onClick={() => {
+        return verDetalleAvisos ?
+            <div className="w-100 login-box py-3">
+                <button type="button" className="iconoVolver" onClick={() => {
+                    setVerDetalleAvisos(false)
+                }}>
+                    <img width={35} src={volver} alt="Icono volver" />
+                </button>
+                <h3 style={{ textAlign: 'center' }}>Avisos día {diaMesSelect.dia} de {obtenerNombreMes(diaMesSelect.mes)} del {diaMesSelect.anio}</h3>
+                <div className="login-box py-3">
+                    {
+                        avisos.filter((a: any) => new Date(a.fecha).getDate() === diaMesSelect.dia).map((e: any) => {
+                            return (
+                                <div className="container-avisos">
+                                    <div className="d-block">
+                                        <span><strong>{e.mensaje}</strong></span><br />
+                                        <span>{new Date(e.fecha).toLocaleTimeString()}</span>
+                                    </div>
+                                    <div style={{ position: 'absolute', right: '25px' }}>
+                                        <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
+                                            //setEditarPerfil(true)
+                                        }}>
+                                            <img src={notificar} />
+                                        </button>
+
+                                        <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
+                                            setEditarAvisos(true);
+                                            setCrear(false);
+                                            setVerDetalleAvisos(false);
+                                            setFechaAviso(e.fecha.toString().substring(0, 10));
+                                            setHoraAviso(e.fecha.toString().substring(11));
+                                            setMensajeAviso(e.mensaje);
+                                        }}>
+                                            <img src={iconeditar} />
+                                        </button>
+                                        <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
+                                            //setEditarPerfil(true)
+                                        }}>
+                                            <img src={iconborrar} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                    <button type="button" className="search-button mt-2" onClick={() => {
+                        setEditarAvisos(true)
+                        setCrear(true)
+                        setVerDetalleAvisos(false);
+                    }}>
+                        Crear aviso
+                    </button>
+                </div>
+            </div> : editarAvisos ?
+                <div className="px-2">
+                    <div className="login-box py-3 w-100">
+                        <button type="button" className="iconoVolver" onClick={() => {
                             setEditarAvisos(false)
                         }}>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
-                            </svg>
+                            <img width={35} src={volver} alt="Icono volver" />
                         </button>
                         <label htmlFor="textfield" className="search-label-admin">
                             Mensaje Aviso
@@ -1232,23 +1371,35 @@ const Condominio = () => {
                             name="descripcion"
                             className="search-input"
                             value={mensajeAviso}
-                            onChange={(e: any) => setMensajeAviso(e.target.values)}
+                            onChange={(e: any) => setMensajeAviso(e.target.value)}
                         />
                         <label htmlFor="textfield" className="search-label-admin mt-3">
                             Fecha Aviso
                         </label>
+                        <div className="d-inline-flex" style={{justifyContent: 'space-between'}}>
                         <input
-                            type="datetime-local"
+                            type="date"
                             name="fechaAviso"
                             className="typeDate"
-                            value={fechaAviso ? fechaAviso.toString().substring(0, 10) : ''}
-                            onChange={(e: any) => setFechaAviso(e.target.values)}
-                            style={{ padding: '8px', fontSize: '16px' }}
+                            disabled
+                            value={fechaAviso ? fechaAviso.toString() : ""}
+                            style={{ padding: '8px', fontSize: '16px', width: '48%' }}
                         />
+
+                        <input
+                            type="time"
+                            name="fechaAviso"
+                            className="typeDate"
+                            value={horaAviso ? horaAviso.toString() : ""}
+                            //onChange={(e: any) => {setFechaAviso(e.target.value);}}
+                            onChange={(e: any) => {changeFechaTime(e)}}
+                            style={{ padding: '8px', fontSize: '16px', width: '48%' }}
+                        />
+                        </div>
                         <button
                             type="button"
                             className="search-button mt-2"
-                            onClick={CrearAnuncio}
+                            onClick={CrearAviso}
                         >
                             {crear ? "Crear" : "Editar"}
                         </button>
@@ -1256,18 +1407,11 @@ const Condominio = () => {
                 </div>
                 :
                 <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                    <button type="button" onClick={() => {
-                        setEditarAvisos(true)
-                        setCrear(false)
-                    }}>
-                        Crear nuevo aviso
-                    </button>
                     <h1 style={{ textAlign: 'center' }}>Calendario de {monthTitle}</h1>
                     <div className="calendario">
                         {days}
                     </div>
                 </div>
-        );
     }
 
     const panelCrearEncuesta = () => {
@@ -1666,7 +1810,8 @@ const Condominio = () => {
                                         {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
                                     </button>
                                     <button type="button" onClick={() => {
-                                        cerrarMenu(false, false, true)
+                                        cerrarMenu(false, false, true);
+                                        setNewTextRich(dataFull.normas);
                                     }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 10-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 9a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4A.75.75 0 0010 9z" clip-rule="evenodd" />
