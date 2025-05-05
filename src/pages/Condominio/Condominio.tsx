@@ -3,7 +3,6 @@ import Loading from "../../components/utils/loading";
 import './Condominio.css';
 import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
-import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
 import menuicon from './../../components/utils/img/menuicon.png';
@@ -31,7 +30,6 @@ const Condominio = () => {
     const [tipoSubir, setTipoSubir] = useState(0);
     const [dataCondominios, setDataCondominios] = useState([]);
     const [enComunidad, setEnComunidad] = useState(false);
-    const [condominio] = useState(0);
     const [open, setOpen] = useState(false);
     const [dataFull, setDataFull] = useState({
         anuncios: [],
@@ -39,7 +37,6 @@ const Condominio = () => {
         logo: "",
         normas: '',
     });
-    const fullURL = window.location.href;
     const [tipo, setTipo] = useState(1)
     const [usuario, setUsuario] = useState({
         nombre: "",
@@ -112,7 +109,6 @@ const Condominio = () => {
     const [days, setDays] = useState([]);
     const [monthTitle, setMonthTitle] = useState('');
 
-    // Simulación de tus datos desde SQL
     const [avisos, setAvisos] = useState([]);
 
     const [año, setAño] = useState(new Date().getFullYear());
@@ -1125,7 +1121,6 @@ const Condominio = () => {
 
 
     const panelDetalleAnuncio = () => {
-        console.log(dataDetalle);
         return (
             <div className="mx-3">
                 <button type="button" className="iconoVolver" onClick={() => {
@@ -1481,7 +1476,6 @@ const Condominio = () => {
         }
     };
     const cambiarNormas = () => {
-        console.log(newTextRich)
         CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
     }
     const selCambiarNormas = (error: Boolean, err: string, data: any) => {
