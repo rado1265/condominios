@@ -112,8 +112,8 @@ const Condominio = () => {
     // Simulación de tus datos desde SQL
     const [avisos, setAvisos] = useState([]);
 
-    const año = new Date().getFullYear();
-    const mes = new Date().getMonth();
+    const [año, setAño] = useState(new Date().getFullYear());
+    const [mes, setMes] = useState(new Date().getMonth());
 
     const [mensajeAviso, setMensajeAviso] = useState('');
     const [fechaAviso, setFechaAviso] = useState('');
@@ -497,22 +497,28 @@ const Condominio = () => {
 
     const selListadoVotaciones = (error: Boolean, err: string, data: any) => {
         try {
+            if (data) {
+                setDataVotaciones(data);
+            }
             setLoading(false);
-            setDataVotaciones(data);
         } catch (er) {
         }
     }
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
+            if (data) {
+                setDataFull(data);
+            }
             setLoading(false);
-            setDataFull(data);
         } catch (er) {
         }
     }
     const selListadoAvisos = (error: Boolean, err: string, data: any) => {
         try {
+            if (data) {
+                setAvisos(data);
+            }
             setLoading(false);
-            setAvisos(data);
         } catch (er) {
         }
     }
@@ -686,8 +692,10 @@ const Condominio = () => {
 
     const selCambiarEstadoVotacion = (error: Boolean, err: string, data: any) => {
         try {
+            if (data) {
+                changeMenu(5);
+            }
             setLoading(false);
-            changeMenu(5);
         } catch (er) {
             ErrorMessage("Ocurrió un error al crear la Votación", "")
         }
@@ -976,18 +984,18 @@ const Condominio = () => {
     const selObtenerAnuncioPorId = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setLoading(false);
                 setDataDetalle(data);
             }
+            setLoading(false);
         } catch (er) {
         }
     }
     const selObtenerUsuarioPorId = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setLoading(false);
                 setUsuarioDetalle(data);
             }
+            setLoading(false);
         } catch (er) {
         }
     }
@@ -1004,9 +1012,9 @@ const Condominio = () => {
     const selObtenerEmergencia = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setLoading(false);
                 setEmergenciaDetalle(data);
             }
+            setLoading(false);
         } catch (er) {
         }
     }
@@ -1744,6 +1752,12 @@ const Condominio = () => {
     const changeFechaTime = (ev: any) => {
         setHoraAviso(ev.target.value);
     }
+    const cambiarMes = (a: any, b: any) => {
+        setMes(a)
+        setAño(b)
+        setLoading(true)
+        ObtenerAvisosLogic(selListadoAvisos, (a + 1).toString(), localStorage.getItem("idCondominio")!.toString(), b.toString());
+    }
 
     const panelAvisos = () => {
         return verDetalleAvisos ?
@@ -1863,6 +1877,26 @@ const Condominio = () => {
                 </div>
                 :
                 <div className="login-box py-3 px-3">
+                    <button
+                        onClick={() => {
+                            const nuevoMes = mes === 1 ? 12 : mes - 1;
+                            const nuevoAño = mes === 1 ? año - 1 : año;
+                            cambiarMes(nuevoMes, nuevoAño);
+                        }}
+                        aria-label="Iquierda"
+                    >
+                        Iquierda
+                    </button>
+                    <button
+                        onClick={() => {
+                            const nuevoMes = mes === 12 ? 1 : mes + 1;
+                            const nuevoAño = mes === 12 ? año + 1 : año;
+                            cambiarMes(nuevoMes, nuevoAño);
+                        }}
+                        aria-label="Derecha"
+                    >
+                        Derecha
+                    </button>
                     <h1 style={{ textAlign: 'center' }}>Calendario de {monthTitle}</h1>
                     <div className="calendario">
                         {days}
