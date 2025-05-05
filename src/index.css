@@ -3,6 +3,7 @@
   --secondColor: #5ead66;
   --primaryColorHover: #33853b;
   --secondColorHover: #106b2a;
+  --colorRed: #a92013;
   --color-bg: #fff;
   --color-border: #e5e7eb;
   --color-text: #1f2937;
@@ -32,8 +33,9 @@ span,
 p,
 li,
 div,
+small,
 a {
-  font-family: var(--fuenteWeb) !important;
+  font-family: system-ui !important;
 }
 
 button {

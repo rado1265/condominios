@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarEstadoVotacionLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -47,6 +47,10 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
+    const [listadousuarios, setUsuarios] = useState([{ nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
+    const [listadousuariosParse, setUsuariosParse] = useState([{ nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
+    const [dataUserSelect, setDataUserSelect] = useState({ nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" });
+    const [verUsuarioInd, setVerUserInd] = useState(false);
     const [usuarioDetalle, setUsuarioDetalle] = useState({
         nombre: "",
         tieneSuscripcionMensajes: false,
@@ -65,7 +69,7 @@ const Condominio = () => {
     const [loguear, setLoguear] = useState({
         usuario: "",
         clave: "",
-        idCondominio: localStorage.getItem("idCondominio")
+        idCondominio: localStorage.getItem("idCondominio") ?? ""
     });
     const [iniciarSesion, setIniciarSesion] = useState(false)
     const [crear, setCrear] = useState(false)
@@ -92,6 +96,7 @@ const Condominio = () => {
     });
     const [newComentario, setNewComentario] = useState('')
     const [verPerfil, setVerPerfil] = useState(false)
+    const [verUsuarios, setVerUsuarios] = useState(false)
     const [diaMesSelect, setDiaMesSelect] = useState({ dia: 0, mes: 0, anio: 0 })
     const [verReglasNormas, setVerReglasNormas] = useState(false)
     const [editarPerfil, setEditarPerfil] = useState(false)
@@ -463,7 +468,6 @@ const Condominio = () => {
         try {
             setLoading(false);
             setAvisos(data);
-            console.log(data);
         } catch (er) {
         }
     }
@@ -506,6 +510,7 @@ const Condominio = () => {
         setVerPerfil(false);
         setEditarPerfil(false);
         setEditarAvisos(false);
+        setVerUsuarios(false);
         setEditarEmergencia(false);
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
@@ -565,12 +570,12 @@ const Condominio = () => {
         reader.readAsDataURL(file);
     };
 
-    document.addEventListener('visibilitychange', () => {
+    /*document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
-    });
+    });*/
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -634,10 +639,19 @@ const Condominio = () => {
         }
     }
 
+    const selCambiarEstadoVotacion = (error: Boolean, err: string, data: any) => {
+        try {
+            setLoading(false);
+            changeMenu(5);
+        } catch (er) {
+            ErrorMessage("Ocurrió un error al crear la Votación", "")
+        }
+    }
+
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
-            {usuario.nombre.length > 0 ?
+            {/*usuario.nombre.length > 0 ?
                 <div className="circular-menu">
                     <button
                         className={`menu-button ${open ? "open" : ""}`}
@@ -647,14 +661,14 @@ const Condominio = () => {
                         <img width={50} src={iconmas} alt="icono de menu" />
                     </button>
                     <div className={`menu-items ${open ? "open" : ""}`}>
-                        <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
+                        <button disabled={!open} className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
                         {
                             usuario.rol === "ADMINISTRADOR" &&
-                            <button className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
+                            <button disabled={!open} className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
                         }
                     </div>
                 </div>
-                : ""}
+                : ""*/}
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
                 <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(1) }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
@@ -695,7 +709,7 @@ const Condominio = () => {
         if (a.idTipo !== tipo)
             return false
         else
-            return <div key={i} className="anuncio card-shadow col-12 col-md-4 my-3" onClick={() => {
+            return <div key={i} className="anuncio card-shadow col-12 my-3" onClick={() => {
                 if (a.idTipo !== 2) {
                     setLoading(true);
                     ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id)
@@ -857,6 +871,7 @@ const Condominio = () => {
             Mensaje: newComentario,
             Fecha: new Date(chileTime)
         };
+        setNewComentario("");
         CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, comentarioAnuncio, localStorage.getItem("idCondominio")!.toString());
     }
     const selcrearComentarioAnuncio = (error: Boolean, err: string, data: any) => {
@@ -886,6 +901,16 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    const selObtenerUsuarios = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(false);
+                setUsuarios(data);
+                setUsuariosParse(data);
+            }
+        } catch (er) {
+        }
+    }
     const selObtenerEmergencia = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -910,17 +935,32 @@ const Condominio = () => {
 
     const panelVotaciones = () => {
         return <div style={{ fontFamily: 'Arial, sans-serif' }}>
-            <h2 className="mt-3 mb-4">VOTACIONES ACTIVAS</h2>
+            <h4 className="mt-3 mb-4 text-center">VOTACIONES</h4>
             {dataVotaciones.map((a: any, i: number) => {
                 return (
-                    <div className="cardVotacion my-4">
+                    <div className="cardVotacion my-4" style={!a.activo ? { opacity: '0.8' } : {}}>
+                        {usuario.rol === "ADMINISTRADOR" && (
+                            <label className="checkbox-container">
+                                <input
+                                    type="checkbox"
+                                    checked={a.activo}
+                                    onChange={() => {
+                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, a.id, !a.activo)
+                                    }}
+                                />
+                                <span className="checkmark"></span>
+                            </label>
+                        )}
                         <h4 className="text-center">{a.cabecera}</h4>
                         <span className="mb-3 text-center d-block">{a.descripcion}</span>
                         {a.opcionesVotacion.map((b: any, o: number) => {
                             let percentage = a.total && b.votaciones.length ? (b.votaciones.length / a.total) * 100 : 0;
                             return (<div key={o} style={{ marginBottom: '10px' }}>
-                                <span>{b.descripcion}</span>
-                                <div id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev) => { cambiarVoto(ev); }}>
+                                <div className="d-flex" style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                    <span>{b.descripcion}</span>
+                                    <small style={{ color: 'grey' }}>{b.votaciones.length} votos</small>
+                                </div>
+                                <div className={!a.activo ? "disabled-click" : ""} id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev) => { cambiarVoto(ev); }}>
                                     <div style={{ background: '#4caf50', height: '100%', width: `${percentage}%`, borderRadius: '5px', textAlign: 'center' }}>
                                         {b.votaciones.find((votacion: any) => votacion.idUsuario === usuario.id) ?
                                             <span style={{ color: 'white', display: 'block', width: '55px', margin: '0 auto' }}>Votado</span>
@@ -937,6 +977,7 @@ const Condominio = () => {
 
 
     const panelDetalleAnuncio = () => {
+        console.log(dataDetalle);
         return (
             <div className="mx-3">
                 <button type="button" className="iconoVolver" onClick={() => {
@@ -983,7 +1024,10 @@ const Condominio = () => {
                         return <div key={j.id} className="comment-box">
                             <div className="comment-header">
                                 <span className="comment-author">{j.nombreUsuario}</span>
+                                <div>
                                 <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
+                                <span className="comment-date ml-2">{new Date(j.fecha).toLocaleTimeString().split(":").slice(0, 2).join(":")}</span>
+                                </div>
                             </div>
                             <p className="comment-content">{j.mensaje}</p>
                         </div>
@@ -1098,7 +1142,7 @@ const Condominio = () => {
                             </div>
                         </>
                         :
-                        <div className="perfil-box w-100">
+                        <div className="perfil-box w-100" style={{ padding: '20px' }}>
                             <button
                                 type="button"
                                 className="perfil-edit-btn"
@@ -1121,27 +1165,152 @@ const Condominio = () => {
                             </div>
                             <h4 className="perfil-nombre">{usuarioDetalle.nombre}</h4>
                             <div className="perfil-info">
-                                <div>
-                                    {usuarioDetalle.rol && <span>Rol</span>}
-                                    {usuarioDetalle.direccion && <span>Dirección</span>}
-                                    {usuarioDetalle.telefono && <span>Teléfono</span>}
-                                    <span>Notif. Anuncios</span>
-                                    <span>Notif. Mensajes</span>
-                                    <span>Notif. Votaciones</span>
-                                    <span>Notif. Avisos</span>
-                                    {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
+                                <div className="w-100">
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.rol && <span>Rol</span>}
+                                        {usuarioDetalle.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.rol}</span>}
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.direccion && <span>Dirección</span>}
+                                        {usuarioDetalle.direccion && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.direccion}</span>}
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.telefono && <span>Teléfono</span>}
+                                        {usuarioDetalle.telefono && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.telefono}</span>}
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Anuncios</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Mensajes</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Votaciones</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Avisos</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
+                                        {usuarioDetalle.fechaCaducidad && (
+                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                }
+            </div>
+        );
+    }
+
+    const filtrarUsuarios = (ev: any) => {
+        let parselistadoUser = listadousuarios.filter((e) => e.nombre.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()));
+        setUsuariosParse(parselistadoUser);
+    }
+
+    const panelUsuarios = () => {
+        return (
+            <div className="w-100 px-3">
+                {
+                    !verUsuarioInd ?
+                        <>
+                            <div className="usuariosContainer">
+                                <h4 className="usuarios-title">Listado Usuarios</h4>
+                                <div className="buscaruser-search-container">
+                                    <label className="buscaruser-search-label">Buscar Usuario</label>
+                                    <input
+                                        type="search"
+                                        id="buscar-usuario"
+                                        className="buscaruser-search-input"
+                                        placeholder="Escribe para buscar..."
+                                        onChange={(ev) => { filtrarUsuarios(ev) }}
+                                    />
                                 </div>
                                 <div>
-                                    {usuarioDetalle.rol && <span>{usuarioDetalle.rol}</span>}
-                                    {usuarioDetalle.direccion && <span>{usuarioDetalle.direccion}</span>}
-                                    {usuarioDetalle.telefono && <span>{usuarioDetalle.telefono}</span>}
-                                    <span>{usuarioDetalle.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
-                                    <span>{usuarioDetalle.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
-                                    <span>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
-                                    <span>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
-                                    {usuarioDetalle.fechaCaducidad && (
-                                        <span>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</span>
-                                    )}
+                                    {listadousuariosParse.map((a, idx) => (
+                                        <div className="usuarios-listado" key={idx} onClick={() => { setDataUserSelect(a); setVerUserInd(true); }}>
+                                            <div className="usuarios-item">
+                                                <span className="usuarios-item-title">Nombre</span>
+                                                <span className="usuarios-item-value">{a.nombre}</span>
+                                            </div>
+                                            <div className="usuarios-item">
+                                                <span className="usuarios-item-title">Rol</span>
+                                                <span className="usuarios-item-value">{a.rol}</span>
+                                            </div>
+                                            <div className="usuarios-item">
+                                                <span className="usuarios-item-title">Fecha Caducidad</span>
+                                                <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="usuarios-item">
+                                                <span className="usuarios-item-title">Estado</span>
+                                                <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                        :
+                        <div className="perfil-box w-100" style={{ padding: '20px' }}>
+                            <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
+                                setVerUserInd(false)
+                            }}>
+                                <img width={35} src={volver} alt="Icono volver" />
+                            </button>
+                            <div className="perfil-avatar">
+                                {dataUserSelect.imagen ? (
+                                    <img
+                                        src={`data:image/jpeg;base64,${dataUserSelect.imagen}`}
+                                        alt="Vista previa"
+                                    />
+                                ) : (
+                                    <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                                    </svg>
+                                )}
+                            </div>
+                            <h4 className="perfil-nombre">{dataUserSelect.nombre}</h4>
+                            <div className="perfil-info">
+                                <div className="w-100">
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.rol && <span>Rol</span>}
+                                        {usuarioDetalle.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.direccion && <span>Dirección</span>}
+                                        {usuarioDetalle.direccion && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span>}
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.telefono && <span>Teléfono</span>}
+                                        {usuarioDetalle.telefono && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span>}
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Anuncios</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Mensajes</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Votaciones</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        <span>Notif. Avisos</span>
+                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                    </div>
+                                    <div className="container-dataPerfil">
+                                        {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
+                                        {usuarioDetalle.fechaCaducidad && (
+                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1648,14 +1817,16 @@ const Condominio = () => {
     }
     const panelCrearAnuncio = () => {
         return <div key={2} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <button type="button" className="iconoVolver" onClick={() => {
-                setCrear(false);
-                setEditar(false);
-                setVerDetalle(false);
-            }}>
-                <img width={35} src={volver} alt="Icono volver" />
-            </button>
-            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio"}</h2>
+            {!crear && (
+                <button type="button" className="iconoVolver" onClick={() => {
+                    setCrear(false);
+                    setEditar(false);
+                    setVerDetalle(false);
+                }}>
+                    <img width={35} src={volver} alt="Icono volver" />
+                </button>
+            )}
+            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {!crear ? tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio" : ""}</h2>
 
             <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                 <label htmlFor="textfield" className="search-label-admin">
@@ -1788,6 +1959,7 @@ const Condominio = () => {
             <input
                 type="checkbox"
                 checked={activa}
+                defaultChecked={activa}
                 className="switch-checkbox"
             />
             <span className="switch-slider" />
@@ -1815,10 +1987,10 @@ const Condominio = () => {
         setVerPuntosInteres(f)
         setVerEmergencia(g)
         setVotaciones(h);
+        setVerUsuarios(i);
     }
     // eslint-disable-next-line
     const selSuscribir = (error: Boolean, err: string, data: any) => {
-        setLoading(false);
         try {
             if (data) {
                 SuscribirNotificaciones2Logic(selSuscribir2, urlPase[3], usuario.id, err, data)
@@ -1887,6 +2059,8 @@ const Condominio = () => {
         const handleClickOutside = (event: any) => {
             if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
                 setMenuOpciones(false);
+                setOpen(false);
+                setOpenNotificaciones(false);
             }
         };
 
@@ -1896,7 +2070,8 @@ const Condominio = () => {
         };
     }, [menuOpciones]);
 
-    const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any) => {
+    const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any, ev : any) => {
+        ev.preventDefault();
         setLoading(true);
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
@@ -1904,6 +2079,10 @@ const Condominio = () => {
             SuscribirNotificacionesLogic(selSuscribir, tipoSuscripcion)
         }
     }
+
+    const [openCrear, setOpenCrear] = useState(false);
+
+    const [openNotificaciones, setOpenNotificaciones] = useState(false);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
@@ -1920,7 +2099,9 @@ const Condominio = () => {
                                 <img width={25} src={menuicon} alt="icono abrir menu" />
                             </button>
                         }
-                        <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
+                        {dataFull.logo ?
+                            <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
+                            : ""}
                         <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
                             <img width={25} src={actualizar} alt="icono actualizar" />
                         </button>
@@ -1937,9 +2118,66 @@ const Condominio = () => {
                                 </svg>
                                 Perfil
                             </button>
+                            {usuario.rol === "ADMINISTRADOR" && (
+                            <button
+                                type="button"
+                                onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
+                                className="crear-btn"
+                            >
+                                <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 27.963 27.963">
+                                    <g>
+                                        <g id="c140__x2B_">
+                                            <path d="M13.98,0C6.259,0,0,6.26,0,13.982s6.259,13.981,13.98,13.981c7.725,0,13.983-6.26,13.983-13.981
+			C27.963,6.26,21.705,0,13.98,0z M21.102,16.059h-4.939v5.042h-4.299v-5.042H6.862V11.76h5.001v-4.9h4.299v4.9h4.939v4.299H21.102z
+			"/>
+                                        </g>
+                                        <g id="Capa_1_9_">
+                                        </g>
+                                    </g>
+                                </svg>
+                                Crear
+                                <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
+                                </svg>
+                            </button>
+                            )}
+                            {openCrear && usuario.rol === "ADMINISTRADOR" && (
+                                <div className="submenu">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setTipo(1);
+                                            setOpenCrear(false);
+                                            changeMenu(3, false, true);
+                                            cerrarMenu(false)
+                                            setOpen(false);
+                                        }}
+                                        className="submenu-item ml-3"
+                                    >
+                                        Anuncios
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setOpenCrear(false);
+                                            cerrarMenu(false);
+                                            changeMenu(3, false, false, false, true);
+                                            setOpen(false);
+                                        }}
+                                        className="submenu-item ml-3"
+                                    >
+                                        Votación
+                                    </button>
+                                </div>
+                            )}
                             {
-                                usuario.rol === "Administrador" && (
-                                    <button type="button" onClick={() => { setVerPerfil(true); setVotaciones(false) }}>
+                                usuario.rol === "Administrador" || usuario.rol === "ADMINISTRADOR" && (
+                                    <button type="button" onClick={() => {
+                                        cerrarMenu(false, false, false, false, false, false, false, false, true)
+                                        setLoading(true);
+                                        ObtenerUsuariosLogic(selObtenerUsuarios, loguear.idCondominio);
+                                    }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.05 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z" />
                                         </svg>
@@ -1947,42 +2185,50 @@ const Condominio = () => {
                                     </button>
                                 )
                             }
-                            <button type="button" onClick={() => {
-                                createSuscripcion(usuario.tieneSuscripcionMensajes, 1)
-                            }}>
+
+                            <button
+                                type="button"
+                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); }}
+                                className="crear-btn"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
                                 </svg>
-                                Notif. Anuncios
-                                {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
-                            </button>
-                            <button type="button" onClick={() => {
-                                createSuscripcion(usuario.tieneSuscripcionMensajes, 2)
-                            }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
+                                Notificaciones
+                                <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
                                 </svg>
-                                Notif. Mensajes
-                                {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
                             </button>
-                            <button type="button" onClick={() => {
-                                createSuscripcion(usuario.tieneSuscripcionMensajes, 3)
-                            }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                </svg>
-                                Notif. Votaciones
-                                {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
-                            </button>
-                            <button type="button" onClick={() => {
-                                createSuscripcion(usuario.tieneSuscripcionMensajes, 4)
-                            }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                </svg>
-                                Notif. Avisos
-                                {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
-                            </button>
+
+                            {openNotificaciones && (
+                                <div className="submenu">
+                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
+                                        createSuscripcion(usuario.tieneSuscripcionAnuncios, 1, ev)
+                                    }}>
+                                        Notif. Anuncios
+                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                                    </button>
+                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
+                                        createSuscripcion(usuario.tieneSuscripcionMensajes, 2, ev)
+                                    }}>
+                                        Notif. Mensajes
+                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                                    </button>
+                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
+                                        createSuscripcion(usuario.tieneSuscripcionVotaciones, 3, ev)
+                                    }}>
+                                        Notif. Votaciones
+                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                                    </button>
+                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
+                                        createSuscripcion(usuario.tieneSuscripcionAvisos, 4, ev)
+                                    }}>
+                                        Notif. Avisos
+                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                    </button>
+                                </div>
+                            )}
+
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, true);
                                 setNewTextRich(dataFull.normas);
@@ -2035,7 +2281,7 @@ const Condominio = () => {
                     )}
                 </div>
                 <div className="container pb-5 mb-5">
-                    <div className="row px-3 px-md-0 justify-content-around">
+                    <div className="row px-3 justify-content-around">
                         {
                             iniciarSesion ?
                                 <>
@@ -2075,21 +2321,26 @@ const Condominio = () => {
                                                                 {panelPerfil()}
                                                             </>
                                                             :
-                                                            verReglasNormas ?
+                                                            verUsuarios ?
                                                                 <>
-                                                                    {panelReglasNormas()}
+                                                                    {panelUsuarios()}
                                                                 </>
                                                                 :
-                                                                verDetalle && tipo !== 2 ?
+                                                                verReglasNormas ?
                                                                     <>
-                                                                        {panelDetalleAnuncio()}
+                                                                        {panelReglasNormas()}
                                                                     </>
                                                                     :
-                                                                    <>
-                                                                        {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
-                                                                            panelAnuncios(a, i)
-                                                                        ))}
-                                                                    </>
+                                                                    verDetalle && tipo !== 2 ?
+                                                                        <>
+                                                                            {panelDetalleAnuncio()}
+                                                                        </>
+                                                                        :
+                                                                        <>
+                                                                            {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                                panelAnuncios(a, i)
+                                                                            ))}
+                                                                        </>
                         }
                     </div>
                 </div>
