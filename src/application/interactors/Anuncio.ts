@@ -186,8 +186,8 @@ export const ObtenerUsuarios = (selListado: any, idCondominio: string) => {
     });
 };
 
-export const ObtenerAvisos = (selListado: any, mes: any) => {
-    SVCAnuncio.ObtenerAvisos(mes).then((res: IServiceResult<any>) => {
+export const ObtenerAvisos = (selListado: any, mes: any, idCondominio: any, anio: any) => {
+    SVCAnuncio.ObtenerAvisos(mes, idCondominio, anio).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);

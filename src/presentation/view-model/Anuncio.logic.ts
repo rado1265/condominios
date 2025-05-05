@@ -59,8 +59,8 @@ export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {
     return ObtenerUsuarios(selListado, idCondominio);
 }
 
-export const ObtenerAvisosLogic = (selListado: any, mes: string) => {
-    return ObtenerAvisos(selListado, mes);
+export const ObtenerAvisosLogic = (selListado: any, mes: string, idCondominio: any, anio: any) => {
+    return ObtenerAvisos(selListado, mes, idCondominio, anio);
 }
 export const CrearAvisosLogic = (selListado: any, aviso: any, eliminar: boolean) => {
     return CrearAvisos(selListado, aviso, eliminar);

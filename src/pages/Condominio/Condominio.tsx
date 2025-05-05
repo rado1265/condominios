@@ -338,7 +338,8 @@ const Condominio = () => {
                 id: a,
                 fecha: b,
                 mensaje: c,
-                idUsuario: usuario.id
+                idUsuario: usuario.id,
+                idCondominio: localStorage.getItem("idCondominio")!.toString()
             }
             CrearAvisosLogic(selCrearAvisos, aviso, true)
         } catch (er) {
@@ -349,9 +350,10 @@ const Condominio = () => {
             let fecha: Date = new Date(fechaAviso)
             var aviso: any = {
                 id: idAviso,
-                fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
+                fecha,//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
                 mensaje: mensajeAviso,
-                idUsuario: usuario.id
+                idUsuario: usuario.id,
+                idCondominio: localStorage.getItem("idCondominio")!.toString()
             }
             CrearAvisosLogic(selCrearAvisos, aviso, false)
         } catch (er) {
@@ -361,7 +363,7 @@ const Condominio = () => {
         try {
             var aviso: any = {
                 mensaje: a,
-                idCondominio:  localStorage.getItem("idCondominio")!.toString(),
+                idCondominio: localStorage.getItem("idCondominio")!.toString(),
                 usuario: usuario.nombre
             }
             EnviarNotifAvisoLogic(selEnviarNotifAviso, aviso)
@@ -383,7 +385,8 @@ const Condominio = () => {
     const selCrearAvisos = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString());
+                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
+                setVerAvisos(false);
                 setEditarAvisos(false);
                 setMensajeAviso('');
                 setFechaAviso('');
@@ -1126,6 +1129,7 @@ const Condominio = () => {
                             </div>
                         </>
                         :
+                        !loading &&
                         <div className="perfil-box w-100">
                             <button
                                 type="button"
@@ -1148,6 +1152,7 @@ const Condominio = () => {
                                 )}
                             </div>
                             <h4 className="perfil-nombre">{usuarioDetalle.nombre}</h4>
+
                             <div className="perfil-info">
                                 <div>
                                     {usuarioDetalle.rol && <span>Rol</span>}
@@ -1528,7 +1533,7 @@ const Condominio = () => {
                                 <div className="container-avisos">
                                     <div className="d-block">
                                         <span><strong>{e.mensaje}</strong></span><br />
-                                        <span>{new Date(e.fecha).toLocaleTimeString()}</span>
+                                        {/* <span>{new Date(e.fecha).toLocaleTimeString()}</span> */}
                                     </div>
                                     <div style={{ position: 'absolute', right: '25px' }}>
                                         {
@@ -1606,10 +1611,10 @@ const Condominio = () => {
                                 className="typeDate"
                                 disabled
                                 value={fechaAviso ? fechaAviso.toString() : ""}
-                                style={{ padding: '8px', fontSize: '16px', width: '48%' }}
+                                style={{ padding: '8px', fontSize: '16px', width: '100%' }}
                             />
 
-                            <input
+                            {/*  <input
                                 type="time"
                                 name="fechaAviso"
                                 className="typeDate"
@@ -1617,7 +1622,7 @@ const Condominio = () => {
                                 //onChange={(e: any) => {setFechaAviso(e.target.value);}}
                                 onChange={(e: any) => { changeFechaTime(e) }}
                                 style={{ padding: '8px', fontSize: '16px', width: '48%' }}
-                            />
+                            /> */}
                         </div>
                         <button
                             type="button"
@@ -2051,7 +2056,7 @@ const Condominio = () => {
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, true)
                                 setLoading(true)
-                                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString())
+                                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#5bc0de" viewBox="0 0 24 24">
                                     <path d="M20 2H4C2.897 2 2 2.897 2 4v14c0 1.103.897 2 2 2h14l4 4V4c0-1.103-.897-2-2-2z" />
