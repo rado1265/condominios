@@ -484,6 +484,13 @@ const Condominio = () => {
             if (data) {
                 ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString());
                 setEditarEmergencia(false)
+                setEmergencia({
+                    id: 0,
+                    descripcion: '',
+                    telefono: '',
+                    idcondominio: 0,
+                    direccion: ''
+                })
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -1316,12 +1323,12 @@ const Condominio = () => {
                                         {usuarioDetalle.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.rol}</span>}
                                     </div>
                                     <div className="container-dataPerfil">
-                                        {usuarioDetalle.direccion && <span>Dirección</span>}
-                                        {usuarioDetalle.direccion && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.direccion}</span>}
+                                        <span>Dirección</span>
+                                        {usuarioDetalle.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.direccion}</span> : <span  style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                     </div>
                                     <div className="container-dataPerfil">
-                                        {usuarioDetalle.telefono && <span>Teléfono</span>}
-                                        {usuarioDetalle.telefono && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.telefono}</span>}
+                                        <span>Teléfono</span>
+                                        {usuarioDetalle.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.telefono}</span> : <span  style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                     </div>
                                     <div className="container-dataPerfil">
                                         <span>Notif. Anuncios</span>
@@ -1340,7 +1347,7 @@ const Condominio = () => {
                                         <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
                                     </div>
                                     <div className="container-dataPerfil">
-                                        {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
+                                        <span>Fecha Caducidad</span>
                                         {usuarioDetalle.fechaCaducidad && (
                                             <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</span>
                                         )}
@@ -1665,7 +1672,8 @@ const Condominio = () => {
                                             {/*<span className="d-block">{e.telefono}</span>*/}
 
                                             <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => {
-                                                //setEditarPerfil(true)
+                                                setEmergencia(e)
+                                                setEditarEmergencia(true)
                                             }}>
                                                 <img src={iconeditar} />
                                             </button>
@@ -1686,6 +1694,13 @@ const Condominio = () => {
                         <button type="button" className="search-button mt-2" onClick={() => {
                             setEditarEmergencia(true)
                             setCrear(false)
+                            setEmergencia({
+                                id: 0,
+                                descripcion: '',
+                                telefono: '',
+                                idcondominio: 0,
+                                direccion: ''
+                            })
                         }}>
                             Crear número de emergencia
                         </button>
