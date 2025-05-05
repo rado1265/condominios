@@ -127,6 +127,20 @@ const Condominio = () => {
         idcondominio: 0,
         direccion: ''
     })
+
+    const [modalOpenImg, setModalOpenImg] = useState(false);
+    const [imgSelect, setImgSelect] = useState(null);
+
+    const openModalImg = (img: any) => {
+        setImgSelect(img);
+        setModalOpenImg(true);
+    };
+
+    const closeModalImg = () => {
+        setModalOpenImg(false);
+        setImgSelect(null);
+    };
+
     /* {
         id: 0,
                 idUsuario: 0,
@@ -740,71 +754,116 @@ const Condominio = () => {
         if (a.idTipo !== tipo)
             return false
         else
-            return <div key={i} className="anuncio card-shadow col-12 my-3" onClick={() => {
-                if (a.idTipo !== 2) {
-                    setLoading(true);
-                    ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id)
-                    setDataDetalle(a);
-                    setVerDetalle(true);
-                }
-            }}>
-                <div className="anuncio-header">
-                    {
-                        usuario.nombre.length > 0 && <div style={{ justifyContent: 'end', display: 'flex' }} >
-                            {
-                                usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR" ?
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon editarInput" onClick={() => {
-                                            changeMenu(a.idTipo, false, false, true)
-                                            cargarAnuncioParaEdit(a)
-                                        }}>
-                                            <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
-                                        </svg>
+            return <div
+                key={i}
+                className="v2-anuncio card-shadow col-12 my-3 pb-5"
+            >
+                <div className="v2-anuncio-header">
+                    {usuario.nombre.length > 0 && (
+                        <div className="v2-anuncio-actions">
+                            {(usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR") && (
+                                <>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                        className="v2-icon editarInput"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            changeMenu(a.idTipo, false, false, true);
+                                            cargarAnuncioParaEdit(a);
+                                        }}
+                                    >
+                                        <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
+                                    </svg>
 
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon deleteInput" onClick={() => {
-                                            EliminarAnuncio(a.id)
-                                        }}>
-                                            <path d="M5 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h3a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5H1a1 1 0 0 1 0-2h3V3zm1 0v1h8V3H6zm-1 3h10v12H5V6z" />
-                                        </svg>
-                                    </>
-                                    : ""
-                            }
-
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                        className="v2-icon deleteInput"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            EliminarAnuncio(a.id);
+                                        }}
+                                    >
+                                        <path d="M5 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h3a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5H1a1 1 0 0 1 0-2h3V3zm1 0v1h8V3H6zm-1 3h10v12H5V6z" />
+                                    </svg>
+                                </>
+                            )}
                         </div>
-                    }
-                    <span className="anuncio-title">{a.cabecera}</span>
+                    )}
+                    <h3 className={(usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR") ? "v2-anuncio-title mt-4" : "v2-anuncio-title"}>{a.cabecera}</h3>
                 </div>
-                <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: a.descripcion }} />
-                <div className="anuncio-footer">
-                    <div className="anuncio-organizador">
-                        <span>Creado por: </span>
+
+                <div className="v2-anuncio-body" dangerouslySetInnerHTML={{ __html: a.descripcion }} />
+
+                {(a.amedida && (
+                    <div className="v2-anuncio-media-wrapper">
+                        {a.amedida.includes("http") ? (
+                            <video src={a.amedida} controls />
+                        ) : (
+                            <img src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" onClick={() => openModalImg(`data:image/jpeg;base64,${a.amedida}`)} />
+                        )}
+                    </div>
+                )) || null}
+
+                <div className="v2-anuncio-footer">
+                    <div className="v2-anuncio-organizador">
+                        <span>Creado por:</span>
                         <span className="ml-1">{a.organizador}</span>
                     </div>
-                    <span className="anuncio-telefono">{a.telefono}</span>
+                    <span className="v2-anuncio-telefono">{a.telefono}</span>
                 </div>
-                {a.amedida && a.amedida.includes("http") ?
-                    <div className="anuncio-img-wrapper">
-                        <video src={a.amedida} controls width="300" />
-                    </div>
-                    : a.amedida && !a.amedida.includes("http") ?
-                        <div className="anuncio-img-wrapper">
-                            <img className="anuncio-img" src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" />
-                        </div>
-                        : ""
-                }
-                <small className="anuncio-fecha">
+
+                <small className="v2-anuncio-fecha">
                     Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString()}
                 </small>
-                <div className="anuncio-like">
-                    <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(a.id, true, false)}>
+
+                {a.idTipo !== 2 && (
+                    <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
+                        <svg fill="#28bd06" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                            width="24px" height="24px" viewBox="0 0 483.789 483.789" onClick={() => {
+                                setLoading(true);
+                                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
+                                setDataDetalle(a);
+                                setVerDetalle(true);
+                            }}>
+                            <g>
+                                <g>
+                                    <polygon points="434.77,405.332 465.895,405.332 465.895,122.667 329.895,122.667 329.895,280.288 329.895,293.333 
+			316.073,293.333 167.228,293.333 167.228,405.332 361.895,405.332 361.895,483.789 		"/>
+                                    <path d="M17.895,280h30.88l73.12,79.973V280h45.333h149.333V122.667V0H17.895V280z M266.138,116.6
+			c6.267,0,11.989,3.4,16.407,6.067c5.43,5.333,8.885,11.845,8.885,19.549c0,13.968-11.325,25.453-25.292,25.453
+			c-13.968,0-25.294-11.565-25.294-25.533c0-7.701,3.453-14.133,8.886-19.467C254.145,120,259.867,116.6,266.138,116.6z
+			 M199.927,116.6c6.267,0,11.99,3.4,16.408,6.067c5.429,5.333,8.886,11.845,8.886,19.549c0,13.968-11.326,25.453-25.294,25.453
+			c-13.968,0-25.293-11.565-25.293-25.533c0-7.701,3.454-14.133,8.886-19.467C187.937,120,193.66,116.6,199.927,116.6z
+			 M133.715,117.243c13.971,0,25.293,11.326,25.293,25.293c0,13.968-11.325,25.293-25.293,25.293
+			c-13.968,0-25.293-11.325-25.293-25.293C108.422,128.565,119.748,117.243,133.715,117.243z M67.507,117.243
+			c13.968,0,25.293,11.326,25.293,25.293c0,13.968-11.326,25.293-25.293,25.293c-13.971,0-25.293-11.325-25.293-25.293
+			C42.214,128.565,53.538,117.243,67.507,117.243z"/>
+                                </g>
+                            </g>
+                        </svg>
+                        <span className="v2-comment-count">{a.cantComentarios}</span>
+                    </div>
+                )}
+
+                <div className="v2-anuncio-like" onClick={(e) => e.stopPropagation()}>
+                    <svg
+                        className="v2-like-icon"
+                        viewBox="0 0 24 24"
+                        onClick={() => handleLike(a.id, true, false)}
+                    >
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
-             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
-             22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
+                  C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
+                  22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
-                    <span className="like-count">{a.likes === 0 ? "" : a.likes}</span>
+                    <span className="v2-like-count">{a.likes}</span>
                 </div>
             </div>
+
     }
 
     const handleKeyDown = (e: any) => {
@@ -2119,9 +2178,11 @@ const Condominio = () => {
 
         const handleClickOutside = (event: any) => {
             if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
-                setMenuOpciones(false);
-                setOpen(false);
-                setOpenNotificaciones(false);
+                if(event.target.id !== "iconoMenuSup"){
+                    setMenuOpciones(false);
+                    setOpen(false);
+                    setOpenNotificaciones(false);
+                }
             }
         };
 
@@ -2156,8 +2217,8 @@ const Condominio = () => {
                 <div className="w-100 pb-3 mb-3 containerMenu">
                     <div className="containerImgMenu">
                         {
-                            usuario.nombre.length > 0 && <button className="iconNotificacion" onClick={() => { setMenuOpciones(true); }}>
-                                <img width={25} src={menuicon} alt="icono abrir menu" />
+                            usuario.nombre.length > 0 && <button id="iconoMenuSup" className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
+                                <img id="iconoMenuSup" width={25} src={menuicon} alt="icono abrir menu" />
                             </button>
                         }
                         {dataFull.logo ?
@@ -2406,6 +2467,14 @@ const Condominio = () => {
                         }
                     </div>
                 </div>
+                {modalOpenImg && (
+                    <div className="modal-overlay" onClick={closeModalImg}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <button className="close-btn" onClick={closeModalImg}>&times;</button>
+                            <img src={imgSelect ?? ""} alt="Imagen Ampliada" />
+                        </div>
+                    </div>
+                )}
                 {navegador()}
             </div>
         </React.Fragment>
