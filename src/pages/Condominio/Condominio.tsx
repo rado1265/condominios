@@ -2236,6 +2236,7 @@ const Condominio = () => {
                                 usuario.rol === "Administrador" || usuario.rol === "ADMINISTRADOR" && (
                                     <button type="button" onClick={() => {
                                         cerrarMenu(false, false, false, false, false, false, false, false, true)
+                                        setCrear(false);
                                         setLoading(true);
                                         ObtenerUsuariosLogic(selObtenerUsuarios, loguear.idCondominio);
                                     }}>
