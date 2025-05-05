@@ -117,7 +117,7 @@ export class SVCAnuncio {
     }
     public static async Login(usuario: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
-        const registration = await navigator.serviceWorker.ready;
+        /*const registration = await navigator.serviceWorker.ready;
 
         const response = await axios.get(_ruta + 'Condominios/obtenerKey');
         console.log(response.data)
@@ -127,13 +127,13 @@ export class SVCAnuncio {
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: convertedVapidKey,
-        });
+        });*/
 
         const url: string = _ruta + "Condominios/getUsuario?usuario=" + usuario.usuario + "&clave=" + usuario.clave + "&idCondominio=" + usuario.idCondominio;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios
-            .post(url, subscription, {
+            .post(url, [], {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",

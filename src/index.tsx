@@ -19,7 +19,7 @@ root.render(
     <Routes>
       <Route path="/desktop" element={<HomeDesktop />}></Route>
       { !validateMobile || isMobile ?
-      <Route path="/" element={<Home />}></Route>
+      <Route path="/" element={<Condominio />}></Route>
       :
       <Route path="/" element={<HomeDesktop />}></Route>
       }

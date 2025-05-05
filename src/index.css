@@ -35,7 +35,7 @@ li,
 div,
 small,
 a {
-  font-family: system-ui !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 button {

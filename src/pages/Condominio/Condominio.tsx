@@ -11,6 +11,7 @@ import volver from './../../components/utils/img/volver.png';
 import iconeditar from './../../components/utils/img/editar.png';
 import iconborrar from './../../components/utils/img/iconborrar.png';
 import notificar from './../../components/utils/img/notificar.png';
+import logo from './../../components/utils/img/logo.png';
 const chileTime = new Intl.DateTimeFormat("es-CL", {
     timeZone: "America/Santiago",
     hour12: false,
@@ -28,6 +29,9 @@ const Condominio = () => {
     const [textRichEditado, setTextRichEditado] = useState(false);
     const [verDetalleAvisos, setVerDetalleAvisos] = useState(false);
     const [tipoSubir, setTipoSubir] = useState(0);
+    const [dataCondominios, setDataCondominios] = useState([]);
+    const [enComunidad, setEnComunidad] = useState(false);
+    const [condominio] = useState(0);
     const [open, setOpen] = useState(false);
     const [dataFull, setDataFull] = useState({
         anuncios: [],
@@ -36,7 +40,6 @@ const Condominio = () => {
         normas: '',
     });
     const fullURL = window.location.href;
-    const urlPase = fullURL.split("/");
     const [tipo, setTipo] = useState(1)
     const [usuario, setUsuario] = useState({
         nombre: "",
@@ -167,15 +170,21 @@ const Condominio = () => {
         setVerDetalle(false);
     }
     useEffect(() => {
-        if (!localStorage.getItem("idCondominio")) localStorage.setItem("idCondominio", urlPase[3]);
         if (localStorage.getItem("nombreUsuario") &&
-            localStorage.getItem("tieneSuscripcionMensajes") &&
+            /*localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
             localStorage.getItem("tieneSuscripcionAnuncios") &&
-            localStorage.getItem("tieneSuscripcionAvisos") &&
+            localStorage.getItem("tieneSuscripcionAvisos") &&*/
             localStorage.getItem("rolUsuario") &&
+            localStorage.getItem("clave") &&
             localStorage.getItem("idUsuario")) {
-            setUsuario({
+
+            LoginLogic(selLogin, {
+                usuario: localStorage.getItem("nombreUsuario"),
+                clave: localStorage.getItem("clave"),
+                idCondominio: 0
+            })
+            /*setUsuario({
                 nombre: localStorage.getItem("nombreUsuario") ?? "",
                 tieneSuscripcionMensajes: localStorage.getItem("tieneSuscripcionMensajes") === "true",
                 tieneSuscripcionVotaciones: localStorage.getItem("tieneSuscripcionVotaciones") === "true",
@@ -183,15 +192,10 @@ const Condominio = () => {
                 tieneSuscripcionAvisos: localStorage.getItem("tieneSuscripcionAvisos") === "true",
                 rol: localStorage.getItem("rolUsuario") ?? "",
                 id: parseInt(localStorage.getItem("idUsuario") ?? "")
-            })
+            })*/
         }
         else {
             cerrarSesion()
-        }
-
-        if (urlPase[3]) {
-            setLoading(true);
-            ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -203,6 +207,9 @@ const Condominio = () => {
         localStorage.removeItem("tieneSuscripcionAvisos");
         localStorage.removeItem("rolUsuario");
         localStorage.removeItem("idUsuario");
+        localStorage.removeItem("clave");
+        localStorage.removeItem("idCondominio");
+        setDataCondominios([]);
         setUsuario({
             nombre: "",
             tieneSuscripcionMensajes: false,
@@ -212,6 +219,9 @@ const Condominio = () => {
             rol: "",
             id: 0
         });
+
+        setIniciarSesion(true);
+        setEnComunidad(false);
     }
 
     const EliminarAnuncio = (a: any) => {
@@ -267,7 +277,7 @@ const Condominio = () => {
         return {
             usuario: data.usuario ?? "",
             clave: data.clave ?? "",
-            idCondominio: localStorage.getItem("idCondominio")
+            idCondominio: 0
         };
     };
 
@@ -287,15 +297,29 @@ const Condominio = () => {
                 setTipo(1)
                 setIniciarSesion(false)
                 localStorage.setItem("nombreUsuario", data.nombre);
-                localStorage.setItem("tieneSuscripcionMensajes", data.tieneSuscripcionMensajes);
-                localStorage.setItem("tieneSuscripcionVotaciones", data.tieneSuscripcionVotaciones);
-                localStorage.setItem("tieneSuscripcionAnuncios", data.tieneSuscripcionAnuncios);
-                localStorage.setItem("tieneSuscripcionAvisos", data.tieneSuscripcionAvisos);
+                localStorage.setItem("clave", data.clave);
                 localStorage.setItem("rolUsuario", data.rol);
                 localStorage.setItem("idUsuario", data.id);
+                setDataCondominios(data.condominios);
+                if(localStorage.getItem("idCondominio")){
+                    let condSelect = data.condominios.filter((a: any) => a.id.toString() === localStorage.getItem("idCondominio")!.toString());
+                    if(new Date(condSelect[0].fechaCaducidad) < new Date()){
+                        cerrarSesion();
+                    }else{
+                        setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
+                    }
+                }else{
+                    if(data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()){
+                        setEnComunidad(true);
+                        ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id);localStorage.setItem("idCondominio", data.condominios[0].id)
+                    }else if(data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()){
+                        cerrarSesion();
+                        ErrorMessage("Su usuario no tiene comunidades activas", "")
+                    }
+                }
             }
             else {
-                setUsuario({
+                /*setUsuario({
                     nombre: "",
                     tieneSuscripcionMensajes: false,
                     tieneSuscripcionVotaciones: false,
@@ -303,13 +327,13 @@ const Condominio = () => {
                     tieneSuscripcionAvisos: false,
                     rol: "",
                     id: 0
-                });
+                });*/
                 ErrorMessage("Credenciales incorrectas", "")
             }
             setLoguear({
                 usuario: "",
                 clave: "",
-                idCondominio: localStorage.getItem("idCondominio")!.toString()
+                idCondominio: "0"
             })
         } catch (er) {
             ErrorMessage("Credenciales incorrectas", "")
@@ -550,13 +574,14 @@ const Condominio = () => {
             [name]: value
         }));
     };
-    const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false) => {
+    const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false, f: boolean = false) => {
+        window.scrollTo(0, 0);
         setVerDetalle(false);
-        setTipo(a)
-        setIniciarSesion(b)
-        setCrear(c)
-        setEditar(d)
-        setEncuesta(e)
+        setTipo(a);
+        setIniciarSesion(b);
+        setCrear(c);
+        setEditar(d);
+        setEncuesta(e);
         setVerDetalle(false)
         setVerPerfil(false);
         setEditarPerfil(false);
@@ -624,7 +649,7 @@ const Condominio = () => {
     /*document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
-            ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+            ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
         }
     });*/
 
@@ -633,7 +658,7 @@ const Condominio = () => {
         try {
             if (data) {
                 setLoading(true);
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
             }
             else {
             }
@@ -880,34 +905,59 @@ const Condominio = () => {
         }
     };
 
+    const panelPrincipal = () => {
+        return <div className="container">
+            <div className="row">
+            <span className="w-100 text-center h2 mb-4">Tus Comunidades</span>
+            {dataCondominios.map((a: any) => {
+                let activo = new Date(a.fechaCaducidad.toString()) > new Date();
+                return (
+                    <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() =>{setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id);localStorage.setItem("idCondominio", a.id)}}>
+                        {a.logo && (
+                        <img id="imgComunidad" width={200} src={`data:image/jpeg;base64,${a.logo}`} />
+                        )}
+                        <span id="nomComunidad" className="h5">{a.nombre}</span>
+                    </div>
+                );
+            })}
+             </div>
+
+        </div>
+    }
+
     const panelInicioSesion = () => {
-        return <div className="mx-3 w-100 search-container" style={{ marginTop: '35%' }}>
-            <label htmlFor="textfield" className="search-label">
-                Inicio de Sesión
-            </label>
-            <div className="login-box">
-                <input
-                    type="text"
-                    name="usuario"
-                    className="search-input"
-                    value={loguear.usuario}
-                    onChange={handleChangeLogin}
-                />
-                <input
-                    type="password"
-                    name="clave"
-                    className="search-input"
-                    value={loguear.clave}
-                    onChange={handleChangeLogin}
-                    onKeyDown={handleKeyDown}
-                />
-                <button
-                    type="button"
-                    className="search-button"
-                    onClick={login}
-                >
-                    Ingresar
-                </button>
+        return <div style={{ marginTop: '-10%' }}>
+            <div className="w-100" style={{ display: 'grid' }}>
+                <img className="w-75 mx-auto" alt="Logo" src={logo} />
+            </div>
+            <div className="w-100 search-container">
+                <label htmlFor="textfield" className="search-label">
+                    Inicio de Sesión
+                </label>
+                <div className="login-box">
+                    <input
+                        type="text"
+                        name="usuario"
+                        className="search-input"
+                        value={loguear.usuario}
+                        onChange={handleChangeLogin}
+                    />
+                    <input
+                        type="password"
+                        name="clave"
+                        className="search-input"
+                        value={loguear.clave}
+                        onChange={handleChangeLogin}
+                        onKeyDown={handleKeyDown}
+                    />
+                    <button
+                        type="button"
+                        className="search-button"
+                        onClick={login}
+                    >
+                        Ingresar
+                    </button>
+                </div>
             </div>
         </div>
     }
@@ -1432,13 +1482,13 @@ const Condominio = () => {
     };
     const cambiarNormas = () => {
         console.log(newTextRich)
-        CambiarNormasLogic(selCambiarNormas, newTextRich, urlPase[3])
+        CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
     }
     const selCambiarNormas = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
                 setLoading(true);
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -1876,28 +1926,43 @@ const Condominio = () => {
                     </div>
                 </div>
                 :
-                <div className="login-box py-3 px-3">
-                    <button
-                        onClick={() => {
-                            const nuevoMes = mes === 1 ? 12 : mes - 1;
-                            const nuevoAño = mes === 1 ? año - 1 : año;
-                            cambiarMes(nuevoMes, nuevoAño);
-                        }}
-                        aria-label="Iquierda"
-                    >
-                        Iquierda
-                    </button>
-                    <button
-                        onClick={() => {
-                            const nuevoMes = mes === 12 ? 1 : mes + 1;
-                            const nuevoAño = mes === 12 ? año + 1 : año;
-                            cambiarMes(nuevoMes, nuevoAño);
-                        }}
-                        aria-label="Derecha"
-                    >
-                        Derecha
-                    </button>
-                    <h1 style={{ textAlign: 'center' }}>Calendario de {monthTitle}</h1>
+                <div className="login-box py-3 px-3 w-100">
+                    <h1 className="mb-0" style={{ textAlign: 'center' }}>Calendario</h1>
+                    <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+                        <button
+                            onClick={() => {
+                                const nuevoMes = mes === 1 ? 12 : mes - 1;
+                                const nuevoAño = mes === 1 ? año - 1 : año;
+                                cambiarMes(nuevoMes, nuevoAño);
+                            }}
+                            aria-label="Iquierda"
+                            className="iconFlecha"
+                        >
+                            <svg fill="#fff" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 330 330">
+                                <path id="XMLID_92_" d="M111.213,165.004L250.607,25.607c5.858-5.858,5.858-15.355,0-21.213c-5.858-5.858-15.355-5.858-21.213,0.001
+	l-150,150.004C76.58,157.211,75,161.026,75,165.004c0,3.979,1.581,7.794,4.394,10.607l150,149.996
+	C232.322,328.536,236.161,330,240,330s7.678-1.464,10.607-4.394c5.858-5.858,5.858-15.355,0-21.213L111.213,165.004z"/>
+                            </svg>
+                        </button>
+                        <h4 className="m-0">{monthTitle}</h4>
+                        <button
+                            onClick={() => {
+                                const nuevoMes = mes === 12 ? 1 : mes + 1;
+                                const nuevoAño = mes === 12 ? año + 1 : año;
+                                cambiarMes(nuevoMes, nuevoAño);
+                            }}
+                            aria-label="Derecha"
+                            className="iconFlecha"
+                        >
+                            <svg fill="#fff" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 330.002 330.002">
+                                <path id="XMLID_103_" d="M233.252,155.997L120.752,6.001c-4.972-6.628-14.372-7.97-21-3c-6.628,4.971-7.971,14.373-3,21
+	l105.75,140.997L96.752,306.001c-4.971,6.627-3.627,16.03,3,21c2.698,2.024,5.856,3.001,8.988,3.001
+	c4.561,0,9.065-2.072,12.012-6.001l112.5-150.004C237.252,168.664,237.252,161.33,233.252,155.997z"/>
+                            </svg>
+                        </button>
+                    </div>
                     <div className="calendario">
                         {days}
                     </div>
@@ -2147,7 +2212,7 @@ const Condominio = () => {
     const selSuscribir = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                SuscribirNotificaciones2Logic(selSuscribir2, urlPase[3], usuario.id, err, data)
+                SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, err, data)
             }
             else {
                 ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
@@ -2212,7 +2277,7 @@ const Condominio = () => {
 
         const handleClickOutside = (event: any) => {
             if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
-                if(event.target.id !== "iconoMenuSup"){
+                if (event.target.id !== "iconoMenuSup") {
                     setMenuOpciones(false);
                     setOpen(false);
                     setOpenNotificaciones(false);
@@ -2248,7 +2313,7 @@ const Condominio = () => {
                     loading ?
                         <Loading />
                         : ""}
-                <div className="w-100 pb-3 mb-3 containerMenu">
+                <div className={enComunidad ? "w-100 pb-3 mb-3 containerMenu" : "d-none"}>
                     <div className="containerImgMenu">
                         {
                             usuario.nombre.length > 0 && <button id="iconoMenuSup" className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
@@ -2258,7 +2323,7 @@ const Condominio = () => {
                         {dataFull.logo ?
                             <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
                             : ""}
-                        <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]); }}>
+                        <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); }}>
                             <img width={25} src={actualizar} alt="icono actualizar" />
                         </button>
                     </div>
@@ -2333,7 +2398,7 @@ const Condominio = () => {
                                         cerrarMenu(false, false, false, false, false, false, false, false, true)
                                         setCrear(false);
                                         setLoading(true);
-                                        ObtenerUsuariosLogic(selObtenerUsuarios, loguear.idCondominio);
+                                        ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
                                     }}>
                                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.05 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z" />
@@ -2388,6 +2453,7 @@ const Condominio = () => {
 
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, true);
+                                setEncuesta(false);
                                 setNewTextRich(dataFull.normas);
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -2440,64 +2506,69 @@ const Condominio = () => {
                 <div className="container pb-5 mb-5">
                     <div className="row px-3 justify-content-around">
                         {
-                            iniciarSesion ?
+                            dataCondominios.length > 1 && !enComunidad ?
                                 <>
-                                    {panelInicioSesion()}
+                                    {panelPrincipal()}
                                 </>
                                 :
-                                crear || editar ?
+                                iniciarSesion ?
                                     <>
-                                        {panelCrearAnuncio()}
+                                        {panelInicioSesion()}
                                     </>
-                                    : votaciones ?
+                                    :
+                                    crear || editar ?
                                         <>
-                                            {panelVotaciones()}
+                                            {panelCrearAnuncio()}
                                         </>
-                                        : verEmergencia ?
+                                        : votaciones ?
                                             <>
-                                                {panelEmergencia()}
+                                                {panelVotaciones()}
                                             </>
-                                            :
-                                            verPuntosInteres ?
+                                            : verEmergencia ?
                                                 <>
-                                                    {panelPuntosInteres()}
+                                                    {panelEmergencia()}
                                                 </>
                                                 :
-                                                encuesta ?
+                                                verPuntosInteres ?
                                                     <>
-                                                        {panelCrearEncuesta()}
+                                                        {panelPuntosInteres()}
                                                     </>
                                                     :
-                                                    verAvisos ?
+                                                    encuesta ?
                                                         <>
-                                                            {panelAvisos()}
+                                                            {panelCrearEncuesta()}
                                                         </>
                                                         :
-                                                        verPerfil ?
+                                                        verAvisos ?
                                                             <>
-                                                                {panelPerfil()}
+                                                                {panelAvisos()}
                                                             </>
                                                             :
-                                                            verUsuarios ?
+                                                            verPerfil ?
                                                                 <>
-                                                                    {panelUsuarios()}
+                                                                    {panelPerfil()}
                                                                 </>
                                                                 :
-                                                                verReglasNormas ?
+                                                                verUsuarios ?
                                                                     <>
-                                                                        {panelReglasNormas()}
+                                                                        {panelUsuarios()}
                                                                     </>
                                                                     :
-                                                                    verDetalle && tipo !== 2 ?
+                                                                    verReglasNormas ?
                                                                         <>
-                                                                            {panelDetalleAnuncio()}
+                                                                            {panelReglasNormas()}
                                                                         </>
                                                                         :
-                                                                        <>
-                                                                            {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
-                                                                                panelAnuncios(a, i)
-                                                                            ))}
-                                                                        </>
+                                                                        verDetalle && tipo !== 2 ?
+                                                                            <>
+                                                                                {panelDetalleAnuncio()}
+                                                                            </>
+                                                                            :
+                                                                            <>
+                                                                                {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                                    panelAnuncios(a, i)
+                                                                                ))}
+                                                                            </>
                         }
                     </div>
                 </div>
@@ -2509,7 +2580,7 @@ const Condominio = () => {
                         </div>
                     </div>
                 )}
-                {navegador()}
+                {enComunidad && navegador()}
             </div>
         </React.Fragment>
     );

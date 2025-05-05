@@ -1,42 +1,113 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/utils/loading";
 import './Home.css';
-import { ObteneCondominioLogic } from "../../presentation/view-model/Anuncio.logic";
+import { LoginLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ErrorMessage } from "../../components/utils/messages";
 import logo from './../../components/utils/img/logo.png';
 
 const Home = () => {
     const [loading, setLoading] = useState(false);
-    const [guid, setGuid] = useState("");
+    const [loguear, setLoguear] = useState({
+        usuario: "",
+        clave: "",
+        idCondominio: localStorage.getItem("idCondominio") ?? ""
+    });
 
-    const handleClick = () => {
-        ObteneCondominioLogic(selObteneCondominio, guid);
-    }
-    const selObteneCondominio = (error: Boolean, err: string, data: any) => {
-        try {
-            setLoading(false);
-            if(data === 0){
-                ErrorMessage("Código Incorrecto", "El código ingresado es incorrecto");
-            }else{
-                window.location.href = "/" + data + "/comunidad"
-            }
-        } catch (er) {
-        }
-    }
-    useEffect(() => {
+    const [usuario, setUsuario] = useState({
+        nombre: "",
+        tieneSuscripcionMensajes: false,
+        tieneSuscripcionVotaciones: false,
+        tieneSuscripcionAnuncios: false,
+        tieneSuscripcionAvisos: false,
+        rol: "",
+        id: 0
+    });
+    const [iniciarSesion, setIniciarSesion] = useState(false)
+
+    /*useEffect(() => {
         if (localStorage.getItem("idCondominio"))
             window.location.href = "/" + localStorage.getItem("idCondominio") + "/comunidad"
-    }, [])
-
-    const handlechange = (e: any) => {
-        setGuid(e.target.value);
-    };
+    }, [])*/
 
     const handleKeyDown = (e: any) => {
         if (e.key === 'Enter') {
-            ObteneCondominioLogic(selObteneCondominio, guid);
+            LoginLogic(selLogin, normalizarLogin(loguear))
         }
     };
+
+    const normalizarLogin = (data: any) => {
+        console.log(data);
+        return {
+            usuario: data.usuario ?? "",
+            clave: data.clave ?? "",
+            idCondominio: localStorage.getItem("idCondominio") ?? ""
+        };
+    };
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => {
+                    console.log('Service Worker registrado:', reg);
+                })
+                .catch(err => console.error('Error al registrar SW:', err));
+        }
+    }, []);
+
+
+    const login = () => {
+        try {
+            setLoading(true);
+            LoginLogic(selLogin, normalizarLogin(loguear))
+        } catch (er) {
+            console.log(er);
+        }
+    }
+
+    const handleChangeLogin = (e: any) => {
+        const { name, value } = e.target;
+        setLoguear(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const selLogin = (error: Boolean, err: string, data: any) => {
+        console.log(data);
+        try {
+            setLoading(false);
+            if (data.nombre !== null) {
+                setUsuario(data);
+                setIniciarSesion(false)
+                localStorage.setItem("nombreUsuario", data.nombre);
+                localStorage.setItem("tieneSuscripcionMensajes", data.tieneSuscripcionMensajes);
+                localStorage.setItem("tieneSuscripcionVotaciones", data.tieneSuscripcionVotaciones);
+                localStorage.setItem("tieneSuscripcionAnuncios", data.tieneSuscripcionAnuncios);
+                localStorage.setItem("tieneSuscripcionAvisos", data.tieneSuscripcionAvisos);
+                localStorage.setItem("rolUsuario", data.rol);
+                localStorage.setItem("idUsuario", data.id);
+            }
+            else {
+                setUsuario({
+                    nombre: "",
+                    tieneSuscripcionMensajes: false,
+                    tieneSuscripcionVotaciones: false,
+                    tieneSuscripcionAnuncios: false,
+                    tieneSuscripcionAvisos: false,
+                    rol: "",
+                    id: 0
+                });
+                ErrorMessage("Credenciales incorrectas", "")
+            }
+            setLoguear({
+                usuario: "",
+                clave: "",
+                idCondominio: localStorage.getItem("idCondominio")!.toString()
+            })
+        } catch (er) {
+            ErrorMessage("Credenciales incorrectas", "")
+        }
+    }
 
     return (
         <React.Fragment>
@@ -44,27 +115,34 @@ const Home = () => {
                 loading ?
                     <Loading />
                     :
-                    <div>
-                        <div className="w-100 my-3" style={{ display: 'grid' }}>
-                            <img className="w-75 mx-auto" alt="Logo" src={logo}/>
+                    <div style={{ marginTop: '-10%' }}>
+                        <div className="w-100" style={{ display: 'grid' }}>
+                            <img className="w-75 mx-auto" alt="Logo" src={logo} />
                         </div>
-                        <div className="search-container">
+                        <div className="w-100 search-container">
                             <label htmlFor="textfield" className="search-label">
-                                Ingrese el código de su comunidad:
+                                Inicio de Sesión
                             </label>
-                            <div className="search-box">
+                            <div className="login-box">
                                 <input
-                                    onChange={handlechange}
                                     type="text"
-                                    id="textfield"
+                                    name="usuario"
                                     className="search-input"
-                                    placeholder="Escriba aquí..."
+                                    value={loguear.usuario}
+                                    onChange={handleChangeLogin}
+                                />
+                                <input
+                                    type="password"
+                                    name="clave"
+                                    className="search-input"
+                                    value={loguear.clave}
+                                    onChange={handleChangeLogin}
                                     onKeyDown={handleKeyDown}
                                 />
                                 <button
                                     type="button"
                                     className="search-button"
-                                    onClick={handleClick}
+                                    onClick={login}
                                 >
                                     Ingresar
                                 </button>
