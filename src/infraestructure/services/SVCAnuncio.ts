@@ -460,10 +460,10 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async ObtenerAvisos(mes: string): Promise<IServiceResult<any>> {
+    public static async ObtenerAvisos(mes: string, idCondominio: any, anio: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/getAvisos?mes=" + mes;
+        const url: string = _ruta + "Condominios/getAvisos?mes=" + mes + "&idCondominio=" + idCondominio + "&anio=" + anio;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios
@@ -519,6 +519,59 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+
+    public static async CambiarNormas(normas: any, idCondominio: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/updateNormas?idCondominio=" + idCondominio;
+
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .post(url, JSON.stringify({ html: normas }), {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+    public static async EnviarNotifAviso(aviso: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/enviarNotifAvisos";
+
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .post(url, aviso, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
                 }
             })
             .then((res: AxiosResponse) => {

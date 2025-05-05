@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CambiarEstadoVotacionLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmas from './../../components/utils/img/icon-mas.png';
 import iconmenos from './../../components/utils/img/icon-menos.png';
@@ -292,6 +292,11 @@ const Condominio = () => {
                 });
                 ErrorMessage("Credenciales incorrectas", "")
             }
+            setLoguear({
+                usuario: "",
+                clave: "",
+                idCondominio: localStorage.getItem("idCondominio")!.toString()
+            })
         } catch (er) {
             ErrorMessage("Credenciales incorrectas", "")
         }
@@ -338,7 +343,8 @@ const Condominio = () => {
                 id: a,
                 fecha: b,
                 mensaje: c,
-                idUsuario: usuario.id
+                idUsuario: usuario.id,
+                idCondominio: localStorage.getItem("idCondominio")!.toString()
             }
             CrearAvisosLogic(selCrearAvisos, aviso, true)
         } catch (er) {
@@ -349,18 +355,43 @@ const Condominio = () => {
             let fecha: Date = new Date(fechaAviso)
             var aviso: any = {
                 id: idAviso,
-                fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
+                fecha,//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
                 mensaje: mensajeAviso,
-                idUsuario: usuario.id
+                idUsuario: usuario.id,
+                idCondominio: localStorage.getItem("idCondominio")!.toString()
             }
             CrearAvisosLogic(selCrearAvisos, aviso, false)
         } catch (er) {
         }
     }
+    const EnviarNotifAviso = (a: any) => {
+        try {
+            var aviso: any = {
+                mensaje: a,
+                idCondominio: localStorage.getItem("idCondominio")!.toString(),
+                usuario: usuario.nombre
+            }
+            EnviarNotifAvisoLogic(selEnviarNotifAviso, aviso)
+        } catch (er) {
+        }
+    }
+    const selEnviarNotifAviso = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                SuccessMessage("Aviso enviado correctamente.")
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+        }
+    }
     const selCrearAvisos = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString());
+                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
+                setVerAvisos(false);
                 setEditarAvisos(false);
                 setMensajeAviso('');
                 setFechaAviso('');
@@ -1025,8 +1056,8 @@ const Condominio = () => {
                             <div className="comment-header">
                                 <span className="comment-author">{j.nombreUsuario}</span>
                                 <div>
-                                <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
-                                <span className="comment-date ml-2">{new Date(j.fecha).toLocaleTimeString().split(":").slice(0, 2).join(":")}</span>
+                                    <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
+                                    <span className="comment-date ml-2">{new Date(j.fecha).toLocaleTimeString().split(":").slice(0, 2).join(":")}</span>
                                 </div>
                             </div>
                             <p className="comment-content">{j.mensaje}</p>
@@ -1142,7 +1173,8 @@ const Condominio = () => {
                             </div>
                         </>
                         :
-                        <div className="perfil-box w-100" style={{ padding: '20px' }}>
+                        !loading &&
+                        <div className="perfil-box w-100">
                             <button
                                 type="button"
                                 className="perfil-edit-btn"
@@ -1164,6 +1196,7 @@ const Condominio = () => {
                                 )}
                             </div>
                             <h4 className="perfil-nombre">{usuarioDetalle.nombre}</h4>
+
                             <div className="perfil-info">
                                 <div className="w-100">
                                     <div className="container-dataPerfil">
@@ -1319,50 +1352,78 @@ const Condominio = () => {
         );
     }
 
-    const editorRef = useRef(null);
+    const editorRef = useRef<HTMLDivElement>(null);
 
     const handleInput = (ev: any) => {
         //setNewTextRich(ev.target.children[0].outerHTML);
         setTextRichEditado(true);
     };
-
+    const handleBlur = (ev: any) => {
+        if (editorRef.current) {
+            setNewTextRich(editorRef.current.innerHTML);
+        }
+    };
+    const cambiarNormas = () => {
+        console.log(newTextRich)
+        CambiarNormasLogic(selCambiarNormas, newTextRich, urlPase[3])
+    }
+    const selCambiarNormas = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setLoading(true);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, urlPase[3]);
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+        }
+    }
     const panelReglasNormas = () => {
         return (
             <div className="login-box py-3 px-3 ">
                 <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>Reglas y Normas</h4>
                 <div className="containerReglas">
-                    {!editarTextRich ?
-                        <div
-                            dangerouslySetInnerHTML={{ __html: dataFull.normas }}
-                        />
-                        :
-                        <div>
+                    {
+                        usuario.rol !== "ADMINISTRADOR" ?
                             <div
-                                className="rich-text-input"
-                                contentEditable
-                                ref={editorRef}
-                                onInput={handleInput}
-                                suppressContentEditableWarning={true}
-                                dangerouslySetInnerHTML={{ __html: newTextRich }}
-                                spellCheck={true}
-                                aria-label="Editor de texto enriquecido"
-                            />
-                            {textRichEditado ?
-                                <button type="button" className="search-button mt-2 w-100" onClick={() => {
-                                    setTextRichEditado(false);
-                                }}>
-                                    Guardar cambios
-                                </button>
-                                : ""}
-                            {textRichEditado ?
-                                <button type="button" className="search-button mt-2 w-100" onClick={() => {
-                                    setNewTextRich(dataFull.normas);
-                                    setTextRichEditado(false);
-                                }}>
-                                    Descartar cambios
-                                </button>
-                                : ""}
-                        </div>
+                                dangerouslySetInnerHTML={{ __html: dataFull.normas }}
+                            /> :
+                            editarTextRich ?
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: dataFull.normas }}
+                                />
+                                :
+                                <div>
+                                    <div
+                                        className="rich-text-input"
+                                        contentEditable
+                                        ref={editorRef}
+                                        onInput={handleInput}
+                                        onBlur={handleBlur}
+                                        suppressContentEditableWarning={true}
+                                        dangerouslySetInnerHTML={{ __html: newTextRich }}
+                                        spellCheck={true}
+                                        aria-label="Editor de texto enriquecido"
+                                    />
+                                    {textRichEditado ?
+                                        <button type="button" className="search-button mt-2 w-100" onClick={() => {
+                                            setTextRichEditado(false);
+                                            cambiarNormas();
+                                        }}>
+                                            Guardar cambios
+                                        </button>
+                                        : ""}
+                                    {textRichEditado ?
+                                        <button type="button" className="search-button mt-2 w-100" onClick={() => {
+                                            setNewTextRich(dataFull.normas);
+                                            setTextRichEditado(false);
+                                        }}>
+                                            Descartar cambios
+                                        </button>
+                                        : ""}
+                                </div>
                     }
 
                 </div>
@@ -1641,14 +1702,14 @@ const Condominio = () => {
                                 <div className="container-avisos">
                                     <div className="d-block">
                                         <span><strong>{e.mensaje}</strong></span><br />
-                                        <span>{new Date(e.fecha).toLocaleTimeString()}</span>
+                                        {/* <span>{new Date(e.fecha).toLocaleTimeString()}</span> */}
                                     </div>
                                     <div style={{ position: 'absolute', right: '25px' }}>
                                         {
                                             usuario.rol === "ADMINISTRADOR" &&
                                             <>
                                                 <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                                    //setEditarPerfil(true)
+                                                    EnviarNotifAviso(e.mensaje)
                                                 }}>
                                                     <img src={notificar} />
                                                 </button>
@@ -1719,10 +1780,10 @@ const Condominio = () => {
                                 className="typeDate"
                                 disabled
                                 value={fechaAviso ? fechaAviso.toString() : ""}
-                                style={{ padding: '8px', fontSize: '16px', width: '48%' }}
+                                style={{ padding: '8px', fontSize: '16px', width: '100%' }}
                             />
 
-                            <input
+                            {/*  <input
                                 type="time"
                                 name="fechaAviso"
                                 className="typeDate"
@@ -1730,7 +1791,7 @@ const Condominio = () => {
                                 //onChange={(e: any) => {setFechaAviso(e.target.value);}}
                                 onChange={(e: any) => { changeFechaTime(e) }}
                                 style={{ padding: '8px', fontSize: '16px', width: '48%' }}
-                            />
+                            /> */}
                         </div>
                         <button
                             type="button"
@@ -2070,7 +2131,7 @@ const Condominio = () => {
         };
     }, [menuOpciones]);
 
-    const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any, ev : any) => {
+    const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any, ev: any) => {
         ev.preventDefault();
         setLoading(true);
         if (tieneSuscripcion) {
@@ -2119,28 +2180,28 @@ const Condominio = () => {
                                 Perfil
                             </button>
                             {usuario.rol === "ADMINISTRADOR" && (
-                            <button
-                                type="button"
-                                onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
-                                className="crear-btn"
-                            >
-                                <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 27.963 27.963">
-                                    <g>
-                                        <g id="c140__x2B_">
-                                            <path d="M13.98,0C6.259,0,0,6.26,0,13.982s6.259,13.981,13.98,13.981c7.725,0,13.983-6.26,13.983-13.981
+                                <button
+                                    type="button"
+                                    onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
+                                    className="crear-btn"
+                                >
+                                    <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 27.963 27.963">
+                                        <g>
+                                            <g id="c140__x2B_">
+                                                <path d="M13.98,0C6.259,0,0,6.26,0,13.982s6.259,13.981,13.98,13.981c7.725,0,13.983-6.26,13.983-13.981
 			C27.963,6.26,21.705,0,13.98,0z M21.102,16.059h-4.939v5.042h-4.299v-5.042H6.862V11.76h5.001v-4.9h4.299v4.9h4.939v4.299H21.102z
 			"/>
+                                            </g>
+                                            <g id="Capa_1_9_">
+                                            </g>
                                         </g>
-                                        <g id="Capa_1_9_">
-                                        </g>
-                                    </g>
-                                </svg>
-                                Crear
-                                <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
-                                </svg>
-                            </button>
+                                    </svg>
+                                    Crear
+                                    <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
+                                    </svg>
+                                </button>
                             )}
                             {openCrear && usuario.rol === "ADMINISTRADOR" && (
                                 <div className="submenu">
@@ -2241,7 +2302,7 @@ const Condominio = () => {
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, true)
                                 setLoading(true)
-                                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString())
+                                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#5bc0de" viewBox="0 0 24 24">
                                     <path d="M20 2H4C2.897 2 2 2.897 2 4v14c0 1.103.897 2 2 2h14l4 4V4c0-1.103-.897-2-2-2z" />
