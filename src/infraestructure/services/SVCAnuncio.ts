@@ -25,6 +25,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -49,6 +50,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -73,6 +75,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -97,6 +100,7 @@ export class SVCAnuncio {
             .post(url, anuncio, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -132,6 +136,7 @@ export class SVCAnuncio {
             .post(url, subscription, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -151,7 +156,7 @@ export class SVCAnuncio {
         let _ruta: string = con.RetornaRuta();
         const registration = await navigator.serviceWorker.ready;
 
-        const response = await axios.get(_ruta + 'Condominios/obtenerKey');
+        const response = await axios.get(_ruta + 'Condominios/obtenerKey',);
         console.log(response.data)
         const vapidPublicKey = response.data;
         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
@@ -171,7 +176,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/guardarSus?idCondominio= " + idCondominio + "&idUsuario=" + idUsuario + "&tipoSuscripcion=" + tipoSuscripcion
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url, subscription)
+        await axios.post(url, subscription, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -190,7 +200,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/eliminarSus?idUsuario=" + idUsuario + "&tipoSuscripcion=" + tipoSuscripcion
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url)
+        await axios.post(url, [], {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -210,7 +225,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/darLike?idAnuncio=" + idAnuncio + "&like=" + like
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url)
+        await axios.post(url, [], {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -230,7 +250,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/getVotaciones?condominio=" + idCondominio + "&idUsuario=" + idUsuario
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.get(url)
+        await axios.get(url, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -250,7 +275,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/cambiarEstadoVotacion?idVotacion=" + idVotacion + "&estado=" + estado
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url)
+        await axios.post(url, [], {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -269,7 +299,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/votarEnVotacion?idOpcionVotacion=" + idOpcionVotacion + "&idUsuario=" + idUsuario
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url)
+        await axios.post(url, [], {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -288,7 +323,12 @@ export class SVCAnuncio {
         const url: string = _ruta + "Condominios/crearVotacion"
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url, votacion)
+        await axios.post(url, votacion, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        })
             .then((res: AxiosResponse) => {
                 if (res.data !== undefined) {
                     sr.result = res.data;
@@ -311,6 +351,7 @@ export class SVCAnuncio {
             .post(url, comentario, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -335,6 +376,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -361,6 +403,7 @@ export class SVCAnuncio {
             .post(url, usuario, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -396,6 +439,7 @@ export class SVCAnuncio {
             .post(url, subscription, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -420,6 +464,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -446,6 +491,7 @@ export class SVCAnuncio {
             .post(url, aviso, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -470,6 +516,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -495,6 +542,7 @@ export class SVCAnuncio {
             .post(url, emergencia, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -519,6 +567,7 @@ export class SVCAnuncio {
             .get(url, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -546,6 +595,7 @@ export class SVCAnuncio {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
@@ -571,7 +621,7 @@ export class SVCAnuncio {
             .post(url, aviso, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
             .then((res: AxiosResponse) => {
