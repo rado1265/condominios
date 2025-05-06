@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmenos from './../../components/utils/img/icon-menos.png';
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
@@ -92,7 +92,8 @@ const Condominio = () => {
         fechaDesde: new Date(),
         fechaHasta: new Date(),
         idTipo: 1,
-        idUsuario: 0
+        idUsuario: 0,
+        activo: true
     });
     const [newComentario, setNewComentario] = useState('')
     const [verPerfil, setVerPerfil] = useState(false)
@@ -161,7 +162,8 @@ const Condominio = () => {
             fechaDesde: new Date(),
             fechaHasta: new Date(),
             idTipo: 1,
-            idUsuario: 0
+            idUsuario: 0,
+            activo: true
         })
         setVerDetalle(false);
     }
@@ -297,18 +299,18 @@ const Condominio = () => {
                 localStorage.setItem("rolUsuario", data.rol);
                 localStorage.setItem("idUsuario", data.id);
                 setDataCondominios(data.condominios);
-                if(localStorage.getItem("idCondominio")){
+                if (localStorage.getItem("idCondominio")) {
                     let condSelect = data.condominios.filter((a: any) => a.id.toString() === localStorage.getItem("idCondominio")!.toString());
-                    if(new Date(condSelect[0].fechaCaducidad) < new Date()){
+                    if (new Date(condSelect[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
-                    }else{
+                    } else {
                         setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
                     }
-                }else{
-                    if(data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()){
+                } else {
+                    if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
-                        ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id);localStorage.setItem("idCondominio", data.condominios[0].id)
-                    }else if(data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()){
+                        ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
+                    } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
                         ErrorMessage("Su usuario no tiene comunidades activas", "")
                     }
@@ -348,7 +350,24 @@ const Condominio = () => {
             fechaDesde: data.fechaDesde ?? new Date(),
             fechaHasta: data.fechaHasta ?? new Date(),
             idTipo: data.idTipo ?? 1,
-            idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario
+            idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario,
+            activo: data.activo ?? true
+        };
+    };
+    const normalizarDeshabilitarAnuncio = (data: any) => {
+        return {
+            id: data.id ?? 0,
+            idCondominio: localStorage.getItem("idCondominio"),
+            cabecera: data.cabecera ?? "",
+            descripcion: data.descripcion ?? "",
+            organizador: usuario.nombre,
+            telefono: data.telefono ?? "",
+            amedida: data.amedida ?? "",
+            fechaDesde: data.fechaDesde ?? new Date(),
+            fechaHasta: data.fechaHasta ?? new Date(),
+            idTipo: data.idTipo ?? 1,
+            idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario,
+            activo: !data.activo
         };
     };
     const normalizarEmergencia = (data: any) => {
@@ -367,6 +386,13 @@ const Condominio = () => {
                 setLoading(true);
                 CrearAnuncioLogic(selCrearAnuncio, normalizarAnuncio(anuncio))
             }
+        } catch (er) {
+        }
+    }
+    const DeshabilitarAnuncio = (e: any) => {
+        try {
+            setLoading(true);
+            CrearAnuncioLogic(selDeshabilitarAnuncio, normalizarDeshabilitarAnuncio(e))
         } catch (er) {
         }
     }
@@ -443,6 +469,22 @@ const Condominio = () => {
         try {
             if (data) {
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                setTipo(1);
+                setCrear(false);
+                setEditar(false);
+                limpiarAnuncio();
+            }
+            else {
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
+        }
+    }
+    const selDeshabilitarAnuncio = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
                 setTipo(1);
                 setCrear(false);
                 setEditar(false);
@@ -535,6 +577,18 @@ const Condominio = () => {
         try {
             if (data) {
                 setDataFull(data);
+            }
+            setLoading(false);
+        } catch (er) {
+        }
+    }
+    const selMisAnuncios = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                setDataFull(prev => ({
+                    ...prev,
+                    ["anuncios"]: data
+                }));
             }
             setLoading(false);
         } catch (er) {
@@ -649,12 +703,12 @@ const Condominio = () => {
         reader.readAsDataURL(file);
     };
 
-    /*document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
         }
-    });*/
+    });
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -751,7 +805,9 @@ const Condominio = () => {
                 </div>
                 : ""*/}
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
-                <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(1) }}>
+                <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => {
+                    cerrarMenu(false); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
@@ -776,7 +832,7 @@ const Condominio = () => {
                         </svg>
                         <span className="text">Votaciones</span>
                     </button> :
-                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(4, true) }}>
+                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(4, true); }}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                                 <path d="M10 0a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
                             </svg>
@@ -812,7 +868,18 @@ const Condominio = () => {
                                     >
                                         <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
                                     </svg>
-
+                                    <label className="checkbox-container">
+                                        <input
+                                            type="checkbox"
+                                            checked={a.activo}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                DeshabilitarAnuncio(a);
+                                                
+                                            }}
+                                        />
+                                        <span className="checkmark"></span>
+                                    </label>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
@@ -911,19 +978,19 @@ const Condominio = () => {
     const panelPrincipal = () => {
         return <div className="container">
             <div className="row">
-            <span className="w-100 text-center h2 mb-4">Tus Comunidades</span>
-            {dataCondominios.map((a: any) => {
-                let activo = new Date(a.fechaCaducidad.toString()) > new Date();
-                return (
-                    <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() =>{setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id);localStorage.setItem("idCondominio", a.id)}}>
-                        {a.logo && (
-                        <img id="imgComunidad" width={200} src={`data:image/jpeg;base64,${a.logo}`} />
-                        )}
-                        <span id="nomComunidad" className="h5">{a.nombre}</span>
-                    </div>
-                );
-            })}
-             </div>
+                <span className="w-100 text-center h2 mb-4">Tus Comunidades</span>
+                {dataCondominios.map((a: any) => {
+                    let activo = new Date(a.fechaCaducidad.toString()) > new Date();
+                    return (
+                        <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() => { setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id); localStorage.setItem("idCondominio", a.id) }}>
+                            {a.logo && (
+                                <img id="imgComunidad" width={200} src={`data:image/jpeg;base64,${a.logo}`} />
+                            )}
+                            <span id="nomComunidad" className="h5">{a.nombre}</span>
+                        </div>
+                    );
+                })}
+            </div>
 
         </div>
     }
@@ -1324,11 +1391,11 @@ const Condominio = () => {
                                     </div>
                                     <div className="container-dataPerfil">
                                         <span>Dirección</span>
-                                        {usuarioDetalle.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.direccion}</span> : <span  style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
+                                        {usuarioDetalle.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                     </div>
                                     <div className="container-dataPerfil">
                                         <span>Teléfono</span>
-                                        {usuarioDetalle.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.telefono}</span> : <span  style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
+                                        {usuarioDetalle.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                     </div>
                                     <div className="container-dataPerfil">
                                         <span>Notif. Anuncios</span>
@@ -2340,6 +2407,7 @@ const Condominio = () => {
                         <div ref={menuRef} className="custom-menu">
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, true)
+                                setCrear(false)
                                 setLoading(true);
                                 ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
                             }}>
@@ -2348,31 +2416,41 @@ const Condominio = () => {
                                 </svg>
                                 Perfil
                             </button>
-                            {usuario.rol === "ADMINISTRADOR" && (
-                                <button
-                                    type="button"
-                                    onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
-                                    className="crear-btn"
-                                >
-                                    <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 27.963 27.963">
-                                        <g>
-                                            <g id="c140__x2B_">
-                                                <path d="M13.98,0C6.259,0,0,6.26,0,13.982s6.259,13.981,13.98,13.981c7.725,0,13.983-6.26,13.983-13.981
+                            <button type="button" onClick={() => {
+                                cerrarMenu(false); changeMenu(999);
+                                setLoading(true);
+                                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
+                            }}>
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5zm13.586 4L13 5.414V9h3.586zM7 13h10v1.5H7V13zm0 3h7v1.5H7V16z" />
+                                </svg>
+                                Mis Publicaciones
+                            </button>
+                            {/*  {usuario.rol === "ADMINISTRADOR" && ( */}
+                            <button
+                                type="button"
+                                onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
+                                className="crear-btn"
+                            >
+                                <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 27.963 27.963">
+                                    <g>
+                                        <g id="c140__x2B_">
+                                            <path d="M13.98,0C6.259,0,0,6.26,0,13.982s6.259,13.981,13.98,13.981c7.725,0,13.983-6.26,13.983-13.981
 			C27.963,6.26,21.705,0,13.98,0z M21.102,16.059h-4.939v5.042h-4.299v-5.042H6.862V11.76h5.001v-4.9h4.299v4.9h4.939v4.299H21.102z
 			"/>
-                                            </g>
-                                            <g id="Capa_1_9_">
-                                            </g>
                                         </g>
-                                    </svg>
-                                    Crear
-                                    <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
-                                    </svg>
-                                </button>
-                            )}
-                            {openCrear && usuario.rol === "ADMINISTRADOR" && (
+                                        <g id="Capa_1_9_">
+                                        </g>
+                                    </g>
+                                </svg>
+                                Crear
+                                <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
+                                </svg>
+                            </button>
+                            {/*  )} */}
+                            {openCrear && /* usuario.rol === "ADMINISTRADOR" &&  */(
                                 <div className="submenu">
                                     <button
                                         type="button"
@@ -2385,20 +2463,22 @@ const Condominio = () => {
                                         }}
                                         className="submenu-item ml-3"
                                     >
-                                        Anuncios
+                                        Publicación
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setOpenCrear(false);
-                                            cerrarMenu(false);
-                                            changeMenu(3, false, false, false, true);
-                                            setOpen(false);
-                                        }}
-                                        className="submenu-item ml-3"
-                                    >
-                                        Votación
-                                    </button>
+                                    {usuario.rol === "ADMINISTRADOR" &&
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setOpenCrear(false);
+                                                cerrarMenu(false);
+                                                changeMenu(3, false, false, false, true);
+                                                setOpen(false);
+                                            }}
+                                            className="submenu-item ml-3"
+                                        >
+                                            Votación
+                                        </button>
+                                    }
                                 </div>
                             )}
                             {

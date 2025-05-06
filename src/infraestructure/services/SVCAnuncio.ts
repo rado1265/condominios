@@ -636,4 +636,30 @@ export class SVCAnuncio {
 
         return sr;
     }
+
+    public static async ObtenerMisAnuncio(idUsuario: string): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/getAnunciosPorUsuario?idUsuario=" + idUsuario;
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .get(url, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
 }
