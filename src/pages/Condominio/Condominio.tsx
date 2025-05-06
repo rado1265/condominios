@@ -36,6 +36,7 @@ const Condominio = () => {
         nombre: "",
         logo: "",
         normas: '',
+        avisosHoy:false
     });
     const [misAnuncios, setMisAnuncios] = useState([]);
     const [tipo, setTipo] = useState(1)
@@ -2687,6 +2688,7 @@ const Condominio = () => {
                             </button>
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, false, false, true)
+                                setCrear(false)
                             }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="red" width="24" height="24" viewBox="0 0 24 24">
                                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
@@ -2695,6 +2697,7 @@ const Condominio = () => {
                             </button>
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, false, false, false, true)
+                                setCrear(false)
                                 setLoading(true)
                                 ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
                             }}>
