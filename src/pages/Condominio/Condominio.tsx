@@ -2665,6 +2665,7 @@ const Condominio = () => {
 
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, true);
+                                setCrear(false)
                                 setEncuesta(false);
                                 setNewTextRich(dataFull.normas);
                             }}>
@@ -2675,6 +2676,7 @@ const Condominio = () => {
                             </button>
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, true)
+                                changeMenu(999)
                                 setLoading(true)
                                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                             }}>
