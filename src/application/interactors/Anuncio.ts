@@ -104,8 +104,8 @@ export const ObtenerVotaciones = (selListado: any, idCondominio: string, idUsuar
     });
 }
 
-export const CambiarEstadoVotacion = (selListado: any, idVotacion: any, estado: any) => {
-    SVCAnuncio.CambiarEstadoVotacion(idVotacion, estado).then((res: IServiceResult<any>) => {
+export const CambiarEstadoVotacion = (selListado: any, idVotacion: any, estado: any, idCondominio: any, idUsuario: any) => {
+    SVCAnuncio.CambiarEstadoVotacion(idVotacion, estado, idCondominio, idUsuario).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);
@@ -114,8 +114,8 @@ export const CambiarEstadoVotacion = (selListado: any, idVotacion: any, estado: 
         }
     });
 }
-export const Votar = (selListado: any, idOpcionVotacion: any, idUsuario: any) => {
-    SVCAnuncio.Votar(idOpcionVotacion, idUsuario).then((res: IServiceResult<any>) => {
+export const Votar = (selListado: any, idOpcionVotacion: any, idUsuario: any, idCondominio: any) => {
+    SVCAnuncio.Votar(idOpcionVotacion, idUsuario, idCondominio).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);

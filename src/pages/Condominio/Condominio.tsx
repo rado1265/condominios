@@ -253,14 +253,16 @@ const Condominio = () => {
         try {
             if (data) {
                 SuccessMessage("Anuncio eliminado correctamente.")
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 /* setTipo(1) */
             }
             else {
                 ErrorMessage("Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos")
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 /* setTipo(1) */
             }
+            setDataFull(data);
+            setLoading(false);
         } catch (er) {
             ErrorMessage("Credenciales incorrectas", "")
         }
@@ -464,8 +466,9 @@ const Condominio = () => {
     const selCrearAvisos = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
-                setVerAvisos(false);
+                setAvisos(data);
+                setLoading(false);
+                setVerAvisos(true);
                 setEditarAvisos(false);
                 setMensajeAviso('');
                 setFechaAviso('');
@@ -482,7 +485,7 @@ const Condominio = () => {
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 setTipo(1);
                 setCrear(false);
                 setEditar(false);
@@ -491,6 +494,8 @@ const Condominio = () => {
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             }
+            setDataFull(data);
+            setLoading(false);
         } catch (er) {
             ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
@@ -498,12 +503,12 @@ const Condominio = () => {
     const selDeshabilitarAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setLoading(true);
-                if (tipo === 8) {
+                /* setLoading(true); */
+                /* if (tipo === 8) {
                     ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
                 } else {
                     ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                }
+                } */
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
@@ -511,6 +516,14 @@ const Condominio = () => {
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             }
+            if (tipo === 8) {
+                setLoading(true);
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
+            } else {
+                setDataFull(data);
+                setLoading(false);
+            }
+
         } catch (er) {
             ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
@@ -542,7 +555,8 @@ const Condominio = () => {
     const selCrearEmergencia = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString());
+                setEmergenciaDetalle(data);
+                setLoading(false);
                 setEditarEmergencia(false)
                 setEmergencia({
                     id: 0,
@@ -594,8 +608,8 @@ const Condominio = () => {
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                if(data.avisosHoy){
-                    setAlerta({tipo: 1, mensaje: "Tu calendario muestra eventos programados para hoy"})
+                if (data.avisosHoy) {
+                    setAlerta({ tipo: 1, mensaje: "Tu calendario muestra eventos programados para hoy" })
                 }
                 setDataFull(data);
             }
@@ -722,19 +736,21 @@ const Condominio = () => {
         reader.readAsDataURL(file);
     };
 
-    document.addEventListener('visibilitychange', () => {
+   /*  document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && tipo < 3) {
             setLoading(true);
             ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
         }
-    });
+    }); */
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
         try {
             if (data) {
-                setLoading(true);
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                /* setLoading(true); */
+                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
+                setDataFull(data);
+                setLoading(false);
             }
             else {
             }
@@ -781,6 +797,8 @@ const Condominio = () => {
             setLoading(false);
             if (data) {
                 SuccessMessage("Votación creada correctamente.")
+                setDataVotaciones(data);
+                setLoading(false);
                 changeMenu(5);
             }
             else {
@@ -794,6 +812,7 @@ const Condominio = () => {
     const selCambiarEstadoVotacion = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
+                setDataVotaciones(data);
                 changeMenu(5);
             }
             setLoading(false);
@@ -807,7 +826,7 @@ const Condominio = () => {
             <div className={`${alerta.tipo === 1 ? "alert-primary" : alerta.tipo === 2 ? "alert-success" : alerta.tipo === 3 ? "alert-danger" : alerta.tipo === 4 ? "alert-warning" : "alert-primary"} alert alert-dismissible fade show mx-3 text-center`} role="alert">
                 {alerta.mensaje}
                 <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={() => {
-                    setAlerta({ tipo: 1, mensaje: ""});
+                    setAlerta({ tipo: 1, mensaje: "" });
                     setAlertaCerrada(true);
                 }}>
                     <span aria-hidden="true">&times;</span>
@@ -1254,15 +1273,17 @@ const Condominio = () => {
     const cambiarVoto = (ev: any) => {
         setLoading(true);
         if (ev.target.id) {
-            VotarLogic(selVotar, ev.target.id, usuario.id);
+            VotarLogic(selVotar, ev.target.id, usuario.id, localStorage.getItem("idCondominio")!.toString());
         } else {
-            VotarLogic(selVotar, ev.target.parentNode.id, usuario.id);
+            VotarLogic(selVotar, ev.target.parentNode.id, usuario.id, localStorage.getItem("idCondominio")!.toString());
         }
     }
 
     const selVotar = (error: Boolean, err: string, data: any) => {
         try {
-            ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
+            /* ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id); */
+            setDataVotaciones(data);
+            setLoading(false);
         } catch (er) {
         }
     }
@@ -1349,7 +1370,7 @@ const Condominio = () => {
                                     type="checkbox"
                                     checked={a.activo}
                                     onChange={() => {
-                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, a.id, !a.activo)
+                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, a.id, !a.activo, localStorage.getItem("idcondominio")!.toString(), usuario.id)
                                     }}
                                 />
                                 <span className="checkmark"></span>
@@ -1741,8 +1762,10 @@ const Condominio = () => {
     const selCambiarNormas = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setLoading(true);
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                /* setLoading(true);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
+                setDataFull(data);
+                setLoading(false);
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -2746,14 +2769,14 @@ const Condominio = () => {
                                 setLoading(true)
                                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                             }}>
-                                <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                height="20px" 
-                                viewBox="0 -960 960 960" 
-                                width="20px" 
-                                fill="currentColor"
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    height="20px"
+                                    viewBox="0 -960 960 960"
+                                    width="20px"
+                                    fill="currentColor"
                                 >
-                                    <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
+                                    <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
                                 </svg>
                                 Calendario
                             </button>

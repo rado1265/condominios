@@ -269,10 +269,10 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async CambiarEstadoVotacion(idVotacion: any, estado: any): Promise<IServiceResult<any>> {
+    public static async CambiarEstadoVotacion(idVotacion: any, estado: any, idCondominio: any, idUsuario: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/cambiarEstadoVotacion?idVotacion=" + idVotacion + "&estado=" + estado
+        const url: string = _ruta + "Condominios/cambiarEstadoVotacion?idVotacion=" + idVotacion + "&estado=" + estado + "&idCondominio=" + idCondominio + "&idUsuario=" + idUsuario
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {
@@ -293,10 +293,10 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async Votar(idOpcionVotacion: any, idUsuario: any): Promise<IServiceResult<any>> {
+    public static async Votar(idOpcionVotacion: any, idUsuario: any, idCondominio: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/votarEnVotacion?idOpcionVotacion=" + idOpcionVotacion + "&idUsuario=" + idUsuario
+        const url: string = _ruta + "Condominios/votarEnVotacion?idOpcionVotacion=" + idOpcionVotacion + "&idUsuario=" + idUsuario + "&idCondominio=" + idCondominio
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {

@@ -30,11 +30,11 @@ export const DarQuitarLikeLogic = (selListado: any, idAnuncio: any, like: any) =
 export const ObtenerVotacionesLogic = (selListado: any, idCondominio: string, idUsuario: any) => {
     return ObtenerVotaciones(selListado, idCondominio, idUsuario);
 }
-export const CambiarEstadoVotacionLogic = (selListado: any, idVotacion: any, estado: any) => {
-    return CambiarEstadoVotacion(selListado, idVotacion, estado);
+export const CambiarEstadoVotacionLogic = (selListado: any, idVotacion: any, estado: any, idCondominio: any, idUsuario: any) => {
+    return CambiarEstadoVotacion(selListado, idVotacion, estado, idCondominio, idUsuario);
 }
-export const VotarLogic = (selListado: any, idOpcionVotacion: any, idUsuario: any) => {
-    return Votar(selListado, idOpcionVotacion, idUsuario);
+export const VotarLogic = (selListado: any, idOpcionVotacion: any, idUsuario: any, idCondominio: any) => {
+    return Votar(selListado, idOpcionVotacion, idUsuario, idCondominio);
 }
 export const CrearVotacionLogic = (selListado: any, votacion: any) => {
     return CrearVotacion(selListado, votacion);
