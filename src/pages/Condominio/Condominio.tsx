@@ -36,7 +36,7 @@ const Condominio = () => {
         nombre: "",
         logo: "",
         normas: '',
-        avisosHoy:false
+        avisosHoy: false
     });
     const [misAnuncios, setMisAnuncios] = useState([]);
     const [tipo, setTipo] = useState(1)
@@ -73,6 +73,18 @@ const Condominio = () => {
         clave: "",
         idCondominio: localStorage.getItem("idCondominio") ?? ""
     });
+
+    /*
+        1 - Información / Celeste - Defecto
+        2 - Success / Verde
+        3 - Peligro / Rojo
+        4 - Warning / Amarillo
+    */
+    const [alerta, setAlerta] = useState({
+        tipo: 1,
+        mensaje: ""
+    });
+    const [alertaCerrada, setAlertaCerrada] = useState(false)
     const [iniciarSesion, setIniciarSesion] = useState(false)
     const [crear, setCrear] = useState(false)
     const [editar, setEditar] = useState(false)
@@ -486,8 +498,12 @@ const Condominio = () => {
     const selDeshabilitarAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
-                setTipo(1);
+                setLoading(true);
+                if (tipo === 8) {
+                    ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
+                } else {
+                    ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                }
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
@@ -578,6 +594,9 @@ const Condominio = () => {
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
+                if(data.avisosHoy){
+                    setAlerta({tipo: 1, mensaje: "Tu calendario muestra eventos programados para hoy"})
+                }
                 setDataFull(data);
             }
             setLoading(false);
@@ -783,6 +802,20 @@ const Condominio = () => {
         }
     }
 
+    const mensajeSuperior = () => {
+        return (
+            <div className={`${alerta.tipo === 1 ? "alert-primary" : alerta.tipo === 2 ? "alert-success" : alerta.tipo === 3 ? "alert-danger" : alerta.tipo === 4 ? "alert-warning" : "alert-primary"} alert alert-dismissible fade show mx-3 text-center`} role="alert">
+                {alerta.mensaje}
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={() => {
+                    setAlerta({ tipo: 1, mensaje: ""});
+                    setAlertaCerrada(true);
+                }}>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        );
+    }
+
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
@@ -852,6 +885,33 @@ const Condominio = () => {
                     <div className="v2-anuncio-actions">
                         {(usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR") && (
                             <>
+                                {!a.activo ?
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 -960 960 960"
+                                        className="v2-icon verInput inactivo"
+                                        fill="currentColor"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            DeshabilitarAnuncio(a);
+                                        }}
+                                    >
+                                        <path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z" />
+                                    </svg>
+                                    :
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 -960 960 960"
+                                        fill="currentColor"
+                                        className="v2-icon verInput activo"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            DeshabilitarAnuncio(a);
+                                        }}
+                                    >
+                                        <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+                                    </svg>
+                                }
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="currentColor"
@@ -865,17 +925,6 @@ const Condominio = () => {
                                 >
                                     <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
                                 </svg>
-                                <label className="checkbox-container">
-                                    <input
-                                        type="checkbox"
-                                        checked={a.activo}
-                                        onChange={(e) => {
-                                            e.stopPropagation();
-                                            DeshabilitarAnuncio(a);
-                                        }}
-                                    />
-                                    <span className="checkmark"></span>
-                                </label>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="currentColor"
@@ -977,6 +1026,33 @@ const Condominio = () => {
                         <div className="v2-anuncio-actions">
                             {(usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR") && (
                                 <>
+                                    {!a.activo ?
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 -960 960 960"
+                                            className="v2-icon verInput inactivo"
+                                            fill="currentColor"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                DeshabilitarAnuncio(a);
+                                            }}
+                                        >
+                                            <path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z" />
+                                        </svg>
+                                        :
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 -960 960 960"
+                                            fill="currentColor"
+                                            className="v2-icon verInput activo"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                DeshabilitarAnuncio(a);
+                                            }}
+                                        >
+                                            <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+                                        </svg>
+                                    }
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
@@ -990,18 +1066,6 @@ const Condominio = () => {
                                     >
                                         <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
                                     </svg>
-                                    <label className="checkbox-container">
-                                        <input
-                                            type="checkbox"
-                                            checked={a.activo}
-                                            onChange={(e) => {
-                                                e.stopPropagation();
-                                                DeshabilitarAnuncio(a);
-
-                                            }}
-                                        />
-                                        <span className="checkmark"></span>
-                                    </label>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
@@ -1278,7 +1342,7 @@ const Condominio = () => {
             <h4 className="mt-3 mb-4 text-center">VOTACIONES</h4>
             {dataVotaciones.map((a: any, i: number) => {
                 return (
-                    <div className="cardVotacion my-4" style={!a.activo ? { opacity: '0.8' } : {}}>
+                    <div key={i} className="cardVotacion my-4" style={!a.activo ? { opacity: '0.8' } : {}}>
                         {usuario.rol === "ADMINISTRADOR" && (
                             <label className="checkbox-container">
                                 <input
@@ -1532,7 +1596,7 @@ const Condominio = () => {
                                         <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
                                     </div>
                                     <div className="container-dataPerfil">
-                                        <span>Notif. Avisos</span>
+                                        <span>Notif. Calendario</span>
                                         <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuarioDetalle.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
                                     </div>
                                     <div className="container-dataPerfil">
@@ -1643,7 +1707,7 @@ const Condominio = () => {
                                         <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
                                     </div>
                                     <div className="container-dataPerfil">
-                                        <span>Notif. Avisos</span>
+                                        <span>Notif. Calendario</span>
                                         <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
                                     </div>
                                     <div className="container-dataPerfil">
@@ -2543,6 +2607,7 @@ const Condominio = () => {
                                 cerrarMenu(false); changeMenu(999);
                                 setLoading(true);
                                 setVerMisAnuncios(true)
+                                setTipo(8);
                                 ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -2658,7 +2723,7 @@ const Condominio = () => {
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionAvisos, 4, ev)
                                     }}>
-                                        Notif. Avisos
+                                        Notif. Calendario
                                         {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
                                     </button>
                                 </div>
@@ -2681,10 +2746,16 @@ const Condominio = () => {
                                 setLoading(true)
                                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                             }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#5bc0de" viewBox="0 0 24 24">
-                                    <path d="M20 2H4C2.897 2 2 2.897 2 4v14c0 1.103.897 2 2 2h14l4 4V4c0-1.103-.897-2-2-2z" />
+                                <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                height="20px" 
+                                viewBox="0 -960 960 960" 
+                                width="20px" 
+                                fill="currentColor"
+                                >
+                                    <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
                                 </svg>
-                                Avisos
+                                Calendario
                             </button>
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, false, false, true)
@@ -2720,6 +2791,7 @@ const Condominio = () => {
                         </div>
                     )}
                 </div>
+                {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 <div className="container pb-5 mb-5">
                     <div className="row px-3 justify-content-around">
                         {

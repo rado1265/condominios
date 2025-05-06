@@ -38,6 +38,8 @@
 
 .anuncio-img {
   max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid #80808014;
 }
 
 .anuncio-footer {
@@ -201,6 +203,16 @@ body {
 
 .deleteInput {
   color: #f34646 !important;
+  margin-left: 5px;
+}
+
+.verInput.inactivo {
+  color: #6a6a6a !important;
+  margin-left: 5px;
+}
+
+.verInput.activo {
+  color: #07830d !important;
   margin-left: 5px;
 }
 
