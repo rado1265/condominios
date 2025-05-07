@@ -2498,7 +2498,7 @@ const Condominio = () => {
         window.addEventListener('load', async () => {
             try {
                 // 1. Registrar el Service Worker
-                const registration = await navigator.serviceWorker.register('/sw.js');
+                const registration = await navigator.serviceWorker.register('/service-worker.js');
                 console.log('[SW] Registrado correctamente:', registration);
 
                 // 2. Esperar a que esté listo
