@@ -11,6 +11,7 @@ import iconeditar from './../../components/utils/img/editar.png';
 import iconborrar from './../../components/utils/img/iconborrar.png';
 import notificar from './../../components/utils/img/notificar.png';
 import logo from './../../components/utils/img/logo.png';
+
 const chileTime = new Intl.DateTimeFormat("es-CL", {
     timeZone: "America/Santiago",
     hour12: false,
@@ -183,7 +184,6 @@ const Condominio = () => {
         setVerDetalle(false);
     }
     useEffect(() => {
-        debugger
         if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
             /*localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
@@ -212,6 +212,93 @@ const Condominio = () => {
             cerrarSesion()
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    function urlBase64ToUint8Array(base64String: string) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    function isIos() {
+        return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+
+    function isAndroid() {
+        return /android/i.test(navigator.userAgent);
+    }
+
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+      }
+
+    function supportsPushNotifications() {
+        const isSecure = window.isSecureContext;
+        const hasServiceWorker = 'serviceWorker' in navigator;
+        const hasPushManager = 'PushManager' in window;
+
+        // En iOS, solo las PWAs instaladas permiten notificaciones
+        if (isIos() && !isStandalone()) {
+            console.warn('iOS detectado: Las notificaciones push solo funcionan si la PWA está instalada');
+            return false;
+        }
+
+        return isSecure && hasServiceWorker && hasPushManager;
+    }
+
+    async function registerPush() {
+        if (!supportsPushNotifications()) {
+            alert('Este navegador no permite notificaciones push o no está en modo correcto (PWA instalada en iOS).');
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                alert('Debes permitir notificaciones para activarlas.');
+                return;
+            }
+
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            const ready = await navigator.serviceWorker.ready;
+
+            let subscription = await ready.pushManager.getSubscription();
+            if (!subscription) {
+                subscription = await ready.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array("BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0"),
+                });
+            }
+
+            // Envía la suscripción al backend
+            console.log('[Push] Suscripción registrada correctamente.');
+            return subscription;
+
+            
+        } catch (err) {
+            console.error('[Push] Error al registrar:', err);
+        }
+    }
+
+
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js').catch(console.error);
+        });
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
 
     const cerrarSesion = () => {
         localStorage.removeItem("nombreUsuario");
@@ -589,7 +676,7 @@ const Condominio = () => {
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
+                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), registerPush());
                 setEditarPerfil(false);
             }
             else {
@@ -2495,54 +2582,7 @@ const Condominio = () => {
     } else {
         console.warn('El navegador no soporta Service Workers');
     } */
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-        window.addEventListener('load', async () => {
-            try {
-                // 1. Registrar el Service Worker
-                const registration = await navigator.serviceWorker.register('/service-worker.js');
-                console.log('[SW] Registrado correctamente:', registration);
 
-                // 2. Esperar a que esté listo
-                const readyRegistration = await navigator.serviceWorker.ready;
-                console.log('[SW] Listo:', readyRegistration);
-
-                // 3. Suscribirse a Push Notifications (si no estás suscrito ya)
-                const subscription = await readyRegistration.pushManager.getSubscription();
-                if (!subscription) {
-                    const newSubscription = await readyRegistration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array('BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0'),
-                    });
-                    console.log('[Push] Suscripción nueva:', newSubscription);
-
-                    // Aquí deberías enviar esta suscripción a tu backend para guardarla
-                    setServiceWorker(newSubscription)
-                    setEstadoServiceWorker('[Push] Suscripción nueva:')
-                } else {
-                    console.log('[Push] Ya suscrito:', subscription);
-                    setServiceWorker(subscription)
-                    setEstadoServiceWorker('[Push] Ya suscrito:')
-                }
-            } catch (error) {
-                console.error('[Error] Registrando SW o suscribiendo Push:', error);
-                setEstadoServiceWorker('[Error] Registrando SW o suscribiendo Push:' + error!.toString())
-            }
-        });
-    } else {
-        console.warn('Service Worker o Push no soportado por este navegador');
-        setEstadoServiceWorker('Service Worker o Push no soportado por este navegador')
-    }
-
-    function urlBase64ToUint8Array(base64String: string) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
-        }
-        return outputArray;
-    }
 
     const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
         setMenuOpciones(a)
@@ -2645,7 +2685,7 @@ const Condominio = () => {
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
         } else {
-            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, serviceWorker)
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, registerPush())
         }
     }
 
@@ -2681,7 +2721,7 @@ const Condominio = () => {
                                 cerrarMenu(false, true)
                                 setCrear(false)
                                 setLoading(true);
-                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
+                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), registerPush());
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
@@ -2773,7 +2813,7 @@ const Condominio = () => {
 
                             <button
                                 type="button"
-                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker); }}
+                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), registerPush()); }}
                                 className="crear-btn"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

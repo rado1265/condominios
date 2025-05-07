@@ -1,10 +1,9 @@
-self.addEventListener('push', (event) => {
+self.addEventListener('push', event => {
   const data = event.data?.json() || {};
-
   const options = {
-    body: data.body || 'Notificación',
+    body: data.body || 'Nueva notificación',
     icon: '/logo192.png',
-    badge: '/badge-icon.png',
+    badge: '/logo192.png',
     data: {
       url: data.url || '/',
     },
@@ -15,7 +14,7 @@ self.addEventListener('push', (event) => {
   );
 });
 
-self.addEventListener('notificationclick', function (event) {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(clients.openWindow(event.notification.data.url));
 });
