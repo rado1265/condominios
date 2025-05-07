@@ -184,6 +184,7 @@ const Condominio = () => {
         setVerDetalle(false);
     }
     useEffect(() => {
+        registerPush();
         if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
             /*localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
@@ -267,7 +268,7 @@ const Condominio = () => {
                 return;
             }
 
-            const registration = await navigator.serviceWorker.register('/sw.js');
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
             const ready = await navigator.serviceWorker.ready;
 
             let subscription = await ready.pushManager.getSubscription();
