@@ -2518,6 +2518,7 @@ const Condominio = () => {
                    setServiceWorker(newSubscription)
                 } else {
                     console.log('[Push] Ya suscrito:', subscription);
+                    setServiceWorker(subscription)
                 }
             } catch (error) {
                 console.error('[Error] Registrando SW o suscribiendo Push:', error);
