@@ -239,7 +239,7 @@ const Condominio = () => {
 
     function isStandalone() {
         return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
-      }
+    }
 
     function supportsPushNotifications() {
         const isSecure = window.isSecureContext;
@@ -247,8 +247,7 @@ const Condominio = () => {
         const hasPushManager = 'PushManager' in window;
 
         // En iOS, solo las PWAs instaladas permiten notificaciones
-        if (isIos() && !isStandalone()) {
-            alert('iOS detectado: Las notificaciones push solo funcionan si la PWA está instalada');
+        if (isIos() && isAndroid()) {
             return false;
         }
 
@@ -258,7 +257,6 @@ const Condominio = () => {
     async function registerPush() {
         debugger
         if (!supportsPushNotifications()) {
-            alert('Este navegador no permite notificaciones push o no está en modo correcto (PWA instalada en iOS).');
             return;
         }
 
@@ -281,13 +279,10 @@ const Condominio = () => {
             }
 
             // Envía la suscripción al backend
-            alert('[Push] Suscripción registrada correctamente.');
-            alert(subscription.endpoint)
             setServiceWorker(subscription)
 
-            
+
         } catch (err) {
-            alert('[Push] Error al registrar:' + err!.toString());
         }
     }
 
@@ -2586,6 +2581,19 @@ const Condominio = () => {
         console.warn('El navegador no soporta Service Workers');
     } */
 
+    async function solicitarPermisoNotificaciones() {
+        debugger
+        const permiso = await Notification.requestPermission();
+
+        if (permiso === 'granted') {
+            alert('✅ Permiso de notificaciones concedido');
+        } else if (permiso === 'denied') {
+            alert('❌ Has denegado las notificaciones. Puedes activarlas desde la configuración del navegador.');
+        } else {
+            alert('ℹ️ Las notificaciones están bloqueadas o no se solicitaron correctamente.');
+        }
+    }
+
 
     const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
         setMenuOpciones(a)
@@ -2724,8 +2732,9 @@ const Condominio = () => {
                                 cerrarMenu(false, true)
                                 setCrear(false)
                                 setLoading(true);
-                                alert((serviceWorker as any).endpoint)
-                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
+                                /* alert((serviceWorker as any).endpoint)
+                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker); */
+                                solicitarPermisoNotificaciones()
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
