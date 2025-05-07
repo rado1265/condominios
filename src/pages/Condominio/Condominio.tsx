@@ -168,11 +168,11 @@ const Condominio = () => {
         let nombreArchivoParse = img.startsWith("img-") ? img.replace("img-", "") : img.replace("video-", "");
         const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
         getDownloadURL(storageRef)
-            .then((url) => {
+            .then((url: any) => {
                 setImgSelect(url);
                 setModalOpenImg(true);
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 console.log(error);
             });
     };
@@ -282,7 +282,7 @@ const Condominio = () => {
 
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
-            alert((serviceWorker as any).endpoint)
+            /* alert((serviceWorker as any).endpoint) */
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
         }
     }
@@ -294,7 +294,7 @@ const Condominio = () => {
         try {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                alert('Debes permitir notificaciones para activarlas.');
+                /* alert('Debes permitir notificaciones para activarlas.'); */
                 return;
             }
 
@@ -825,7 +825,7 @@ const Condominio = () => {
     }
 
     const obtenerURLArchivo = (nombreArchivo: string = "", idUbicacion: string, tipo: number) => {
-        if(!buscarArchivo){
+        if (!buscarArchivo) {
             return;
         }
 
@@ -836,7 +836,7 @@ const Condominio = () => {
         let nombreArchivoParse = nombreArchivo.startsWith("img-") ? nombreArchivo.replace("img-", "") : nombreArchivo.replace("video-", "");
         const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
         getDownloadURL(storageRef)
-            .then((url) => {
+            .then((url: any) => {
                 if (tipo == 1) {
                     const img = document.getElementById(idUbicacion) as HTMLImageElement | null;
                     if (img) {
@@ -850,7 +850,7 @@ const Condominio = () => {
                     }
                 }
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 console.log(error);
             });
     }
@@ -1658,18 +1658,18 @@ const Condominio = () => {
                                     <img width={30} src={volver} alt="Icono volver" />
                                 </button>
                                 <div style={{ justifySelf: 'center' }}>
-                                            <img
-                                                className={usuarioDetalle.imagen != null ? "": "d-none"}
-                                                id="userDetallePerfil"
-                                                src={editImgPerfil ? obtenerURLArchivo(usuarioDetalle.imagen, "userDetallePerfil", 1) : ""}
-                                                alt="Vista previa"
-                                                style={{ maxWidth: '200px', marginTop: '10px' }}
-                                            /> 
-                                            <div id="userDetallePerfilSVG" className={ usuarioDetalle.imagen != null ? "d-none" : "perfil-avatar"}>
-                                                <svg fill="#e0e0e0" viewBox="0 0 24 24" style={{width: '50px'}} width="72" height="72">
-                                                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path>
-                                                </svg>
-                                            </div>
+                                    <img
+                                        className={usuarioDetalle.imagen != null ? "" : "d-none"}
+                                        id="userDetallePerfil"
+                                        src={editImgPerfil ? obtenerURLArchivo(usuarioDetalle.imagen, "userDetallePerfil", 1) : ""}
+                                        alt="Vista previa"
+                                        style={{ maxWidth: '200px', marginTop: '10px' }}
+                                    />
+                                    <div id="userDetallePerfilSVG" className={usuarioDetalle.imagen != null ? "d-none" : "perfil-avatar"}>
+                                        <svg fill="#e0e0e0" viewBox="0 0 24 24" style={{ width: '50px' }} width="72" height="72">
+                                            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path>
+                                        </svg>
+                                    </div>
                                 </div>
 
                                 {
@@ -1741,7 +1741,7 @@ const Condominio = () => {
                             <button
                                 type="button"
                                 className="perfil-edit-btn"
-                                onClick={() => {setEditarPerfil(true); setEditImgPerfil(usuarioDetalle.imagen != "" && usuarioDetalle.imagen != null ? true : false) } }
+                                onClick={() => { setEditarPerfil(true); setEditImgPerfil(usuarioDetalle.imagen != "" && usuarioDetalle.imagen != null ? true : false) }}
                                 aria-label="Editar perfil"
                             >
                                 <img src={iconeditar} />
@@ -2661,11 +2661,10 @@ const Condominio = () => {
     } */
 
     async function solicitarPermisoNotificaciones() {
-        debugger
         const permiso = await Notification.requestPermission();
 
         if (permiso === 'granted') {
-            alert('✅ Permiso de notificaciones concedido');
+            /* alert('✅ Permiso de notificaciones concedido'); */
             const registration = await navigator.serviceWorker.register('/service-worker.js');
             const ready = await navigator.serviceWorker.ready;
 
