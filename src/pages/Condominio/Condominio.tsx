@@ -248,7 +248,7 @@ const Condominio = () => {
 
         // En iOS, solo las PWAs instaladas permiten notificaciones
         if (isIos() && !isStandalone()) {
-            setEstadoServiceWorker('iOS detectado: Las notificaciones push solo funcionan si la PWA está instalada');
+            alert('iOS detectado: Las notificaciones push solo funcionan si la PWA está instalada');
             return false;
         }
 
@@ -281,12 +281,13 @@ const Condominio = () => {
             }
 
             // Envía la suscripción al backend
-            setEstadoServiceWorker('[Push] Suscripción registrada correctamente.');
+            alert('[Push] Suscripción registrada correctamente.');
+            alert(subscription.endpoint)
             setServiceWorker(subscription)
 
             
         } catch (err) {
-            setEstadoServiceWorker('[Push] Error al registrar:' + err!.toString());
+            alert('[Push] Error al registrar:' + err!.toString());
         }
     }
 
@@ -2723,6 +2724,7 @@ const Condominio = () => {
                                 cerrarMenu(false, true)
                                 setCrear(false)
                                 setLoading(true);
+                                alert((serviceWorker as any).endpoint)
                                 ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
