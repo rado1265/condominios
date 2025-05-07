@@ -145,7 +145,7 @@ const Condominio = () => {
     const [modalOpenImg, setModalOpenImg] = useState(false);
     const [imgSelect, setImgSelect] = useState(null);
     const [serviceWorker, setServiceWorker] = useState({})
-    const [estadoServiceWorker, setEstadoServiceWorker] = useState('')
+    const [estadoServiceWorker, setEstadoServiceWorker] = useState('aun nada')
     const openModalImg = (img: any) => {
         setImgSelect(img);
         setModalOpenImg(true);
