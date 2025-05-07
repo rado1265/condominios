@@ -183,14 +183,15 @@ const Condominio = () => {
         setVerDetalle(false);
     }
     useEffect(() => {
-        if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != undefined) &&
+        debugger
+        if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
             /*localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
             localStorage.getItem("tieneSuscripcionAnuncios") &&
             localStorage.getItem("tieneSuscripcionAvisos") &&*/
-            (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario") != undefined) &&
-            (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario") != undefined) &&
-            (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario") != undefined)) {
+            (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+            (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+            (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario") != 'undefined')) {
 
             LoginLogic(selLogin, {
                 usuario: localStorage.getItem("nombreUsuario"),
