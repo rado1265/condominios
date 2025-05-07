@@ -11,6 +11,8 @@ import iconeditar from './../../components/utils/img/editar.png';
 import iconborrar from './../../components/utils/img/iconborrar.png';
 import notificar from './../../components/utils/img/notificar.png';
 import logo from './../../components/utils/img/logo.png';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 const chileTime = new Intl.DateTimeFormat("es-CL", {
     timeZone: "America/Santiago",
     hour12: false,
@@ -22,6 +24,21 @@ const chileTime = new Intl.DateTimeFormat("es-CL", {
     second: "2-digit",
 }).format(new Date());
 const Condominio = () => {
+    const firebaseConfig = {
+        apiKey: "AIzaSyAGLBDs0MOUKRBrVxIp0ai7aygveSRHKkA",
+        authDomain: "conexionresidencialapp.firebaseapp.com",
+        projectId: "conexionresidencialapp",
+        storageBucket: "conexionresidencialapp.firebasestorage.app",
+        messagingSenderId: "1047153246562",
+        appId: "1:1047153246562:web:233d121eafee71fb95ec3b",
+        measurementId: "G-54LZY2M3BN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+    const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
+    const [editImgPerfil, setEditImgPerfil] = useState(false);
+
     const [loading, setLoading] = useState(false);
     const [editarTextRich, setEditarTextRich] = useState(false);
     const [newTextRich, setNewTextRich] = useState("");
@@ -84,6 +101,7 @@ const Condominio = () => {
         tipo: 1,
         mensaje: ""
     });
+    const [buscarArchivo, setBuscarArchivo] = useState(true)
     const [alertaCerrada, setAlertaCerrada] = useState(false)
     const [iniciarSesion, setIniciarSesion] = useState(false)
     const [crear, setCrear] = useState(false)
@@ -143,16 +161,24 @@ const Condominio = () => {
     })
 
     const [modalOpenImg, setModalOpenImg] = useState(false);
-    const [imgSelect, setImgSelect] = useState(null);
+    const [imgSelect, setImgSelect] = useState("");
 
     const openModalImg = (img: any) => {
-        setImgSelect(img);
-        setModalOpenImg(true);
+        let nombreArchivoParse = img.startsWith("img-") ? img.replace("img-", "") : img.replace("video-", "");
+        const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
+        getDownloadURL(storageRef)
+            .then((url) => {
+                setImgSelect(url);
+                setModalOpenImg(true);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     };
 
     const closeModalImg = () => {
         setModalOpenImg(false);
-        setImgSelect(null);
+        setImgSelect("");
     };
 
     /* {
@@ -269,22 +295,27 @@ const Condominio = () => {
     }
 
     const uploadVideo = (files: any) => {
-        const formData = new FormData();
-        formData.append("file", files[0]);
-        formData.append("upload_preset", "conexionresidencial");
+        setBuscarArchivo(false);
+        const file = files[0];
+        setArchivoTemp(file);
 
-        fetch("https://api.cloudinary.com/v1_1/djphh67ai/video/upload", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setAnuncio(prev => ({
-                    ...prev,
-                    // eslint-disable-next-line
-                    ["amedida"]: data.secure_url
-                }));
-            });
+        if (!file) return;
+
+        document.getElementById('containerViewVideo')?.classList.remove("d-none");
+
+        const videoPreview = document.getElementById('visualizadorVideo') as HTMLVideoElement;
+        if (videoPreview) {
+            const videoURL = URL.createObjectURL(file);
+            videoPreview.src = videoURL;
+            videoPreview.load();
+
+            setAnuncio(prev => ({
+                ...prev,
+                // eslint-disable-next-line
+                ["amedida"]: 'video-' + file.name
+            }));
+            //videoPreview.play();
+        }
     };
 
     const normalizarLogin = (data: any) => {
@@ -306,7 +337,7 @@ const Condominio = () => {
     const selLogin = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
-            if (data.nombre !== null) {
+            if (data.nombre && data.nombre != null && data.nombre != "") {
                 setUsuario(data);
                 setTipo(1)
                 setIniciarSesion(false)
@@ -397,6 +428,7 @@ const Condominio = () => {
     };
 
     const CrearAnuncio = () => {
+        guardarArchivo();
         try {
             if (anuncio.cabecera.length > 0) {
                 setLoading(true);
@@ -490,6 +522,7 @@ const Condominio = () => {
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
+                setArchivoTemp(null);
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -576,6 +609,7 @@ const Condominio = () => {
     }
 
     const EditarPerfil = () => {
+        guardarArchivo();
         try {
             setLoading(true);
             EditUsuarioPorIdLogic(selEditarPerfil, usuarioDetalle)
@@ -680,6 +714,7 @@ const Condominio = () => {
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
         setVerMisAnuncios(false);
+        setBuscarArchivo(true);
         if (a === 5) {
             setLoading(true);
             ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
@@ -695,53 +730,92 @@ const Condominio = () => {
         setAnuncio(a);
     }
 
-    const handleImageChange = (e: any) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event: any) => {
-            const base64 = event.target.result;
-            //console.log(base64.replace("data:image/jpeg;base64,", ""))
-            if (base64.startsWith('data:image')) {
-                setAnuncio(prev => ({
-                    ...prev,
-                    // eslint-disable-next-line
-                    ["amedida"]: base64.replace("data:image/jpeg;base64,", "")
-                }));
-            } else {
-                alert('Archivo no válido o no es una imagen.');
-            }
-        };
-        reader.readAsDataURL(file);
-    };
-    const handleImagePerfilChange = (e: any) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event: any) => {
-            const base64 = event.target.result;
-            //console.log(base64.replace("data:image/jpeg;base64,", ""))
-            if (base64.startsWith('data:image')) {
-                setUsuarioDetalle(prev => ({
-                    ...prev,
-                    // eslint-disable-next-line
-                    ["imagen"]: base64.replace("data:image/jpeg;base64,", "")
-                }));
-            } else {
-                alert('Archivo no válido o no es una imagen.');
-            }
-        };
-        reader.readAsDataURL(file);
-    };
-
-   /*  document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && tipo < 3) {
-            setLoading(true);
-            ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+    const obtenerURLArchivo = (nombreArchivo: string = "", idUbicacion: string, tipo: number) => {
+        if(!buscarArchivo){
+            return;
         }
-    }); */
+
+        if (nombreArchivo == "") {
+            return "";
+        }
+
+        let nombreArchivoParse = nombreArchivo.startsWith("img-") ? nombreArchivo.replace("img-", "") : nombreArchivo.replace("video-", "");
+        const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
+        getDownloadURL(storageRef)
+            .then((url) => {
+                if (tipo == 1) {
+                    const img = document.getElementById(idUbicacion) as HTMLImageElement | null;
+                    if (img) {
+                        img.src = url;
+                    }
+                } else {
+                    const video = document.getElementById(idUbicacion) as HTMLVideoElement | null;
+                    if (video) {
+                        video.src = url;
+                        video.load();
+                    }
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const guardarArchivo = () => {
+        if (archivoTemp && !(archivoTemp.size > 100000000)) {
+            const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoTemp.name}`);
+            const uploadTask = uploadBytes(storageRef, archivoTemp);
+            setBuscarArchivo(true);
+        }
+    }
+
+    const handleImageChange = (e: any) => {
+        setBuscarArchivo(false);
+        const file = e.target.files[0];
+        setArchivoTemp(file);
+
+        if (!file) return;
+
+        document.getElementById('containerViewImg')?.classList.remove("d-none");
+
+        const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
+        if (img) {
+            img.src = URL.createObjectURL(file);
+            setAnuncio(prev => ({
+                ...prev,
+                // eslint-disable-next-line
+                ["amedida"]: 'img-' + file.name
+            }));
+        }
+    };
+
+    const handleImagePerfilChange = (e: any) => {
+        setBuscarArchivo(false);
+        const file = e.target.files[0];
+        setArchivoTemp(file);
+
+        if (!file) return;
+
+        document.getElementById('userDetallePerfil')?.classList.remove("d-none");
+        document.getElementById('userDetallePerfilSVG')?.classList.add("d-none");
+
+        const img = document.getElementById('userDetallePerfil') as HTMLImageElement | null;
+        if (img) {
+            img.src = URL.createObjectURL(file);
+            setUsuarioDetalle(prev => ({
+                ...prev,
+                // eslint-disable-next-line
+                ["imagen"]: 'img-' + file.name
+            }));
+        }
+    };
+
+    /*  document.addEventListener('visibilitychange', () => {
+         if (document.visibilityState === 'visible' && tipo < 3) {
+             setLoading(true);
+             ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+         }
+     }); */
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -967,10 +1041,10 @@ const Condominio = () => {
 
             {(a.amedida && (
                 <div className="v2-anuncio-media-wrapper">
-                    {a.amedida.includes("http") ? (
-                        <video src={a.amedida} controls />
+                    {a.amedida.startsWith("video") ? (
+                        <video id={"videoAnuncio1-" + i} src={obtenerURLArchivo(a.amedida, `videoAnuncio1-${i}`, 2)} controls />
                     ) : (
-                        <img src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" onClick={() => openModalImg(`data:image/jpeg;base64,${a.amedida}`)} />
+                        <img id={"imgAnuncio1-" + i} src={obtenerURLArchivo(a.amedida, `imgAnuncio1-${i}`, 1)} alt="Foto" onClick={() => openModalImg(a.amedida)} />
                     )}
                 </div>
             )) || null}
@@ -1108,10 +1182,10 @@ const Condominio = () => {
 
                 {(a.amedida && (
                     <div className="v2-anuncio-media-wrapper">
-                        {a.amedida.includes("http") ? (
-                            <video src={a.amedida} controls />
+                        {a.amedida.startsWith("video") ? (
+                            <video id={"videoAnuncio2-" + i} src={obtenerURLArchivo(a.amedida, `videoAnuncio2-${i}`, 2)} controls />
                         ) : (
-                            <img src={`data:image/jpeg;base64,${a.amedida}`} alt="Foto" onClick={() => openModalImg(`data:image/jpeg;base64,${a.amedida}`)} />
+                            <img id={"imgAnuncio2-" + i} src={obtenerURLArchivo(a.amedida, `imgAnuncio2-${i}`, 1)} alt="Foto" onClick={() => openModalImg(a.amedida)} />
                         )}
                     </div>
                 )) || null}
@@ -1368,7 +1442,7 @@ const Condominio = () => {
                             <label className="checkbox-container">
                                 <input
                                     type="checkbox"
-                                    checked={a.activo}
+                                    checked={!!a.activo}
                                     onChange={() => {
                                         CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, a.id, !a.activo, localStorage.getItem("idcondominio")!.toString(), usuario.id)
                                     }}
@@ -1418,13 +1492,13 @@ const Condominio = () => {
                     </div>
                     <span className="anuncio-telefono">{dataDetalle.telefono}</span>
                 </div>
-                {dataDetalle.amedida && dataDetalle.amedida.includes("http") ?
+                {dataDetalle.amedida && dataDetalle.amedida.startsWith("video") ?
                     <div className="anuncio-img-wrapper">
-                        <video src={dataDetalle.amedida} controls width="300" />
+                        <video id="videoAnuncio3" src={obtenerURLArchivo(dataDetalle.amedida, "videoAnuncio3", 2)} controls width="300" />
                     </div>
-                    : dataDetalle.amedida && !dataDetalle.amedida.includes("http") ?
+                    : dataDetalle.amedida && dataDetalle.amedida.startsWith("img") ?
                         <div className="anuncio-img-wrapper">
-                            <img className="anuncio-img" src={`data:image/jpeg;base64,${dataDetalle.amedida}`} alt="Foto" />
+                            <img id="imgAnuncio3" className="anuncio-img" src={obtenerURLArchivo(dataDetalle.amedida, "imgAnuncio3", 1)} alt="Foto" />
                         </div>
                         : ""
                 }
@@ -1489,17 +1563,18 @@ const Condominio = () => {
                                     <img width={30} src={volver} alt="Icono volver" />
                                 </button>
                                 <div style={{ justifySelf: 'center' }}>
-                                    {
-                                        usuarioDetalle.imagen != null ?
-                                            < img
-                                                src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
+                                            <img
+                                                className={usuarioDetalle.imagen != null ? "": "d-none"}
+                                                id="userDetallePerfil"
+                                                src={editImgPerfil ? obtenerURLArchivo(usuarioDetalle.imagen, "userDetallePerfil", 1) : ""}
                                                 alt="Vista previa"
                                                 style={{ maxWidth: '200px', marginTop: '10px' }}
-                                            /> :
-                                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-                                            </svg>
-                                    }
+                                            /> 
+                                            <div id="userDetallePerfilSVG" className={ usuarioDetalle.imagen != null ? "d-none" : "perfil-avatar"}>
+                                                <svg fill="#e0e0e0" viewBox="0 0 24 24" style={{width: '50px'}} width="72" height="72">
+                                                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path>
+                                                </svg>
+                                            </div>
                                 </div>
 
                                 {
@@ -1526,7 +1601,7 @@ const Condominio = () => {
                                     value={usuarioDetalle.rol}
                                     disabled
                                 />
-                                <label htmlFor="textfield" className="search-label-admin">
+                                <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
                                     Dirección
                                 </label>
                                 <input
@@ -1571,7 +1646,7 @@ const Condominio = () => {
                             <button
                                 type="button"
                                 className="perfil-edit-btn"
-                                onClick={() => setEditarPerfil(true)}
+                                onClick={() => {setEditarPerfil(true); setEditImgPerfil(usuarioDetalle.imagen != "" && usuarioDetalle.imagen != null ? true : false) } }
                                 aria-label="Editar perfil"
                             >
                                 <img src={iconeditar} />
@@ -1579,7 +1654,8 @@ const Condominio = () => {
                             <div className="perfil-avatar">
                                 {usuarioDetalle.imagen ? (
                                     <img
-                                        src={`data:image/jpeg;base64,${usuarioDetalle.imagen}`}
+                                        id="imgPerfil1"
+                                        src={obtenerURLArchivo(usuarioDetalle.imagen, `imgPerfil1`, 1)}
                                         alt="Vista previa"
                                     />
                                 ) : (
@@ -1691,7 +1767,8 @@ const Condominio = () => {
                             <div className="perfil-avatar">
                                 {dataUserSelect.imagen ? (
                                     <img
-                                        src={`data:image/jpeg;base64,${dataUserSelect.imagen}`}
+                                        id="imgPerfilSelect1"
+                                        src={obtenerURLArchivo(dataUserSelect.imagen, `imgPerfilSelect1`, 1)}
                                         alt="Vista previa"
                                     />
                                 ) : (
@@ -1904,7 +1981,7 @@ const Condominio = () => {
                         value={emergencia.descripcion}
                         onChange={(e: any) => handleChangeEmergencia(e)}
                     />
-                    <label htmlFor="textfield" className="search-label-admin">
+                    <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
                         Dirección
                     </label>
                     <input
@@ -2406,40 +2483,37 @@ const Condominio = () => {
                     </div>
                 )}
 
-                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("img")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>
                 )}
-                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("img")))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 )}
-                {(anuncio.amedida && (anuncio.amedida && !anuncio.amedida.startsWith("http"))) && (
-                    <div>
-                        <h3>Vista previa Imagen:</h3>
-                        <img
-                            src={`data:image/jpeg;base64,${anuncio.amedida}`}
-                            alt="Vista previa"
-                            style={{ maxWidth: '300px', marginTop: '10px' }}
-                        />
-                    </div>
-                )}
+                <div id="containerViewImg" className={anuncio.amedida.startsWith("img") ? "" : "d-none"}>
+                    <h3>Vista previa Imagen:</h3>
+                    <img
+                        id="visualizadorImg"
+                        src={!crear ? obtenerURLArchivo(anuncio.amedida, "visualizadorImg", 1) : ""}
+                        alt="Vista previa"
+                        style={{ maxWidth: '300px', marginTop: '10px' }}
+                    />
+                </div>
 
 
-                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("video")))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("http")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("video")))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
-                {(anuncio.amedida && anuncio.amedida.startsWith("http")) && (
-                    <div>
-                        <h3>Vista previa Video:</h3>
-                        <video src={anuncio.amedida} controls width="300" />
-                    </div>
-                )}
+                <div id="containerViewVideo" className={anuncio.amedida.startsWith("video") ? "" : "d-none"}>
+                    <h3>Vista previa Video:</h3>
+                    <video id="visualizadorVideo" src={!crear ? obtenerURLArchivo(anuncio.amedida, "visualizadorVideo", 2) : ""} controls width="300" />
+                </div>
                 <label htmlFor="textfield" className="search-label mt-3">
                     Tipo
                 </label>
@@ -2476,9 +2550,11 @@ const Condominio = () => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js')
                 .then(reg => {
-                    console.log('Service Worker registrado:', reg);
+                    //console.log('Service Worker registrado:', reg);
                 })
-                .catch(err => console.error('Error al registrar SW:', err));
+                .catch(err => 
+                    console.error('Error al registrar SW:', err)
+                );
         }
     }, []);
 
@@ -2493,6 +2569,7 @@ const Condominio = () => {
         setVotaciones(h);
         setVerUsuarios(i);
         setVerMisAnuncios(false);
+        setBuscarArchivo(true);
     }
     // eslint-disable-next-line
     const selSuscribir = (error: Boolean, err: string, data: any) => {
