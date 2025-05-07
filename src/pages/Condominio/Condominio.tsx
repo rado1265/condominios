@@ -2524,10 +2524,12 @@ const Condominio = () => {
                 }
             } catch (error) {
                 console.error('[Error] Registrando SW o suscribiendo Push:', error);
+                setEstadoServiceWorker('[Error] Registrando SW o suscribiendo Push:' + error!.toString())
             }
         });
     } else {
         console.warn('Service Worker o Push no soportado por este navegador');
+        setEstadoServiceWorker('Service Worker o Push no soportado por este navegador')
     }
 
     function urlBase64ToUint8Array(base64String: string) {
