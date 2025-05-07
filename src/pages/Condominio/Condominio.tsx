@@ -320,11 +320,13 @@ const Condominio = () => {
                     if (new Date(condSelect[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
                     } else {
+                        setLoading(true);
                         setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
                     }
                 } else {
                     if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
+                        setLoading(true);
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
@@ -1187,7 +1189,7 @@ const Condominio = () => {
                 {dataCondominios.map((a: any) => {
                     let activo = new Date(a.fechaCaducidad.toString()) > new Date();
                     return (
-                        <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() => { setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id); localStorage.setItem("idCondominio", a.id) }}>
+                        <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() => { setEnComunidad(true); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id); localStorage.setItem("idCondominio", a.id) }}>
                             {a.logo && (
                                 <img id="imgComunidad" width={200} src={`data:image/jpeg;base64,${a.logo}`} />
                             )}
