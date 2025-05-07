@@ -2476,7 +2476,7 @@ const Condominio = () => {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    if ('serviceWorker' in navigator) {
+    /* if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
             try {
                 const registration = await navigator.serviceWorker.register('/service-worker.js');
@@ -2493,6 +2493,49 @@ const Condominio = () => {
         });
     } else {
         console.warn('El navegador no soporta Service Workers');
+    } */
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        window.addEventListener('load', async () => {
+            try {
+                // 1. Registrar el Service Worker
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('[SW] Registrado correctamente:', registration);
+
+                // 2. Esperar a que esté listo
+                const readyRegistration = await navigator.serviceWorker.ready;
+                console.log('[SW] Listo:', readyRegistration);
+
+                // 3. Suscribirse a Push Notifications (si no estás suscrito ya)
+                const subscription = await readyRegistration.pushManager.getSubscription();
+                if (!subscription) {
+                    const newSubscription = await readyRegistration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array('BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0'),
+                    });
+                    console.log('[Push] Suscripción nueva:', newSubscription);
+
+                    // Aquí deberías enviar esta suscripción a tu backend para guardarla
+                   setServiceWorker(newSubscription)
+                } else {
+                    console.log('[Push] Ya suscrito:', subscription);
+                }
+            } catch (error) {
+                console.error('[Error] Registrando SW o suscribiendo Push:', error);
+            }
+        });
+    } else {
+        console.warn('Service Worker o Push no soportado por este navegador');
+    }
+
+    function urlBase64ToUint8Array(base64String: string) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
     }
 
     const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
@@ -2596,7 +2639,7 @@ const Condominio = () => {
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
         } else {
-            SuscribirNotificacionesLogic(selSuscribir, tipoSuscripcion, serviceWorker)
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, serviceWorker)
         }
     }
 
