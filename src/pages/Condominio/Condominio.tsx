@@ -145,6 +145,7 @@ const Condominio = () => {
     const [modalOpenImg, setModalOpenImg] = useState(false);
     const [imgSelect, setImgSelect] = useState(null);
     const [serviceWorker, setServiceWorker] = useState({})
+    const [estadoServiceWorker, setEstadoServiceWorker] = useState('')
     const openModalImg = (img: any) => {
         setImgSelect(img);
         setModalOpenImg(true);
@@ -833,7 +834,7 @@ const Condominio = () => {
                 }}>
                     <span aria-hidden="true">&times;</span>
                 </button>
-                {/* {serviceWorker} */}
+                {estadoServiceWorker}
             </div>
         );
     }
@@ -2483,6 +2484,7 @@ const Condominio = () => {
 
                 const readyReg = await navigator.serviceWorker.ready;
                 console.log('SW listo:', readyReg);
+                setEstadoServiceWorker('SW listo:' + readyReg.toString())
                 setServiceWorker(readyReg)
                 // Aquí puedes continuar con pushManager.subscribe...
             } catch (error) {
