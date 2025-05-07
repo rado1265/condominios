@@ -162,7 +162,8 @@ const Condominio = () => {
 
     const [modalOpenImg, setModalOpenImg] = useState(false);
     const [imgSelect, setImgSelect] = useState("");
-
+    const [serviceWorker, setServiceWorker] = useState({})
+    const [estadoServiceWorker, setEstadoServiceWorker] = useState('aun nada')
     const openModalImg = (img: any) => {
         let nombreArchivoParse = img.startsWith("img-") ? img.replace("img-", "") : img.replace("video-", "");
         const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
@@ -208,14 +209,15 @@ const Condominio = () => {
         setVerDetalle(false);
     }
     useEffect(() => {
-        if (localStorage.getItem("nombreUsuario") &&
+        registerPush();
+        if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
             /*localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
             localStorage.getItem("tieneSuscripcionAnuncios") &&
             localStorage.getItem("tieneSuscripcionAvisos") &&*/
-            localStorage.getItem("rolUsuario") &&
-            localStorage.getItem("clave") &&
-            localStorage.getItem("idUsuario")) {
+            (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+            (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+            (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario") != 'undefined')) {
 
             LoginLogic(selLogin, {
                 usuario: localStorage.getItem("nombreUsuario"),
@@ -236,6 +238,90 @@ const Condominio = () => {
             cerrarSesion()
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+
+
+
+    ///////////////////////////////////////////////////////////////////
+    function urlBase64ToUint8Array(base64String: string) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    function isIos() {
+        return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+
+    function isAndroid() {
+        return /android/i.test(navigator.userAgent);
+    }
+
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+    }
+
+    function supportsPushNotifications() {
+        const isSecure = window.isSecureContext;
+        const hasServiceWorker = 'serviceWorker' in navigator;
+        const hasPushManager = 'PushManager' in window;
+
+        // En iOS, solo las PWAs instaladas permiten notificaciones
+        if (isIos() && isAndroid()) {
+            return false;
+        }
+
+        return isSecure && hasServiceWorker && hasPushManager;
+    }
+
+    async function registerPush() {
+        debugger
+        if (!supportsPushNotifications()) {
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                alert('Debes permitir notificaciones para activarlas.');
+                return;
+            }
+
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            const ready = await navigator.serviceWorker.ready;
+
+            let subscription = await ready.pushManager.getSubscription();
+            if (!subscription) {
+                subscription = await ready.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array("BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0"),
+                });
+            }
+
+            // Envía la suscripción al backend
+            setServiceWorker(subscription)
+
+
+        } catch (err) {
+        }
+    }
+
+
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js').catch(console.error);
+        });
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////
 
     const cerrarSesion = () => {
         localStorage.removeItem("nombreUsuario");
@@ -351,11 +437,13 @@ const Condominio = () => {
                     if (new Date(condSelect[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
                     } else {
+                        setLoading(true);
                         setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
                     }
                 } else {
                     if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
+                        setLoading(true);
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
@@ -619,7 +707,7 @@ const Condominio = () => {
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString());
+                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
                 setEditarPerfil(false);
             }
             else {
@@ -905,6 +993,7 @@ const Condominio = () => {
                 }}>
                     <span aria-hidden="true">&times;</span>
                 </button>
+                {estadoServiceWorker}
             </div>
         );
     }
@@ -1261,7 +1350,7 @@ const Condominio = () => {
                 {dataCondominios.map((a: any) => {
                     let activo = new Date(a.fechaCaducidad.toString()) > new Date();
                     return (
-                        <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() => { setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id); localStorage.setItem("idCondominio", a.id) }}>
+                        <div className={activo ? "card col-12 condominioList mb-3" : "card col-12 condominioList mb-3 disabled"} onClick={() => { setEnComunidad(true); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, a.id); localStorage.setItem("idCondominio", a.id) }}>
                             {a.logo && (
                                 <img id="imgComunidad" width={200} src={`data:image/jpeg;base64,${a.logo}`} />
                             )}
@@ -2546,17 +2635,41 @@ const Condominio = () => {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    useEffect(() => {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(reg => {
-                    //console.log('Service Worker registrado:', reg);
-                })
-                .catch(err => 
-                    console.error('Error al registrar SW:', err)
-                );
+    /* if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+            try {
+                const registration = await navigator.serviceWorker.register('/service-worker.js');
+                console.log('SW registrado:', registration);
+
+                const readyReg = await navigator.serviceWorker.ready;
+                console.log('SW listo:', readyReg);
+                setEstadoServiceWorker('SW listo:' + readyReg.toString())
+                setServiceWorker(readyReg)
+                // Aquí puedes continuar con pushManager.subscribe...
+            } catch (error) {
+                console.error('Error al registrar o preparar el Service Worker:', error);
+            }
+        });
+    } else {
+        console.warn('El navegador no soporta Service Workers');
+    } */
+
+    async function solicitarPermisoNotificaciones() {
+        debugger
+        const permiso = await Notification.requestPermission();
+
+        if (permiso === 'granted') {
+            alert('✅ Permiso de notificaciones concedido');
+            return true
+        } else if (permiso === 'denied') {
+            alert('❌ Has denegado las notificaciones. Puedes activarlas desde la configuración del navegador.');
+            return false
+        } else {
+            alert('ℹ️ Las notificaciones están bloqueadas o no se solicitaron correctamente.');
+            return false
         }
-    }, []);
+    }
+
 
     const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
         setMenuOpciones(a)
@@ -2660,7 +2773,7 @@ const Condominio = () => {
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
         } else {
-            SuscribirNotificacionesLogic(selSuscribir, tipoSuscripcion)
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, serviceWorker)
         }
     }
 
@@ -2696,7 +2809,12 @@ const Condominio = () => {
                                 cerrarMenu(false, true)
                                 setCrear(false)
                                 setLoading(true);
-                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
+
+                                var result: any = solicitarPermisoNotificaciones()
+                                if (result) {
+                                    alert((serviceWorker as any).endpoint)
+                                    ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
+                                }
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
@@ -2788,7 +2906,7 @@ const Condominio = () => {
 
                             <button
                                 type="button"
-                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); }}
+                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker); }}
                                 className="crear-btn"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -2806,25 +2924,25 @@ const Condominio = () => {
                                         createSuscripcion(usuario.tieneSuscripcionAnuncios, 1, ev)
                                     }}>
                                         Notif. Anuncios
-                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionAnuncios)}
                                     </button>
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionMensajes, 2, ev)
                                     }}>
                                         Notif. Mensajes
-                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionMensajes)}
                                     </button>
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionVotaciones, 3, ev)
                                     }}>
                                         Notif. Votaciones
-                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionVotaciones)}
                                     </button>
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionAvisos, 4, ev)
                                     }}>
                                         Notif. Calendario
-                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionAvisos)}
                                     </button>
                                 </div>
                             )}

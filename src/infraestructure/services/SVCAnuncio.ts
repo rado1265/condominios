@@ -152,10 +152,8 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async SuscribirNotificaciones(): Promise<IServiceResult<any>> {
+    public static async SuscribirNotificaciones(registration: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
-        const registration = await navigator.serviceWorker.ready;
-
         const response = await axios.get(_ruta + 'Condominios/obtenerKey',);
         console.log(response.data)
         const vapidPublicKey = response.data;
@@ -418,21 +416,19 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async ObtenerUsuarioPorId(idUsuario: string): Promise<IServiceResult<any>> {
+    public static async ObtenerUsuarioPorId(idUsuario: string, idCondominio: string, subscription: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
-        const registration = await navigator.serviceWorker.ready;
-
-        const response = await axios.get(_ruta + 'Condominios/obtenerKey');
+        /* const response = await axios.get(_ruta + 'Condominios/obtenerKey');
         console.log(response.data)
         const vapidPublicKey = response.data;
         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-
+        console.log(registration)
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: convertedVapidKey,
-        });
+        }); */
 
-        const url: string = _ruta + "Condominios/getUsuarioPorId?idUsuario=" + idUsuario;
+        const url: string = _ruta + "Condominios/getUsuarioPorId?idUsuario=" + idUsuario + "&idCondominio=" + idCondominio;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios

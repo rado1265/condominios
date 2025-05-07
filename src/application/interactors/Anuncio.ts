@@ -53,8 +53,8 @@ export const Login = (selListado: any, usuario: any) => {
     });
 }
 
-export const SuscribirNotificaciones = (selListado: any, tipoSuscripcion: any) => {
-    SVCAnuncio.SuscribirNotificaciones().then((res: IServiceResult<any>) => {
+export const SuscribirNotificaciones = (selListado: any, tipoSuscripcion: any, registration: any) => {
+    SVCAnuncio.SuscribirNotificaciones(registration).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, tipoSuscripcion.toString(), data);
@@ -165,8 +165,8 @@ export const EditUsuarioPorId = (selListado: any, usuario: any) => {
         }
     });
 };
-export const ObtenerUsuarioPorId = (selListado: any, idUsuario: string) => {
-    SVCAnuncio.ObtenerUsuarioPorId(idUsuario).then((res: IServiceResult<any>) => {
+export const ObtenerUsuarioPorId = (selListado: any, idUsuario: string, idCondominio: string, registration: any) => {
+    SVCAnuncio.ObtenerUsuarioPorId(idUsuario, idCondominio, registration).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);
