@@ -256,6 +256,7 @@ const Condominio = () => {
     }
 
     async function registerPush() {
+        debugger
         if (!supportsPushNotifications()) {
             alert('Este navegador no permite notificaciones push o no está en modo correcto (PWA instalada en iOS).');
             return;
@@ -281,7 +282,7 @@ const Condominio = () => {
 
             // Envía la suscripción al backend
             setEstadoServiceWorker('[Push] Suscripción registrada correctamente.');
-            return subscription;
+            setServiceWorker(subscription)
 
             
         } catch (err) {
@@ -677,7 +678,7 @@ const Condominio = () => {
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), registerPush());
+                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
                 setEditarPerfil(false);
             }
             else {
@@ -2686,7 +2687,7 @@ const Condominio = () => {
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
         } else {
-            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, registerPush())
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, serviceWorker)
         }
     }
 
@@ -2722,7 +2723,7 @@ const Condominio = () => {
                                 cerrarMenu(false, true)
                                 setCrear(false)
                                 setLoading(true);
-                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), registerPush());
+                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
@@ -2814,7 +2815,7 @@ const Condominio = () => {
 
                             <button
                                 type="button"
-                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), registerPush()); }}
+                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker); }}
                                 className="crear-btn"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
