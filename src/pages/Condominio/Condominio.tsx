@@ -168,11 +168,11 @@ const Condominio = () => {
         let nombreArchivoParse = img.startsWith("img-") ? img.replace("img-", "") : img.replace("video-", "");
         const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
         getDownloadURL(storageRef)
-            .then((url) => {
+            .then((url: any) => {
                 setImgSelect(url);
                 setModalOpenImg(true);
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 console.log(error);
             });
     };
@@ -278,9 +278,15 @@ const Condominio = () => {
 
         return isSecure && hasServiceWorker && hasPushManager;
     }
+    async function Perfil() {
 
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            /* alert((serviceWorker as any).endpoint) */
+            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
+        }
+    }
     async function registerPush() {
-        debugger
         if (!supportsPushNotifications()) {
             return;
         }
@@ -288,7 +294,7 @@ const Condominio = () => {
         try {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                alert('Debes permitir notificaciones para activarlas.');
+                /* alert('Debes permitir notificaciones para activarlas.'); */
                 return;
             }
 
@@ -819,7 +825,7 @@ const Condominio = () => {
     }
 
     const obtenerURLArchivo = (nombreArchivo: string = "", idUbicacion: string, tipo: number) => {
-        if(!buscarArchivo){
+        if (!buscarArchivo) {
             return;
         }
 
@@ -830,7 +836,7 @@ const Condominio = () => {
         let nombreArchivoParse = nombreArchivo.startsWith("img-") ? nombreArchivo.replace("img-", "") : nombreArchivo.replace("video-", "");
         const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
         getDownloadURL(storageRef)
-            .then((url) => {
+            .then((url: any) => {
                 if (tipo == 1) {
                     const img = document.getElementById(idUbicacion) as HTMLImageElement | null;
                     if (img) {
@@ -844,7 +850,7 @@ const Condominio = () => {
                     }
                 }
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 console.log(error);
             });
     }
@@ -1652,18 +1658,18 @@ const Condominio = () => {
                                     <img width={30} src={volver} alt="Icono volver" />
                                 </button>
                                 <div style={{ justifySelf: 'center' }}>
-                                            <img
-                                                className={usuarioDetalle.imagen != null ? "": "d-none"}
-                                                id="userDetallePerfil"
-                                                src={editImgPerfil ? obtenerURLArchivo(usuarioDetalle.imagen, "userDetallePerfil", 1) : ""}
-                                                alt="Vista previa"
-                                                style={{ maxWidth: '200px', marginTop: '10px' }}
-                                            /> 
-                                            <div id="userDetallePerfilSVG" className={ usuarioDetalle.imagen != null ? "d-none" : "perfil-avatar"}>
-                                                <svg fill="#e0e0e0" viewBox="0 0 24 24" style={{width: '50px'}} width="72" height="72">
-                                                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path>
-                                                </svg>
-                                            </div>
+                                    <img
+                                        className={usuarioDetalle.imagen != null ? "" : "d-none"}
+                                        id="userDetallePerfil"
+                                        src={editImgPerfil ? obtenerURLArchivo(usuarioDetalle.imagen, "userDetallePerfil", 1) : ""}
+                                        alt="Vista previa"
+                                        style={{ maxWidth: '200px', marginTop: '10px' }}
+                                    />
+                                    <div id="userDetallePerfilSVG" className={usuarioDetalle.imagen != null ? "d-none" : "perfil-avatar"}>
+                                        <svg fill="#e0e0e0" viewBox="0 0 24 24" style={{ width: '50px' }} width="72" height="72">
+                                            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path>
+                                        </svg>
+                                    </div>
                                 </div>
 
                                 {
@@ -1735,7 +1741,7 @@ const Condominio = () => {
                             <button
                                 type="button"
                                 className="perfil-edit-btn"
-                                onClick={() => {setEditarPerfil(true); setEditImgPerfil(usuarioDetalle.imagen != "" && usuarioDetalle.imagen != null ? true : false) } }
+                                onClick={() => { setEditarPerfil(true); setEditImgPerfil(usuarioDetalle.imagen != "" && usuarioDetalle.imagen != null ? true : false) }}
                                 aria-label="Editar perfil"
                             >
                                 <img src={iconeditar} />
@@ -2655,12 +2661,21 @@ const Condominio = () => {
     } */
 
     async function solicitarPermisoNotificaciones() {
-        debugger
         const permiso = await Notification.requestPermission();
 
         if (permiso === 'granted') {
-            alert('✅ Permiso de notificaciones concedido');
-            return true
+            /* alert('✅ Permiso de notificaciones concedido'); */
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            const ready = await navigator.serviceWorker.ready;
+
+            let subscription = await ready.pushManager.getSubscription();
+            if (!subscription) {
+                subscription = await ready.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array("BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0"),
+                });
+            }
+            return subscription
         } else if (permiso === 'denied') {
             alert('❌ Has denegado las notificaciones. Puedes activarlas desde la configuración del navegador.');
             return false
@@ -2810,11 +2825,7 @@ const Condominio = () => {
                                 setCrear(false)
                                 setLoading(true);
 
-                                var result: any = solicitarPermisoNotificaciones()
-                                if (result) {
-                                    alert((serviceWorker as any).endpoint)
-                                    ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
-                                }
+                                Perfil()
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
