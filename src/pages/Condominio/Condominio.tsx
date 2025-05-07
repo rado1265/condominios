@@ -278,9 +278,15 @@ const Condominio = () => {
 
         return isSecure && hasServiceWorker && hasPushManager;
     }
+    async function Perfil() {
 
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            alert((serviceWorker as any).endpoint)
+            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
+        }
+    }
     async function registerPush() {
-        debugger
         if (!supportsPushNotifications()) {
             return;
         }
@@ -2660,7 +2666,17 @@ const Condominio = () => {
 
         if (permiso === 'granted') {
             alert('✅ Permiso de notificaciones concedido');
-            return true
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            const ready = await navigator.serviceWorker.ready;
+
+            let subscription = await ready.pushManager.getSubscription();
+            if (!subscription) {
+                subscription = await ready.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array("BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0"),
+                });
+            }
+            return subscription
         } else if (permiso === 'denied') {
             alert('❌ Has denegado las notificaciones. Puedes activarlas desde la configuración del navegador.');
             return false
@@ -2810,11 +2826,7 @@ const Condominio = () => {
                                 setCrear(false)
                                 setLoading(true);
 
-                                var result: any = solicitarPermisoNotificaciones()
-                                if (result) {
-                                    alert((serviceWorker as any).endpoint)
-                                    ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
-                                }
+                                Perfil()
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
