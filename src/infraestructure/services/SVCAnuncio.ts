@@ -418,7 +418,7 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async ObtenerUsuarioPorId(idUsuario: string): Promise<IServiceResult<any>> {
+    public static async ObtenerUsuarioPorId(idUsuario: string, idCondominio: string): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
         const registration = await navigator.serviceWorker.ready;
 
@@ -432,7 +432,7 @@ export class SVCAnuncio {
             applicationServerKey: convertedVapidKey,
         });
 
-        const url: string = _ruta + "Condominios/getUsuarioPorId?idUsuario=" + idUsuario;
+        const url: string = _ruta + "Condominios/getUsuarioPorId?idUsuario=" + idUsuario + "&idCondominio=" + idCondominio;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios

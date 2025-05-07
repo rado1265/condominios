@@ -165,8 +165,8 @@ export const EditUsuarioPorId = (selListado: any, usuario: any) => {
         }
     });
 };
-export const ObtenerUsuarioPorId = (selListado: any, idUsuario: string) => {
-    SVCAnuncio.ObtenerUsuarioPorId(idUsuario).then((res: IServiceResult<any>) => {
+export const ObtenerUsuarioPorId = (selListado: any, idUsuario: string, idCondominio: string) => {
+    SVCAnuncio.ObtenerUsuarioPorId(idUsuario, idCondominio).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);

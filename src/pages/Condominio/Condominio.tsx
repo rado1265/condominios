@@ -587,7 +587,7 @@ const Condominio = () => {
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString());
+                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString());
                 setEditarPerfil(false);
             }
             else {
@@ -738,12 +738,12 @@ const Condominio = () => {
         reader.readAsDataURL(file);
     };
 
-   /*  document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && tipo < 3) {
-            setLoading(true);
-            ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-        }
-    }); */
+    /*  document.addEventListener('visibilitychange', () => {
+         if (document.visibilityState === 'visible' && tipo < 3) {
+             setLoading(true);
+             ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+         }
+     }); */
 
     const selDarQuitarLike = (error: Boolean, err: string, data: any) => {
         setLoading(false);
@@ -2621,7 +2621,7 @@ const Condominio = () => {
                                 cerrarMenu(false, true)
                                 setCrear(false)
                                 setLoading(true);
-                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString());
+                                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString());
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
@@ -2713,7 +2713,7 @@ const Condominio = () => {
 
                             <button
                                 type="button"
-                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); }}
+                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString()); }}
                                 className="crear-btn"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -2731,25 +2731,25 @@ const Condominio = () => {
                                         createSuscripcion(usuario.tieneSuscripcionAnuncios, 1, ev)
                                     }}>
                                         Notif. Anuncios
-                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionAnuncios)}
                                     </button>
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionMensajes, 2, ev)
                                     }}>
                                         Notif. Mensajes
-                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionMensajes)}
                                     </button>
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionVotaciones, 3, ev)
                                     }}>
                                         Notif. Votaciones
-                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionVotaciones)}
                                     </button>
                                     <button type="button" className="submenu-item ml-3" onClick={(ev) => {
                                         createSuscripcion(usuario.tieneSuscripcionAvisos, 4, ev)
                                     }}>
                                         Notif. Calendario
-                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionAvisos)}
                                     </button>
                                 </div>
                             )}

@@ -51,8 +51,8 @@ export const EditUsuarioPorIdLogic = (selListado: any, usuario: any) => {
     return EditUsuarioPorId(selListado, usuario);
 }
 
-export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string) => {
-    return ObtenerUsuarioPorId(selListado, idUsuario);
+export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string, idCondominio: string) => {
+    return ObtenerUsuarioPorId(selListado, idUsuario, idCondominio);
 }
 
 export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {
