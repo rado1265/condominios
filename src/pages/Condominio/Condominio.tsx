@@ -247,7 +247,7 @@ const Condominio = () => {
 
         // En iOS, solo las PWAs instaladas permiten notificaciones
         if (isIos() && !isStandalone()) {
-            console.warn('iOS detectado: Las notificaciones push solo funcionan si la PWA está instalada');
+            setEstadoServiceWorker('iOS detectado: Las notificaciones push solo funcionan si la PWA está instalada');
             return false;
         }
 
@@ -279,12 +279,12 @@ const Condominio = () => {
             }
 
             // Envía la suscripción al backend
-            console.log('[Push] Suscripción registrada correctamente.');
+            setEstadoServiceWorker('[Push] Suscripción registrada correctamente.');
             return subscription;
 
             
         } catch (err) {
-            console.error('[Push] Error al registrar:', err);
+            setEstadoServiceWorker('[Push] Error al registrar:' + err!.toString());
         }
     }
 
