@@ -144,7 +144,7 @@ const Condominio = () => {
 
     const [modalOpenImg, setModalOpenImg] = useState(false);
     const [imgSelect, setImgSelect] = useState(null);
-
+    const [serviceWorker, setServiceWorker] = useState('')
     const openModalImg = (img: any) => {
         setImgSelect(img);
         setModalOpenImg(true);
@@ -833,6 +833,7 @@ const Condominio = () => {
                 }}>
                     <span aria-hidden="true">&times;</span>
                 </button>
+                {serviceWorker}
             </div>
         );
     }
@@ -2474,15 +2475,23 @@ const Condominio = () => {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    useEffect(() => {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(reg => {
-                    console.log('Service Worker registrado:', reg);
-                })
-                .catch(err => console.error('Error al registrar SW:', err));
-        }
-    }, []);
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+            try {
+                const registration = await navigator.serviceWorker.register('/service-worker.js');
+                console.log('SW registrado:', registration);
+
+                const readyReg = await navigator.serviceWorker.ready;
+                console.log('SW listo:', readyReg);
+                setServiceWorker('SW listo:' + readyReg.toString())
+                // Aquí puedes continuar con pushManager.subscribe...
+            } catch (error) {
+                console.error('Error al registrar o preparar el Service Worker:', error);
+            }
+        });
+    } else {
+        console.warn('El navegador no soporta Service Workers');
+    }
 
     const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
         setMenuOpciones(a)
