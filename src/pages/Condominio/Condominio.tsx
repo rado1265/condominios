@@ -183,14 +183,14 @@ const Condominio = () => {
         setVerDetalle(false);
     }
     useEffect(() => {
-        if (localStorage.getItem("nombreUsuario") &&
+        if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario")?.toString() != "undefined") &&
             /*localStorage.getItem("tieneSuscripcionMensajes") &&
             localStorage.getItem("tieneSuscripcionVotaciones") &&
             localStorage.getItem("tieneSuscripcionAnuncios") &&
             localStorage.getItem("tieneSuscripcionAvisos") &&*/
-            localStorage.getItem("rolUsuario") &&
-            localStorage.getItem("clave") &&
-            localStorage.getItem("idUsuario")) {
+            (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario")?.toString() != "undefined") &&
+            (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario")?.toString() != "undefined") &&
+            (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario")?.toString() != "undefined")) {
 
             LoginLogic(selLogin, {
                 usuario: localStorage.getItem("nombreUsuario"),
@@ -2515,7 +2515,7 @@ const Condominio = () => {
                     console.log('[Push] Suscripción nueva:', newSubscription);
 
                     // Aquí deberías enviar esta suscripción a tu backend para guardarla
-                   setServiceWorker(newSubscription)
+                    setServiceWorker(newSubscription)
                 } else {
                     console.log('[Push] Ya suscrito:', subscription);
                     setServiceWorker(subscription)
