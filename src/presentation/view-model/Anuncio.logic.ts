@@ -15,8 +15,8 @@ export const CrearAnuncioLogic = (selListado: any, anuncio: any) => {
 export const LoginLogic = (selListado: any, usuario: any) => {
     return Login(selListado, usuario);
 }
-export const SuscribirNotificacionesLogic = (selListado: any, tipoSuscripcion: any) => {
-    return SuscribirNotificaciones(selListado, tipoSuscripcion);
+export const SuscribirNotificacionesLogic = (selListado: any, tipoSuscripcion: any, registration: any) => {
+    return SuscribirNotificaciones(selListado, tipoSuscripcion, registration);
 }
 export const SuscribirNotificaciones2Logic = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any) => {
     return SuscribirNotificaciones2(selListado, idCondominio, idUsuario, tipoSuscripcion, subscription);
@@ -51,8 +51,8 @@ export const EditUsuarioPorIdLogic = (selListado: any, usuario: any) => {
     return EditUsuarioPorId(selListado, usuario);
 }
 
-export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string, idCondominio: string) => {
-    return ObtenerUsuarioPorId(selListado, idUsuario, idCondominio);
+export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string, idCondominio: string, registration: any) => {
+    return ObtenerUsuarioPorId(selListado, idUsuario, idCondominio, registration);
 }
 
 export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {
