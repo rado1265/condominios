@@ -1,6 +1,7 @@
 {
-  "short_name": "MiApp",
-  "name": "Mi Aplicación Web",
+  "short_name": "Conexión",
+  "name": "Conexión Residencial - Tu comunidad más unida",
+  "description": "Conexión Residencial: la plataforma que une a tu comunidad como nunca antes.",
   "icons": [
     {
       "src": "logo192.png",
@@ -11,10 +12,20 @@
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "logo512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/?utm_source=homescreen",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#317EFB"
+  "theme_color": "#317EFB",
+  "lang": "es",
+  "dir": "ltr"
 }

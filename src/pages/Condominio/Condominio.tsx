@@ -1024,6 +1024,8 @@ const Condominio = () => {
     };
     const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false, f: boolean = false) => {
         window.scrollTo(0, 0);
+        setAlerta({ tipo: 1, mensaje: "" })
+        setAlertaCerrada(false);
         setVerDetalle(false);
         setTipo(a);
         setIniciarSesion(b);
@@ -3020,6 +3022,8 @@ const Condominio = () => {
 
 
     const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
+        setAlerta({ tipo: 1, mensaje: "" })
+        setAlertaCerrada(false);
         setMenuOpciones(a)
         setVerPerfil(b)
         setVerReglasNormas(c);

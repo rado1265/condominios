@@ -30,7 +30,7 @@ const Precios = () => {
     return (
         <div className="container text-center mb-5" style={{ marginTop: '-50px' }}>
             <section id="sectionLogo" className='d-flex justify-content-center align-items-center' style={{ height: '100vh' }} ref={sectionLogoRef}>
-                <img src={logo} style={{ width: '80%', marginTop: '-25px' }} />
+                <img alt="Logo Conexion Residencial"  src={logo} style={{ width: '80%', marginTop: '-25px' }} />
             </section>
             <section id="sectionPrecios" ref={sectionPreciosRef}>
                 <h1 className="text-primary titulo-precios">PRECIOS</h1>
