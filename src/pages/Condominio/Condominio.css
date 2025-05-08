@@ -1748,3 +1748,9 @@ a:hover {
   display: flex;
   align-items: center;
 }
+
+.newAlertas{
+  position: fixed;
+  z-index: 99;
+  bottom: 75px;
+}
