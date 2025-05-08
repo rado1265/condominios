@@ -834,11 +834,19 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    async function PerfilEditar() {
+
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            /* alert((serviceWorker as any).endpoint) */
+            ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
+            setEditarPerfil(false);
+        }
+    }
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
-                setEditarPerfil(false);
+                PerfilEditar()
             }
             else {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -2945,7 +2953,15 @@ const Condominio = () => {
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
         } else {
-            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, serviceWorker)
+            Suscripcion(tipoSuscripcion)
+        }
+    }
+    async function Suscripcion(tipoSuscripcion: any) {
+
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            /* alert((serviceWorker as any).endpoint) */
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result)
         }
     }
 
@@ -2953,6 +2969,14 @@ const Condominio = () => {
 
     const [openNotificaciones, setOpenNotificaciones] = useState(false);
 
+    async function UsuarioObtener() {
+
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            /* alert((serviceWorker as any).endpoint) */
+            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
+        }
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <React.Fragment>
@@ -3074,7 +3098,7 @@ const Condominio = () => {
 
                             <button
                                 type="button"
-                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker); }}
+                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); UsuarioObtener(); }}
                                 className="crear-btn"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
