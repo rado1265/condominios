@@ -12,7 +12,7 @@ import iconborrar from './../../components/utils/img/iconborrar.png';
 import notificar from './../../components/utils/img/notificar.png';
 import logo from './../../components/utils/img/logo.png';
 import { initializeApp } from 'firebase/app';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 const chileTime = new Intl.DateTimeFormat("es-CL", {
     timeZone: "America/Santiago",
     hour12: false,
@@ -23,6 +23,16 @@ const chileTime = new Intl.DateTimeFormat("es-CL", {
     minute: "2-digit",
     second: "2-digit",
 }).format(new Date());
+
+interface DataFull {
+    anuncios: any[];
+    nombre: string;
+    logo: string;
+    normas: string;
+    avisosHoy: boolean;
+    esVideo: boolean;
+}
+
 const Condominio = () => {
     const firebaseConfig = {
         apiKey: "AIzaSyAGLBDs0MOUKRBrVxIp0ai7aygveSRHKkA",
@@ -41,21 +51,25 @@ const Condominio = () => {
 
     const [loading, setLoading] = useState(false);
     const [editarTextRich, setEditarTextRich] = useState(false);
+    const [actualizarData, setActualizarData] = useState(false);
     const [newTextRich, setNewTextRich] = useState("");
     const [textRichEditado, setTextRichEditado] = useState(false);
     const [verDetalleAvisos, setVerDetalleAvisos] = useState(false);
     const [tipoSubir, setTipoSubir] = useState(0);
     const [dataCondominios, setDataCondominios] = useState([]);
+    const [dataArchivosComunidad, setDataArchivosComunidad] = useState([{ nombre: "test", url: "test" }]);
     const [enComunidad, setEnComunidad] = useState(false);
     const [open, setOpen] = useState(false);
-    const [dataFull, setDataFull] = useState({
+    const [dataFull, setDataFull] = useState<DataFull>({
         anuncios: [],
         nombre: "",
         logo: "",
         normas: '',
-        avisosHoy: false
+        avisosHoy: false,
+        esVideo: false
     });
-    const [misAnuncios, setMisAnuncios] = useState([]);
+    const [misAnuncios, setMisAnuncios] = useState<any[]>([]);
+    const [actualizarMisAnuncios, setActualizarMisAnuncios] = useState(false);
     const [tipo, setTipo] = useState(1)
     const [usuario, setUsuario] = useState({
         nombre: "",
@@ -110,7 +124,7 @@ const Condominio = () => {
     const [encuesta, setEncuesta] = useState(false)
     const [menuOpciones, setMenuOpciones] = useState(false)
     const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
-    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [] })
+    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false })
     const [verDetalle, setVerDetalle] = useState(false)
     const menuRef = useRef(null);
     const [anuncio, setAnuncio] = useState({
@@ -125,7 +139,8 @@ const Condominio = () => {
         fechaHasta: new Date(),
         idTipo: 1,
         idUsuario: 0,
-        activo: true
+        activo: true,
+        esVideo: false
     });
     const [newComentario, setNewComentario] = useState('')
     const [verPerfil, setVerPerfil] = useState(false)
@@ -165,17 +180,9 @@ const Condominio = () => {
     const [serviceWorker, setServiceWorker] = useState({})
     const [estadoServiceWorker, setEstadoServiceWorker] = useState('aun nada')
     const openModalImg = (img: any) => {
-        let nombreArchivoParse = img.startsWith("img-") ? img.replace("img-", "") : img.replace("video-", "");
-        const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
-        getDownloadURL(storageRef)
-            .then((url: any) => {
-                setImgSelect(url);
-                setModalOpenImg(true);
-            })
-            .catch((error: any) => {
-                console.log(error);
-            });
-    };
+        setImgSelect(img);
+        setModalOpenImg(true);
+    }
 
     const closeModalImg = () => {
         setModalOpenImg(false);
@@ -204,11 +211,117 @@ const Condominio = () => {
             fechaHasta: new Date(),
             idTipo: 1,
             idUsuario: 0,
-            activo: true
+            activo: true,
+            esVideo: false
         })
         setVerDetalle(false);
     }
+
+    /*const obtenerAchivosComunidad = () => {
+        const folderRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/`);
+        console.log(folderRef);
+        let arrayArchivos: any = [];
+        listAll(folderRef)
+            .then((res: any) => {
+                res.items.forEach((itemRef: any) => {
+                    // Obtener el nombre del archivo
+                    const nombreArchivo = itemRef.name;
+
+                    // Obtener la URL de descarga
+                    getDownloadURL(itemRef).then((url) => {
+                        arrayArchivos.push({
+                            nombre: nombreArchivo,
+                            url: url
+                        })
+                    });
+                });
+            })
+            .catch((error: any) => {
+                console.error('Error al listar archivos:', error);
+            });
+
+        setDataArchivosComunidad(arrayArchivos)
+    }
+
     useEffect(() => {
+        if (actualizarData) {
+            obtenerAchivosComunidad();
+            let newDataFull = dataFull;
+            newDataFull.anuncios.map((a: any) => {
+                let matchArchivo = dataArchivosComunidad.filter((b: any) => b.nombre === a.amedida.replace("video-", "").replace("img-", ""));
+                if (matchArchivo[0]) {
+                    a.amedida = matchArchivo[0].url;
+                }
+            })
+
+            if (JSON.stringify(newDataFull) !== JSON.stringify(dataFull)) {
+                setDataFull(newDataFull);
+            }
+        }
+
+    }, [actualizarData])*/
+
+    const obtenerArchivosComunidad = async (idCondominio: string) => {
+        const folderRef = ref(storage, `comunidad-${idCondominio}/`);
+        try {
+            const res = await listAll(folderRef);
+            const arrayArchivos = await Promise.all(
+                res.items.map(async (itemRef) => {
+                    const nombreArchivo = itemRef.name;
+                    const url = await getDownloadURL(itemRef);
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(itemRef.fullPath)
+                    return { nombre: nombreArchivo, url: url, esVideo: esVideo };
+                })
+            );
+            return arrayArchivos;
+        } catch (error) {
+            console.error("Error al listar archivos:", error);
+            return [];
+        }
+    };
+
+    useEffect(() => {
+        const cargarDatos = async () => {
+            if (!actualizarData) return;
+
+            const idCondominio = localStorage.getItem("idCondominio");
+            if (!idCondominio) return;
+
+            const archivos = await obtenerArchivosComunidad(idCondominio);
+
+            setDataArchivosComunidad(archivos);
+
+            const newDataFull = {
+                ...dataFull,
+                anuncios: dataFull.anuncios.map((a: any) => {
+                    const nombreBuscado = a.amedida?.replace("video-", "").replace("img-", "") || "";
+                    const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
+                    return {
+                        ...a,
+                        amedida: matchArchivo ? matchArchivo.url : a.amedida,
+                        esVideo: matchArchivo ? matchArchivo.esVideo : false
+                    };
+                }),
+            };
+
+            if (JSON.stringify(newDataFull) !== JSON.stringify(dataFull)) {
+                setDataFull(newDataFull);
+            }
+
+            setActualizarData(false);
+        };
+
+        cargarDatos();
+    }, [actualizarData]);
+
+    useEffect(() => {
+        if (localStorage.getItem("idCondominio")) {
+            const cargarDatos = async () => {
+                const archivos = await obtenerArchivosComunidad(localStorage.getItem("idCondominio")!);
+                setDataArchivosComunidad(archivos);
+            }
+            cargarDatos();
+        }
         registerPush();
         if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
             /*localStorage.getItem("tieneSuscripcionMensajes") &&
@@ -380,6 +493,7 @@ const Condominio = () => {
                 /* setTipo(1) */
             }
             setDataFull(data);
+            setActualizarData(true);
             setLoading(false);
         } catch (er) {
             ErrorMessage("Credenciales incorrectas", "")
@@ -393,6 +507,12 @@ const Condominio = () => {
 
         if (!file) return;
 
+        /*setAnuncio(prev => ({
+            ...prev,
+            // eslint-disable-next-line
+            ["amedida"]: 'video-' + file.name
+        }));*/
+
         document.getElementById('containerViewVideo')?.classList.remove("d-none");
 
         const videoPreview = document.getElementById('visualizadorVideo') as HTMLVideoElement;
@@ -400,13 +520,6 @@ const Condominio = () => {
             const videoURL = URL.createObjectURL(file);
             videoPreview.src = videoURL;
             videoPreview.load();
-
-            setAnuncio(prev => ({
-                ...prev,
-                // eslint-disable-next-line
-                ["amedida"]: 'video-' + file.name
-            }));
-            //videoPreview.play();
         }
     };
 
@@ -523,10 +636,15 @@ const Condominio = () => {
 
     const CrearAnuncio = () => {
         guardarArchivo();
+        let anuncioParse = anuncio;
+        if (archivoTemp) {
+            anuncioParse.amedida = archivoTemp.name
+        }
         try {
-            if (anuncio.cabecera.length > 0) {
+
+            if (anuncioParse.cabecera.length > 0) {
                 setLoading(true);
-                CrearAnuncioLogic(selCrearAnuncio, normalizarAnuncio(anuncio))
+                CrearAnuncioLogic(selCrearAnuncio, normalizarAnuncio(anuncioParse))
             }
         } catch (er) {
         }
@@ -622,6 +740,7 @@ const Condominio = () => {
                 ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             }
             setDataFull(data);
+            setActualizarData(true);
             setLoading(false);
         } catch (er) {
             ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
@@ -648,6 +767,7 @@ const Condominio = () => {
                 ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
             } else {
                 setDataFull(data);
+                setActualizarData(true);
                 setLoading(false);
             }
 
@@ -704,16 +824,20 @@ const Condominio = () => {
 
     const EditarPerfil = () => {
         guardarArchivo();
+        let usuarioParse = usuarioDetalle;
+        if (archivoTemp) {
+            usuarioParse.imagen = archivoTemp.name
+        }
         try {
             setLoading(true);
-            EditUsuarioPorIdLogic(selEditarPerfil, usuarioDetalle)
+            EditUsuarioPorIdLogic(selEditarPerfil, usuarioParse)
         } catch (er) {
         }
     }
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
+                ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), serviceWorker);
                 setEditarPerfil(false);
             }
             else {
@@ -740,15 +864,47 @@ const Condominio = () => {
                     setAlerta({ tipo: 1, mensaje: "Tu calendario muestra eventos programados para hoy" })
                 }
                 setDataFull(data);
+                setActualizarData(true);
             }
             setLoading(false);
         } catch (er) {
         }
     }
+
+    useEffect(() => {
+        const cargarDatos = async () => {
+            if (!actualizarMisAnuncios) return;
+    
+            const idCondominio = localStorage.getItem("idCondominio");
+            if (!idCondominio) return;
+    
+            const archivos = await obtenerArchivosComunidad(idCondominio);
+    
+            setDataArchivosComunidad(archivos);
+    
+            // Crear nuevo array modificando cada elemento sin mutar el original
+            const newDataFull = misAnuncios.map((a: any) => {
+                const nombreBuscado = a.amedida?.replace("video-", "").replace("img-", "") || "";
+                const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
+                return {
+                    ...a,
+                    amedida: matchArchivo ? matchArchivo.url : a.amedida,
+                    esVideo: matchArchivo ? matchArchivo.esVideo : false,
+                };
+            });
+    
+            setMisAnuncios(newDataFull);
+            setActualizarMisAnuncios(false);
+        };
+    
+        cargarDatos();
+    }, [actualizarMisAnuncios, misAnuncios]);
+
     const selMisAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
                 setMisAnuncios(data);
+                setActualizarMisAnuncios(true);
             }
             setLoading(false);
         } catch (er) {
@@ -824,42 +980,12 @@ const Condominio = () => {
         setAnuncio(a);
     }
 
-    const obtenerURLArchivo = (nombreArchivo: string = "", idUbicacion: string, tipo: number) => {
-        if (!buscarArchivo) {
-            return;
-        }
-
-        if (nombreArchivo == "") {
-            return "";
-        }
-
-        let nombreArchivoParse = nombreArchivo.startsWith("img-") ? nombreArchivo.replace("img-", "") : nombreArchivo.replace("video-", "");
-        const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${nombreArchivoParse}`);
-        getDownloadURL(storageRef)
-            .then((url: any) => {
-                if (tipo == 1) {
-                    const img = document.getElementById(idUbicacion) as HTMLImageElement | null;
-                    if (img) {
-                        img.src = url;
-                    }
-                } else {
-                    const video = document.getElementById(idUbicacion) as HTMLVideoElement | null;
-                    if (video) {
-                        video.src = url;
-                        video.load();
-                    }
-                }
-            })
-            .catch((error: any) => {
-                console.log(error);
-            });
-    }
-
     const guardarArchivo = () => {
         if (archivoTemp && !(archivoTemp.size > 100000000)) {
             const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoTemp.name}`);
             const uploadTask = uploadBytes(storageRef, archivoTemp);
             setBuscarArchivo(true);
+            setArchivoTemp(null);
         }
     }
 
@@ -875,11 +1001,11 @@ const Condominio = () => {
         const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
         if (img) {
             img.src = URL.createObjectURL(file);
-            setAnuncio(prev => ({
+            /*setAnuncio(prev => ({
                 ...prev,
                 // eslint-disable-next-line
                 ["amedida"]: 'img-' + file.name
-            }));
+            }));*/
         }
     };
 
@@ -896,11 +1022,11 @@ const Condominio = () => {
         const img = document.getElementById('userDetallePerfil') as HTMLImageElement | null;
         if (img) {
             img.src = URL.createObjectURL(file);
-            setUsuarioDetalle(prev => ({
+            /*setUsuarioDetalle(prev => ({
                 ...prev,
                 // eslint-disable-next-line
                 ["imagen"]: 'img-' + file.name
-            }));
+            }));*/
         }
     };
 
@@ -918,6 +1044,7 @@ const Condominio = () => {
                 /* setLoading(true); */
                 /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 setDataFull(data);
+                setActualizarData(true);
                 setLoading(false);
             }
             else {
@@ -1136,10 +1263,10 @@ const Condominio = () => {
 
             {(a.amedida && (
                 <div className="v2-anuncio-media-wrapper">
-                    {a.amedida.startsWith("video") ? (
-                        <video id={"videoAnuncio1-" + i} src={obtenerURLArchivo(a.amedida, `videoAnuncio1-${i}`, 2)} controls />
+                    {a.esVideo ? (
+                        <video src={a.amedida} controls />
                     ) : (
-                        <img id={"imgAnuncio1-" + i} src={obtenerURLArchivo(a.amedida, `imgAnuncio1-${i}`, 1)} alt="Foto" onClick={() => openModalImg(a.amedida)} />
+                        <img src={a.amedida} alt="Foto Mis Anuncios" onClick={() => openModalImg(a.amedida)} />
                     )}
                 </div>
             )) || null}
@@ -1160,7 +1287,7 @@ const Condominio = () => {
                 <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
                     <svg fill="#28bd06" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                         width="24px" height="24px" viewBox="0 0 483.789 483.789" onClick={() => {
-                            setLoading(true);
+                            //setLoading(true);
                             ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
                             setDataDetalle(a);
                             setVerDetalle(true);
@@ -1277,10 +1404,10 @@ const Condominio = () => {
 
                 {(a.amedida && (
                     <div className="v2-anuncio-media-wrapper">
-                        {a.amedida.startsWith("video") ? (
-                            <video id={"videoAnuncio2-" + i} src={obtenerURLArchivo(a.amedida, `videoAnuncio2-${i}`, 2)} controls />
+                        {a.esVideo ? (
+                            <video src={a.amedida} controls />
                         ) : (
-                            <img id={"imgAnuncio2-" + i} src={obtenerURLArchivo(a.amedida, `imgAnuncio2-${i}`, 1)} alt="Foto" onClick={() => openModalImg(a.amedida)} />
+                            <img src={a.amedida} alt="Foto Anuncios" onClick={() => openModalImg(a.amedida)} />
                         )}
                     </div>
                 )) || null}
@@ -1301,7 +1428,7 @@ const Condominio = () => {
                     <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
                         <svg fill="#28bd06" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                             width="24px" height="24px" viewBox="0 0 483.789 483.789" onClick={() => {
-                                setLoading(true);
+                                //setLoading(true);
                                 ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
                                 setDataDetalle(a);
                                 setVerDetalle(true);
@@ -1480,27 +1607,57 @@ const Condominio = () => {
     const selObtenerAnuncioPorId = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setDataDetalle(data);
+                let newData = data;
+                const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.imagen}`);
+
+                getDownloadURL(imageRef)
+                    .then((url) => {
+                        newData.imagen = url;
+                        setDataDetalle(newData);
+                        setLoading(false);
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
             }
-            setLoading(false);
         } catch (er) {
         }
     }
     const selObtenerUsuarioPorId = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setUsuarioDetalle(data);
+                let newData = data;
+                const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.imagen}`);
+
+                getDownloadURL(imageRef)
+                    .then((url) => {
+                        newData.imagen = url;
+                        setUsuarioDetalle(newData);
+                        setLoading(false);
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
             }
-            setLoading(false);
         } catch (er) {
         }
     }
     const selObtenerUsuarios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
+                let usuariosParse = data;
+
+                usuariosParse.map((a: any) => {
+                    const nombreBuscado = a.imagen?.replace("video-", "").replace("img-", "") || "";
+                    const matchArchivo = dataArchivosComunidad.find((b: any) => b.nombre === nombreBuscado);
+                    if(matchArchivo){
+                        a.imagen = matchArchivo.url;
+                    }
+                });
+
                 setLoading(false);
-                setUsuarios(data);
-                setUsuariosParse(data);
+                setUsuarios(usuariosParse);
+                setUsuariosParse(usuariosParse);
             }
         } catch (er) {
         }
@@ -1587,13 +1744,13 @@ const Condominio = () => {
                     </div>
                     <span className="anuncio-telefono">{dataDetalle.telefono}</span>
                 </div>
-                {dataDetalle.amedida && dataDetalle.amedida.startsWith("video") ?
+                {dataDetalle.amedida && dataDetalle.esVideo ?
                     <div className="anuncio-img-wrapper">
-                        <video id="videoAnuncio3" src={obtenerURLArchivo(dataDetalle.amedida, "videoAnuncio3", 2)} controls width="300" />
+                        <video id="videoAnuncio3" src={dataDetalle.amedida} controls width="300" />
                     </div>
-                    : dataDetalle.amedida && dataDetalle.amedida.startsWith("img") ?
+                    : dataDetalle.amedida && !dataDetalle.esVideo ?
                         <div className="anuncio-img-wrapper">
-                            <img id="imgAnuncio3" className="anuncio-img" src={obtenerURLArchivo(dataDetalle.amedida, "imgAnuncio3", 1)} alt="Foto" />
+                            <img id="imgAnuncio3" className="anuncio-img" src={dataDetalle.amedida} alt="Foto" />
                         </div>
                         : ""
                 }
@@ -1661,7 +1818,7 @@ const Condominio = () => {
                                     <img
                                         className={usuarioDetalle.imagen != null ? "" : "d-none"}
                                         id="userDetallePerfil"
-                                        src={editImgPerfil ? obtenerURLArchivo(usuarioDetalle.imagen, "userDetallePerfil", 1) : ""}
+                                        src={editImgPerfil ? usuarioDetalle.imagen : ""}
                                         alt="Vista previa"
                                         style={{ maxWidth: '200px', marginTop: '10px' }}
                                     />
@@ -1749,8 +1906,7 @@ const Condominio = () => {
                             <div className="perfil-avatar">
                                 {usuarioDetalle.imagen ? (
                                     <img
-                                        id="imgPerfil1"
-                                        src={obtenerURLArchivo(usuarioDetalle.imagen, `imgPerfil1`, 1)}
+                                        src={usuarioDetalle.imagen}
                                         alt="Vista previa"
                                     />
                                 ) : (
@@ -1863,7 +2019,7 @@ const Condominio = () => {
                                 {dataUserSelect.imagen ? (
                                     <img
                                         id="imgPerfilSelect1"
-                                        src={obtenerURLArchivo(dataUserSelect.imagen, `imgPerfilSelect1`, 1)}
+                                        src={dataUserSelect.imagen}
                                         alt="Vista previa"
                                     />
                                 ) : (
@@ -1937,6 +2093,7 @@ const Condominio = () => {
                 /* setLoading(true);
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 setDataFull(data);
+                setActualizarData(true);
                 setLoading(false);
             }
             else {
@@ -2157,7 +2314,7 @@ const Condominio = () => {
             </div >
     }
 
-    const anuncios = [
+    const anunciosInteres = [
         {
             id: 1,
             titulo: "Ferretería El Tornillo",
@@ -2229,7 +2386,7 @@ const Condominio = () => {
             <div className="login-box w-100">
                 <h1 style={{ textAlign: 'center' }}>Puntos de Interes</h1>
                 <div className="anuncios-lista-container">
-                    {anuncios.map(({ id, titulo, descripcion, imagen, url }) => (
+                    {anunciosInteres.map(({ id, titulo, descripcion, imagen, url }) => (
                         <AnuncioCard
                             key={id}
                             titulo={titulo}
@@ -2578,36 +2735,36 @@ const Condominio = () => {
                     </div>
                 )}
 
-                {(tipoSubir === 1 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("img")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>
                 )}
-                {(tipoSubir === 1 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("img")))) && (
+                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
                 )}
-                <div id="containerViewImg" className={anuncio.amedida.startsWith("img") ? "" : "d-none"}>
+                <div id="containerViewImg" className={anuncio.amedida && !anuncio.esVideo ? "" : "d-none"}>
                     <h3>Vista previa Imagen:</h3>
                     <img
                         id="visualizadorImg"
-                        src={!crear ? obtenerURLArchivo(anuncio.amedida, "visualizadorImg", 1) : ""}
+                        src={!crear ? anuncio.amedida : ""}
                         alt="Vista previa"
                         style={{ maxWidth: '300px', marginTop: '10px' }}
                     />
                 </div>
 
 
-                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("video")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.amedida.startsWith("video")))) && (
+                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
-                <div id="containerViewVideo" className={anuncio.amedida.startsWith("video") ? "" : "d-none"}>
+                <div id="containerViewVideo" className={anuncio.amedida && anuncio.esVideo ? "" : "d-none"}>
                     <h3>Vista previa Video:</h3>
-                    <video id="visualizadorVideo" src={!crear ? obtenerURLArchivo(anuncio.amedida, "visualizadorVideo", 2) : ""} controls width="300" />
+                    <video id="visualizadorVideo" src={!crear ? anuncio.amedida : ""} controls width="300" />
                 </div>
                 <label htmlFor="textfield" className="search-label mt-3">
                     Tipo
