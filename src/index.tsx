@@ -7,6 +7,7 @@ import Condominio from './pages/Condominio/Condominio';
 import HomeDesktop from './pages/HomeDesktop/HomeDesktop';
 import { Analytics } from "@vercel/analytics/react";
 import { isMobile } from 'react-device-detect';
+import Precios from './pages/Precios/Precios';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -18,6 +19,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/desktop" element={<HomeDesktop />}></Route>
+      <Route path="/precios" element={<Precios />}></Route>
       { !validateMobile || isMobile ?
       <Route path="/" element={<Condominio />}></Route>
       :

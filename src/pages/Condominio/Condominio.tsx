@@ -1065,7 +1065,7 @@ const Condominio = () => {
                 const uploadTask = uploadBytes(storageRef, archivoTemp);
             }
             setArchivoTemp(null);
-        } else {
+        } else if(archivoTemp && (archivoTemp.size > 100000000)) {
             alert("El archivo pesa mas de 100 MB")
         }
     }

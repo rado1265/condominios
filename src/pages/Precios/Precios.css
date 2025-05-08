@@ -1,0 +1,106 @@
+.spacing {
+    letter-spacing: 10px;
+  }
+  
+  .card-pricing {
+    padding: 2rem 1rem;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .ribbon {
+    background-color: white;
+    padding: 2.5rem 0.5rem;
+    font-weight: bold;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    height: 230px;
+    transform: translateX(-50%);
+    width: 64%;
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  }
+  
+  .price {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+  
+  .subtext {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .bg-blue {
+    background-color: #00BFFF;
+  }
+  
+  .bg-orange {
+    background-color: #f57c00;
+  }
+  
+  .bg-red {
+    background-color: #e53935;
+  }
+
+  .color-blue{
+    color: #00BFFF;
+  }
+
+  .color-orange{
+    color: #f57c00;
+  }
+
+  .color-red{
+    color: #e53935;
+  }
+
+  .caracteristicas{
+    margin-top: 210px;
+    text-align: left;
+    font-weight: 600;
+    margin-left: 20px;
+    width: 90%;
+  }
+
+  .caracteristicas > li{
+    color: white;
+    border: 1px dashed #ffffff;
+  }
+
+  .btn-loquiero-blue{
+    border: 1px solid #00BFFF;
+    color: #00BFFF;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: white;
+  }
+
+  .btn-loquiero-orange{
+    border: 1px solid #f57c00;
+    color: #f57c00;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: white;
+  }
+
+  .btn-loquiero-red{
+    border: 1px solid #e53935;
+    color: #e53935;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: white;
+  }
+
+  .titulo-precios{
+    font-weight: 700;
+    font-size: 3rem;
+    margin-bottom: 0;
+  }
+  
