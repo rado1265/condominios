@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage, ErrorMessage, SuccessMessage } from "../../components/utils/messages";
 import iconmenos from './../../components/utils/img/icon-menos.png';
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
@@ -48,7 +48,7 @@ const Condominio = () => {
     const storage = getStorage(app);
     const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
     const [editImgPerfil, setEditImgPerfil] = useState(false);
-
+    const [agregarUsuario, setAgregarUsuario] = useState(false);
     const [loading, setLoading] = useState(false);
     const [editarTextRich, setEditarTextRich] = useState(false);
     const [actualizarData, setActualizarData] = useState(false);
@@ -71,6 +71,7 @@ const Condominio = () => {
     const [misAnuncios, setMisAnuncios] = useState<any[]>([]);
     const [actualizarMisAnuncios, setActualizarMisAnuncios] = useState(false);
     const [tipo, setTipo] = useState(1)
+    const [cupoUsuarios, setCupoUsuarios] = useState({ usados: 0, cupo: 0 })
     const [usuario, setUsuario] = useState({
         nombre: "",
         tieneSuscripcionMensajes: false,
@@ -172,6 +173,13 @@ const Condominio = () => {
         telefono: '',
         idcondominio: 0,
         direccion: ''
+    })
+
+    const [newUser, setNewUser] = useState({
+        nombre: '',
+        clave: '',
+        rol: '',
+        idCondominio: 0
     })
 
     const [modalOpenImg, setModalOpenImg] = useState(false);
@@ -800,6 +808,15 @@ const Condominio = () => {
         } catch (er) {
         }
     }
+    const CrearUsuario = () => {
+        try {
+            if (newUser.nombre.length > 0) {
+                setLoading(true);
+                CrearUsuarioLogic(selCrearUsuario, newUser)
+            }
+        } catch (er) {
+        }
+    }
     const EliminarEmergencia = () => {
         try {
             handleConfirmMessageEliminarEmergencia()
@@ -837,6 +854,29 @@ const Condominio = () => {
             ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
         }
     }
+
+    const selCrearUsuario = (error: Boolean, err: string, data: any) => {
+        try {
+            if (data) {
+                ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
+                setAgregarUsuario(false);
+                setNewUser({
+                    nombre: '',
+                    clave: '',
+                    rol: '',
+                    idCondominio: 0
+                })
+            }
+            else {
+                setLoading(false);
+                ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Usuario. Comuníquese con el Administrador.")
+            }
+        } catch (er) {
+            setLoading(false);
+            ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Usuario. Comuníquese con el Administrador.")
+        }
+    }
+
 
     const EditarPerfil = () => {
         guardarArchivo(2);
@@ -920,7 +960,7 @@ const Condominio = () => {
             setMisAnuncios(newDataFull);
             setActualizarMisAnuncios(false);
         };
-    
+
         cargarDatos();
     }, [actualizarMisAnuncios, misAnuncios]);
 
@@ -964,6 +1004,13 @@ const Condominio = () => {
             [name]: value
         }));
     };
+    const handleChangeNewUser = (e: any) => {
+        const { name, value } = e.target;
+        setNewUser(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
     const handleChangePerfil = (e: any) => {
         const { name, value } = e.target;
         setUsuarioDetalle(prev => ({
@@ -988,6 +1035,7 @@ const Condominio = () => {
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
         setVerMisAnuncios(false);
+        setAgregarUsuario(false);
         if (a === 5) {
             setLoading(true);
             ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
@@ -1673,7 +1721,8 @@ const Condominio = () => {
     const selObtenerUsuarios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                let usuariosParse = data;
+                let usuariosParse = data.usuarios;
+                setCupoUsuarios({ usados: data.cantUsuario, cupo: data.totalUsuario })
                 const cargarDatos = async () => {
 
                     const archivos = await obtenerArchivosPerfil();
@@ -2002,108 +2051,166 @@ const Condominio = () => {
         setUsuariosParse(parselistadoUser);
     }
 
+
+
     const panelUsuarios = () => {
         return (
             <div className="w-100 px-3">
                 {
-                    !verUsuarioInd ?
+                    agregarUsuario ?
                         <>
-                            <div className="usuariosContainer">
-                                <h4 className="usuarios-title">Listado Usuarios</h4>
-                                <div className="buscaruser-search-container">
-                                    <label className="buscaruser-search-label">Buscar Usuario</label>
+                            <div className="w-100 px-3 mt-2">
+                                <div className="login-box py-3">
+                                    <h2 className="text-center">Agregar Usuario</h2>
+                                    <label htmlFor="textfield" className="search-label-admin">
+                                        Nombre
+                                    </label>
                                     <input
-                                        type="search"
-                                        id="buscar-usuario"
-                                        className="buscaruser-search-input"
-                                        placeholder="Escribe para buscar..."
-                                        onChange={(ev) => { filtrarUsuarios(ev) }}
+                                        name="nombre"
+                                        className="search-input"
+                                        value={newUser.nombre}
+                                        onChange={(e: any) => handleChangeNewUser(e)}
                                     />
+                                    <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
+                                        Clave
+                                    </label>
+                                    <input
+                                        name="clave"
+                                        className="search-input"
+                                        value={newUser.clave}
+                                        onChange={(e: any) => handleChangeNewUser(e)}
+                                    />
+                                    <label htmlFor="textfield" className="search-label-admin">
+                                        Rol
+                                    </label>
+                                    <select id="rol" className="typeDate" name="rol" onChange={(e: any) => { handleChangeNewUser(e) }}>
+                                        <option value="VECINO" selected>Vecino</option>
+                                        <option value="ADMINISTRADOR">Administrador</option>
+                                    </select>
+                                    <button
+                                        type="button"
+                                        disabled={newUser.nombre === "" || newUser.clave === ""}
+                                        className="search-button mt-2"
+                                        onClick={CrearUsuario}
+                                    >
+                                        Aceptar
+                                    </button>
                                 </div>
-                                <div>
-                                    {listadousuariosParse.map((a, idx) => (
-                                        <div className="usuarios-listado" key={idx} onClick={() => { setDataUserSelect(a); setVerUserInd(true); }}>
-                                            <div className="usuarios-item">
-                                                <span className="usuarios-item-title">Nombre</span>
-                                                <span className="usuarios-item-value">{a.nombre}</span>
-                                            </div>
-                                            <div className="usuarios-item">
-                                                <span className="usuarios-item-title">Rol</span>
-                                                <span className="usuarios-item-value">{a.rol}</span>
-                                            </div>
-                                            <div className="usuarios-item">
-                                                <span className="usuarios-item-title">Fecha Caducidad</span>
-                                                <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
-                                            </div>
-                                            <div className="usuarios-item">
-                                                <span className="usuarios-item-title">Estado</span>
-                                                <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
-                                            </div>
+                            </div>
+                        </> :
+                        !verUsuarioInd ?
+                            <>
+                                <div className="usuariosContainer">
+                                    <h4 className="usuarios-title">Listado Usuarios</h4>
+                                    {(cupoUsuarios.cupo > cupoUsuarios.usados) && (
+                                        <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
+                                            setAgregarUsuario(true); setNewUser({ nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
+                                        }}>
+                                            <button className="cupo-usuarios-add" title="Agregar usuario">
+                                                <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
+                                                    <circle cx="9" cy="9" r="9" fill="#05c724" />
+                                                    <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                                                </svg>
+                                            </button>
+                                            <span className="cupo-usuarios">
+                                                {cupoUsuarios.usados}/{cupoUsuarios.cupo}
+                                            </span>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </>
-                        :
-                        <div className="perfil-box w-100" style={{ padding: '20px' }}>
-                            <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
-                                setVerUserInd(false)
-                            }}>
-                                <img width={35} src={volver} alt="Icono volver" />
-                            </button>
-                            <div className="perfil-avatar">
-                                {dataUserSelect.imagen ? (
-                                    <img
-                                        id="imgPerfilSelect1"
-                                        src={dataUserSelect.imagen}
-                                        alt="Vista previa"
-                                    />
-                                ) : (
-                                    <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
-                                        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-                                    </svg>
-                                )}
-                            </div>
-                            <h4 className="perfil-nombre">{dataUserSelect.nombre}</h4>
-                            <div className="perfil-info">
-                                <div className="w-100">
-                                    <div className="container-dataPerfil">
-                                        {usuarioDetalle.rol && <span>Rol</span>}
-                                        {usuarioDetalle.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
+                                    )}
+                                    <div className="buscaruser-search-container">
+                                        <label className="buscaruser-search-label">Buscar Usuario</label>
+                                        <input
+                                            type="search"
+                                            id="buscar-usuario"
+                                            className="buscaruser-search-input"
+                                            placeholder="Escribe para buscar..."
+                                            onChange={(ev) => { filtrarUsuarios(ev) }}
+                                        />
                                     </div>
-                                    <div className="container-dataPerfil">
-                                        {usuarioDetalle.direccion && <span>Dirección</span>}
-                                        {usuarioDetalle.direccion && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span>}
-                                    </div>
-                                    <div className="container-dataPerfil">
-                                        {usuarioDetalle.telefono && <span>Teléfono</span>}
-                                        {usuarioDetalle.telefono && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span>}
-                                    </div>
-                                    <div className="container-dataPerfil">
-                                        <span>Notif. Anuncios</span>
-                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
-                                    </div>
-                                    <div className="container-dataPerfil">
-                                        <span>Notif. Mensajes</span>
-                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
-                                    </div>
-                                    <div className="container-dataPerfil">
-                                        <span>Notif. Votaciones</span>
-                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
-                                    </div>
-                                    <div className="container-dataPerfil">
-                                        <span>Notif. Calendario</span>
-                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
-                                    </div>
-                                    <div className="container-dataPerfil">
-                                        {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
-                                        {usuarioDetalle.fechaCaducidad && (
-                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(usuarioDetalle.fechaCaducidad).toLocaleDateString()}</span>
-                                        )}
+                                    <div>
+                                        {listadousuariosParse.map((a, idx) => (
+                                            <div className="usuarios-listado" key={idx} onClick={() => { setDataUserSelect(a); setVerUserInd(true); }}>
+                                                <div className="usuarios-item">
+                                                    <span className="usuarios-item-title">Nombre</span>
+                                                    <span className="usuarios-item-value">{a.nombre}</span>
+                                                </div>
+                                                <div className="usuarios-item">
+                                                    <span className="usuarios-item-title">Rol</span>
+                                                    <span className="usuarios-item-value">{a.rol}</span>
+                                                </div>
+                                                <div className="usuarios-item">
+                                                    <span className="usuarios-item-title">Fecha Caducidad</span>
+                                                    <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="usuarios-item">
+                                                    <span className="usuarios-item-title">Estado</span>
+                                                    <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
+                            </>
+                            :
+                            <div className="perfil-box w-100" style={{ padding: '20px' }}>
+                                <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
+                                    setVerUserInd(false)
+                                }}>
+                                    <img width={35} src={volver} alt="Icono volver" />
+                                </button>
+                                <div className="perfil-avatar">
+                                    {dataUserSelect.imagen ? (
+                                        <img
+                                            id="imgPerfilSelect1"
+                                            src={dataUserSelect.imagen}
+                                            alt="Vista previa"
+                                        />
+                                    ) : (
+                                        <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <h4 className="perfil-nombre">{dataUserSelect.nombre}</h4>
+                                <div className="perfil-info">
+                                    <div className="w-100">
+                                        <div className="container-dataPerfil">
+                                            {usuarioDetalle.rol && <span>Rol</span>}
+                                            {usuarioDetalle.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            {usuarioDetalle.direccion && <span>Dirección</span>}
+                                            {usuarioDetalle.direccion && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span>}
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            {usuarioDetalle.telefono && <span>Teléfono</span>}
+                                            {usuarioDetalle.telefono && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span>}
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            <span>Notif. Anuncios</span>
+                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            <span>Notif. Mensajes</span>
+                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            <span>Notif. Votaciones</span>
+                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            <span>Notif. Calendario</span>
+                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                        </div>
+                                        <div className="container-dataPerfil">
+                                            {usuarioDetalle.fechaCaducidad && <span>Fecha Caducidad</span>}
+                                            {usuarioDetalle.fechaCaducidad && (
+                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(dataUserSelect.fechaCaducidad).toLocaleDateString()}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
                 }
             </div>
         );
@@ -2890,6 +2997,7 @@ const Condominio = () => {
         setVotaciones(h);
         setVerUsuarios(i);
         setVerMisAnuncios(false);
+        setAgregarUsuario(false);
     }
     // eslint-disable-next-line
     const selSuscribir = (error: Boolean, err: string, data: any) => {

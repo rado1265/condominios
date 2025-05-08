@@ -553,6 +553,33 @@ export class SVCAnuncio {
 
         return sr;
     }
+
+    public static async CrearUsuario(usuario: any): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/crearUsuarioComunidad";
+
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .post(url, usuario, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
     public static async ObtenerEmergencias(idCondominio: string): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 

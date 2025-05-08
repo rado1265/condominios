@@ -229,6 +229,16 @@ export const CrearEmergencia = (selListado: any, emergencia: string, eliminar: b
         }
     });
 };
+export const CrearUsuario = (selListado: any, usuario: string) => {
+    SVCAnuncio.CrearUsuario(usuario).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
 export const CambiarNormas = (selListado: any, normas: any, idCondominio: any) => {
     SVCAnuncio.CambiarNormas(normas, idCondominio).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
