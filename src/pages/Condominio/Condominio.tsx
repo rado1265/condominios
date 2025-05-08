@@ -224,6 +224,10 @@ const Condominio = () => {
         setVerDetalle(false);
     }
 
+    const imgError  = "https://media1.tenor.com/m/rg2timExtOAAAAAd/%E1%BB%A7a.gif";
+
+    //const [imgError, setImgError] = useState("https://img.freepik.com/vector-premium/imagen-no-es-conjunto-iconos-disponibles-simbolo-vectorial-stock-fotos-faltante-defecto-estilo-relleno-delineado-negro-signo-no-encontro-imagen_268104-6708.jpg");
+
     /*const obtenerAchivosComunidad = () => {
         const folderRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/`);
         console.log(folderRef);
@@ -1340,7 +1344,13 @@ const Condominio = () => {
                     {a.esVideo ? (
                         <video src={a.amedida} controls />
                     ) : (
-                        <img src={a.amedida} alt="Foto Mis Anuncios" onClick={() => openModalImg(a.amedida)} />
+                        <img src={a.amedida} alt="Foto Mis Anuncios"
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = imgError;
+                            }}
+                            onClick={() => openModalImg(a.amedida)} />
                     )}
                 </div>
             )) || null}
@@ -1481,7 +1491,13 @@ const Condominio = () => {
                         {a.esVideo ? (
                             <video src={a.amedida} controls />
                         ) : (
-                            <img src={a.amedida} alt="Foto Anuncios" onClick={() => openModalImg(a.amedida)} />
+                            <img src={a.amedida} alt="Foto Anuncios" 
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = imgError;
+                            }}
+                            onClick={() => openModalImg(a.amedida)} />
                         )}
                     </div>
                 )) || null}
@@ -1835,7 +1851,13 @@ const Condominio = () => {
                     </div>
                     : dataDetalle.amedida && !dataDetalle.esVideo ?
                         <div className="anuncio-img-wrapper">
-                            <img id="imgAnuncio3" className="anuncio-img" src={dataDetalle.amedida} alt="Foto" />
+                            <img id="imgAnuncio3" className="anuncio-img" 
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = imgError;
+                            }}
+                            src={dataDetalle.amedida} alt="Foto" />
                         </div>
                         : ""
                 }
@@ -2102,7 +2124,7 @@ const Condominio = () => {
                             <>
                                 <div className="usuariosContainer">
                                     <h4 className="usuarios-title">Listado Usuarios</h4>
-                                    {(cupoUsuarios.cupo > cupoUsuarios.usados) && (
+                                    {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
                                         <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
                                             setAgregarUsuario(true); setNewUser({ nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
                                         }}>
@@ -2116,7 +2138,13 @@ const Condominio = () => {
                                                 {cupoUsuarios.usados}/{cupoUsuarios.cupo}
                                             </span>
                                         </div>
-                                    )}
+                                        :
+                                        <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }}>
+                                            <span className="cupo-usuarios">
+                                                {cupoUsuarios.usados}/{cupoUsuarios.cupo}
+                                            </span>
+                                        </div>
+                                    }
                                     <div className="buscaruser-search-container">
                                         <label className="buscaruser-search-label">Buscar Usuario</label>
                                         <input
@@ -2891,6 +2919,11 @@ const Condominio = () => {
                     <img
                         id="visualizadorImg"
                         src={!crear ? anuncio.amedida : ""}
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = imgError;
+                        }}
                         alt="Vista previa"
                         style={{ maxWidth: '300px', marginTop: '10px' }}
                     />
@@ -3418,7 +3451,13 @@ const Condominio = () => {
                     <div className="modal-overlay" onClick={closeModalImg}>
                         <div className="modal-content" onClick={e => e.stopPropagation()}>
                             <button className="close-btn" onClick={closeModalImg}>&times;</button>
-                            <img src={imgSelect ?? ""} alt="Imagen Ampliada" />
+                            <img src={imgSelect ?? ""} 
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = imgError;
+                            }}
+                            alt="Imagen Ampliada" />
                         </div>
                     </div>
                 )}
