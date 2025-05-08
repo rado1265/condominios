@@ -115,7 +115,6 @@ const Condominio = () => {
         tipo: 1,
         mensaje: ""
     });
-    const [buscarArchivo, setBuscarArchivo] = useState(true)
     const [alertaCerrada, setAlertaCerrada] = useState(false)
     const [iniciarSesion, setIniciarSesion] = useState(false)
     const [crear, setCrear] = useState(false)
@@ -271,6 +270,24 @@ const Condominio = () => {
                     const url = await getDownloadURL(itemRef);
                     const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(itemRef.fullPath)
                     return { nombre: nombreArchivo, url: url, esVideo: esVideo };
+                })
+            );
+            return arrayArchivos;
+        } catch (error) {
+            console.error("Error al listar archivos:", error);
+            return [];
+        }
+    };
+
+    const obtenerArchivosPerfil = async () => {
+        const folderRef = ref(storage, `perfiles/`);
+        try {
+            const res = await listAll(folderRef);
+            const arrayArchivos = await Promise.all(
+                res.items.map(async (itemRef) => {
+                    const nombreArchivo = itemRef.name;
+                    const url = await getDownloadURL(itemRef);
+                    return { nombre: nombreArchivo, url: url };
                 })
             );
             return arrayArchivos;
@@ -501,7 +518,6 @@ const Condominio = () => {
     }
 
     const uploadVideo = (files: any) => {
-        setBuscarArchivo(false);
         const file = files[0];
         setArchivoTemp(file);
 
@@ -823,7 +839,7 @@ const Condominio = () => {
     }
 
     const EditarPerfil = () => {
-        guardarArchivo();
+        guardarArchivo(2);
         let usuarioParse = usuarioDetalle;
         if (archivoTemp) {
             usuarioParse.imagen = archivoTemp.name
@@ -839,7 +855,7 @@ const Condominio = () => {
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
             /* alert((serviceWorker as any).endpoint) */
-            ObtenerUsuarioPorIdLogic(selListadoAnuncios, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
+            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
             setEditarPerfil(false);
         }
     }
@@ -882,14 +898,14 @@ const Condominio = () => {
     useEffect(() => {
         const cargarDatos = async () => {
             if (!actualizarMisAnuncios) return;
-    
+
             const idCondominio = localStorage.getItem("idCondominio");
             if (!idCondominio) return;
-    
+
             const archivos = await obtenerArchivosComunidad(idCondominio);
-    
+
             setDataArchivosComunidad(archivos);
-    
+
             // Crear nuevo array modificando cada elemento sin mutar el original
             const newDataFull = misAnuncios.map((a: any) => {
                 const nombreBuscado = a.amedida?.replace("video-", "").replace("img-", "") || "";
@@ -900,7 +916,7 @@ const Condominio = () => {
                     esVideo: matchArchivo ? matchArchivo.esVideo : false,
                 };
             });
-    
+
             setMisAnuncios(newDataFull);
             setActualizarMisAnuncios(false);
         };
@@ -972,7 +988,6 @@ const Condominio = () => {
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
         setVerMisAnuncios(false);
-        setBuscarArchivo(true);
         if (a === 5) {
             setLoading(true);
             ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
@@ -988,17 +1003,22 @@ const Condominio = () => {
         setAnuncio(a);
     }
 
-    const guardarArchivo = () => {
+    const guardarArchivo = (tipo: number = 1) => {
         if (archivoTemp && !(archivoTemp.size > 100000000)) {
-            const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoTemp.name}`);
-            const uploadTask = uploadBytes(storageRef, archivoTemp);
-            setBuscarArchivo(true);
+            if (tipo === 1) {
+                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoTemp.name}`);
+                const uploadTask = uploadBytes(storageRef, archivoTemp);
+            } else {
+                const storageRef = ref(storage, `perfiles/${archivoTemp.name}`);
+                const uploadTask = uploadBytes(storageRef, archivoTemp);
+            }
             setArchivoTemp(null);
+        } else {
+            alert("El archivo pesa mas de 100 MB")
         }
     }
 
     const handleImageChange = (e: any) => {
-        setBuscarArchivo(false);
         const file = e.target.files[0];
         setArchivoTemp(file);
 
@@ -1018,7 +1038,6 @@ const Condominio = () => {
     };
 
     const handleImagePerfilChange = (e: any) => {
-        setBuscarArchivo(false);
         const file = e.target.files[0];
         setArchivoTemp(file);
 
@@ -1134,7 +1153,6 @@ const Condominio = () => {
                 }}>
                     <span aria-hidden="true">&times;</span>
                 </button>
-                {estadoServiceWorker}
             </div>
         );
     }
@@ -1635,7 +1653,7 @@ const Condominio = () => {
         try {
             if (data) {
                 let newData = data;
-                const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.imagen}`);
+                const imageRef = ref(storage, `perfiles/${newData.imagen}`);
 
                 getDownloadURL(imageRef)
                     .then((url) => {
@@ -1644,7 +1662,9 @@ const Condominio = () => {
                         setLoading(false);
                     })
                     .catch((err) => {
+                        setUsuarioDetalle(newData);
                         console.error(err);
+                        setLoading(false);
                     });
             }
         } catch (er) {
@@ -1654,18 +1674,26 @@ const Condominio = () => {
         try {
             if (data) {
                 let usuariosParse = data;
+                const cargarDatos = async () => {
 
-                usuariosParse.map((a: any) => {
-                    const nombreBuscado = a.imagen?.replace("video-", "").replace("img-", "") || "";
-                    const matchArchivo = dataArchivosComunidad.find((b: any) => b.nombre === nombreBuscado);
-                    if(matchArchivo){
-                        a.imagen = matchArchivo.url;
+                    const archivos = await obtenerArchivosPerfil();
+
+                    if (archivos && archivos.length > 0) {
+                        usuariosParse.map((a: any) => {
+                            const nombreBuscado = a.imagen?.replace("video-", "").replace("img-", "") || "";
+                            const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
+                            if (matchArchivo) {
+                                a.imagen = matchArchivo.url;
+                            }
+                        });
                     }
-                });
 
-                setLoading(false);
-                setUsuarios(usuariosParse);
-                setUsuariosParse(usuariosParse);
+                    setLoading(false);
+                    setUsuarios(usuariosParse);
+                    setUsuariosParse(usuariosParse);
+                };
+
+                cargarDatos();
             }
         } catch (er) {
         }
@@ -2862,7 +2890,6 @@ const Condominio = () => {
         setVotaciones(h);
         setVerUsuarios(i);
         setVerMisAnuncios(false);
-        setBuscarArchivo(true);
     }
     // eslint-disable-next-line
     const selSuscribir = (error: Boolean, err: string, data: any) => {
