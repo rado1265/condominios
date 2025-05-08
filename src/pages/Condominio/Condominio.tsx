@@ -224,7 +224,7 @@ const Condominio = () => {
         setVerDetalle(false);
     }
 
-    const imgError  = "https://media1.tenor.com/m/rg2timExtOAAAAAd/%E1%BB%A7a.gif";
+    const imgError  = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
 
     //const [imgError, setImgError] = useState("https://img.freepik.com/vector-premium/imagen-no-es-conjunto-iconos-disponibles-simbolo-vectorial-stock-fotos-faltante-defecto-estilo-relleno-delineado-negro-signo-no-encontro-imagen_268104-6708.jpg");
 
