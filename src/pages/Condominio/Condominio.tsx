@@ -58,6 +58,7 @@ const Condominio = () => {
 
     const app = initializeApp(firebaseConfig);
     const storage = getStorage(app);
+    const [buscarDataFull, setBuscarDataFull] = useState("");
     const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
     const [editImgPerfil, setEditImgPerfil] = useState(false);
     const [agregarUsuario, setAgregarUsuario] = useState(false);
@@ -73,6 +74,15 @@ const Condominio = () => {
     const [enComunidad, setEnComunidad] = useState(false);
     const [open, setOpen] = useState(false);
     const [dataFull, setDataFull] = useState<DataFull>({
+        anuncios: [],
+        nombre: "",
+        logo: "",
+        normas: '',
+        avisosHoy: false,
+        esVideo: false
+    });
+
+    const [dataFullParse, setDataFullParse] = useState<DataFull>({
         anuncios: [],
         nombre: "",
         logo: "",
@@ -279,7 +289,7 @@ const Condominio = () => {
                 );
                 const safeSearch = response.data.responses[0].safeSearchAnnotation;
                 console.log(response.data.responses[0]);
-                if(safeSearch.adult === "VERY_LIKELY" || safeSearch.adult === 'LIKELY'){
+                if (safeSearch.adult === "VERY_LIKELY" || safeSearch.adult === 'LIKELY') {
                     toast.error('La imagen contiene posiblemente contenido para adultos. Se enviará a su revisión', {
                         position: posicionAlertas,
                     });
@@ -404,6 +414,8 @@ const Condominio = () => {
 
             if (JSON.stringify(newDataFull) !== JSON.stringify(dataFull)) {
                 setDataFull(newDataFull);
+                setDataFullParse(newDataFull as any);
+                setBuscarDataFull("");
             }
 
             setActualizarData(false);
@@ -542,7 +554,7 @@ const Condominio = () => {
 
     const cerrarSesion = () => {
         localStorage.clear();
-        
+
         setDataCondominios([]);
         setUsuario({
             nombre: "",
@@ -2264,6 +2276,13 @@ const Condominio = () => {
         setUsuariosParse(parselistadoUser);
     }
 
+    const filtrarDataFull = (ev: any) => {
+        let parselistadoDataFull = dataFull.anuncios.filter((e) => e.organizador.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()) || e.cabecera.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()));
+        setDataFullParse(prev => ({
+            ...prev,
+            ['anuncios']: parselistadoDataFull
+        }));
+    }
 
 
     const panelUsuarios = () => {
@@ -3112,7 +3131,7 @@ const Condominio = () => {
                     </label>
                 )}
                 {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
-                    <input type="file" accept="image/*" className="w-100" onChange={handleImage}/>
+                    <input type="file" accept="image/*" className="w-100" onChange={handleImage} />
                 )}
                 <div id="containerViewImg" className={anuncio.amedida && !anuncio.esVideo ? "" : "d-none"}>
                     <h3>Vista previa Imagen:</h3>
@@ -3668,7 +3687,18 @@ const Condominio = () => {
                                                                                 </>
                                                                                 :
                                                                                 <>
-                                                                                    {dataFull.anuncios !== null && dataFull.anuncios.map((a: any, i) => (
+                                                                                    <div className="buscaruser-search-container mt-3">
+                                                                                        <label className="buscaruser-search-label">Buscar por título o creador</label>
+                                                                                        <input
+                                                                                            type="search"
+                                                                                            id="buscar-datafull"
+                                                                                            value={buscarDataFull}
+                                                                                            className="buscaruser-search-input"
+                                                                                            placeholder="Escribe para buscar..."
+                                                                                            onChange={(ev) => { filtrarDataFull(ev); setBuscarDataFull(ev.target.value) }}
+                                                                                        />
+                                                                                    </div>
+                                                                                    {dataFullParse.anuncios !== null && dataFullParse.anuncios.map((a: any, i) => (
                                                                                         panelAnuncios(a, i)
                                                                                     ))}
                                                                                 </>
