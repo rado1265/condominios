@@ -3266,6 +3266,8 @@ const Condominio = () => {
 
     const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any, ev: any) => {
         ev.preventDefault();
+        setOpenNotificaciones(false);
+        setMenuOpciones(false);
         setLoading(true);
         if (tieneSuscripcion) {
             DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
