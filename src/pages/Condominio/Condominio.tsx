@@ -1806,20 +1806,27 @@ const Condominio = () => {
         try {
             if (data) {
                 let newData = data;
-                const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.amedida.replace("video-", "").replace("img-", "")}`);
 
-                const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(imageRef.fullPath)
+                if (newData.amedida) {
+                    const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.amedida.replace("video-", "").replace("img-", "")}`);
 
-                getDownloadURL(imageRef)
-                    .then((url) => {
-                        newData.amedida = url;
-                        newData.esVideo = esVideo;
-                        setDataDetalle(newData);
-                        setLoading(false);
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(imageRef.fullPath)
+
+                    getDownloadURL(imageRef)
+                        .then((url) => {
+                            newData.amedida = url;
+                            newData.esVideo = esVideo;
+                            setDataDetalle(newData);
+                            setLoading(false);
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+
+                } else {
+                    setDataDetalle(newData);
+                    setLoading(false);
+                }
             }
         } catch (er) {
         }
@@ -1828,19 +1835,24 @@ const Condominio = () => {
         try {
             if (data) {
                 let newData = data;
-                const imageRef = ref(storage, `perfiles/${newData.imagen}`);
+                if (newData.imagen) {
+                    const imageRef = ref(storage, `perfiles/${newData.imagen}`);
 
-                getDownloadURL(imageRef)
-                    .then((url) => {
-                        newData.imagen = url;
-                        setUsuarioDetalle(newData);
-                        setLoading(false);
-                    })
-                    .catch((err) => {
-                        setUsuarioDetalle(newData);
-                        console.error(err);
-                        setLoading(false);
-                    });
+                    getDownloadURL(imageRef)
+                        .then((url) => {
+                            newData.imagen = url;
+                            setUsuarioDetalle(newData);
+                            setLoading(false);
+                        })
+                        .catch((err) => {
+                            setUsuarioDetalle(newData);
+                            console.error(err);
+                            setLoading(false);
+                        });
+                } else {
+                    setUsuarioDetalle(newData);
+                    setLoading(false);
+                }
             }
         } catch (er) {
         }
