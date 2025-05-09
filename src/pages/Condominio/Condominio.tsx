@@ -724,10 +724,11 @@ const Condominio = () => {
     }
     const CrearAviso = () => {
         try {
-            let fecha: Date = new Date(fechaAviso)
+            let newFecha = fechaAviso;
+
             var aviso: any = {
                 id: idAviso,
-                fecha,//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
+                fecha: newFecha,//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
                 mensaje: mensajeAviso,
                 idUsuario: usuario.id,
                 idCondominio: localStorage.getItem("idCondominio")!.toString()
