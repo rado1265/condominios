@@ -1754,3 +1754,7 @@ a:hover {
   z-index: 99;
   bottom: 75px;
 }
+
+.Toastify__toast-container--bottom-left {
+  bottom: 20px !important;
+}
