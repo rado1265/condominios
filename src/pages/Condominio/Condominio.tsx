@@ -15,7 +15,6 @@ import axios from 'axios';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
-import ImageUploader from "../../components/ImageUploader";
 interface SafeSearchAnnotation {
     adult: string;
     violence: string;
@@ -241,21 +240,27 @@ const Condominio = () => {
 
     const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
 
-    const [result, setResult] = useState<SafeSearchAnnotation | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const handleImage = (files: any) => {
+        console.log(files);
+        if (files.target.files.length === 0) return;
+        const file = files.target.files[0];
 
-    const handleImage = (files: File[]) => {
-        if (files.length === 0) return;
-        const file = files[0];
+        setArchivoTemp(files.target.files[0]);
+
+        document.getElementById('containerViewImg')?.classList.remove("d-none");
+
+        const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
+        if (img) {
+            img.src = URL.createObjectURL(files.target.files[0]);
+        }
+
         const reader = new FileReader();
 
         reader.onloadend = async () => {
             if (!reader.result || typeof reader.result !== 'string') {
-                setError('No se pudo leer la imagen');
                 return;
             }
 
-            // Extraemos solo el base64 sin el prefijo data:image/...
             const base64 = reader.result.split(',')[1];
 
             const body = {
@@ -267,21 +272,22 @@ const Condominio = () => {
                 ],
             };
 
-            setLoading(true);
-            setError(null);
-
             try {
                 const response = await axios.post(
                     `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`,
                     body
                 );
                 const safeSearch = response.data.responses[0].safeSearchAnnotation;
-                setResult(safeSearch);
+                console.log(response.data.responses[0]);
+                if(safeSearch.adult === "VERY_LIKELY" || safeSearch.adult === 'LIKELY'){
+                    toast.error('La imagen contiene posiblemente contenido para adultos. Se enviará a su revisión', {
+                        position: posicionAlertas,
+                    });
+                }
             } catch (err) {
-                setError('Error al analizar la imagen');
-                setResult(null);
+
             } finally {
-                setLoading(false);
+
             }
         };
 
@@ -535,15 +541,8 @@ const Condominio = () => {
     ///////////////////////////////////////////////////////////////////
 
     const cerrarSesion = () => {
-        localStorage.removeItem("nombreUsuario");
-        localStorage.removeItem("tieneSuscripcionMensajes");
-        localStorage.removeItem("tieneSuscripcionVotaciones");
-        localStorage.removeItem("tieneSuscripcionAnuncios");
-        localStorage.removeItem("tieneSuscripcionAvisos");
-        localStorage.removeItem("rolUsuario");
-        localStorage.removeItem("idUsuario");
-        localStorage.removeItem("clave");
-        localStorage.removeItem("idCondominio");
+        localStorage.clear();
+        
         setDataCondominios([]);
         setUsuario({
             nombre: "",
@@ -597,7 +596,7 @@ const Condominio = () => {
             setLoading(false);
         } catch (er) {
             //ErrorMessage("Credenciales incorrectas", "")
-            toast.error('Credenciales incorrectas', {
+            toast.error('Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos', {
                 position: posicionAlertas,
             });
         }
@@ -690,6 +689,8 @@ const Condominio = () => {
                     position: posicionAlertas,
                 });
 
+                localStorage.clear();
+
             }
             setLoguear({
                 usuario: "",
@@ -701,6 +702,8 @@ const Condominio = () => {
             toast.info('Credenciales incorrectas', {
                 position: posicionAlertas,
             });
+
+            localStorage.clear();
         }
     }
 
@@ -3109,7 +3112,7 @@ const Condominio = () => {
                     </label>
                 )}
                 {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
-                    <input type="file" accept="image/*" className="w-100" onChange={handleImageChange} />
+                    <input type="file" accept="image/*" className="w-100" onChange={handleImage}/>
                 )}
                 <div id="containerViewImg" className={anuncio.amedida && !anuncio.esVideo ? "" : "d-none"}>
                     <h3>Vista previa Imagen:</h3>
@@ -3596,24 +3599,6 @@ const Condominio = () => {
                 </div>
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 <div className="container pb-5 mb-5">
-                    {/*<div>
-                        <h2>Sube una imagen para analizar contenido inapropiado</h2>
-                        <ImageUploader onDrop={handleImage} />
-                        {loading && <p>Analizando imagen...</p>}
-                        {error && <p style={{ color: 'red' }}>{error}</p>}
-                        {result && (
-                            <div>
-                                <h3>Resultados de Safe Search Detection:</h3>
-                                <ul>
-                                    <li>Adulto: {result.adult}</li>
-                                    <li>Violencia: {result.violence}</li>
-                                    <li>Contenido sexual: {result.sexualContent}</li>
-                                    <li>Riesgo médico: {result.medical}</li>
-                                    <li>Contenido ofensivo: {result.racy}</li>
-                                </ul>
-                            </div>
-                        )}
-                    </div>*/}
                     <div className="row px-3 justify-content-around">
                         {
                             dataCondominios.length > 1 && !enComunidad ?
