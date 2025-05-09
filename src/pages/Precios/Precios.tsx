@@ -1,38 +1,25 @@
-import React, { useRef, useEffect } from 'react';
-import './Precios.css'; // CSS personalizado
+import React, { useEffect } from 'react';
+import './Precios.css';
 import logo from './../../components/utils/img/logo.png';
 
 const Precios = () => {
-    const sectionLogoRef = useRef<HTMLDivElement>(null);
-    const sectionPreciosRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
+        const timer = setTimeout(() => {
+          const section = document.getElementById('sectionPrecios');
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 1000);
+      
+        return () => clearTimeout(timer);
+      }, []);
 
-        const sectionLogo = sectionLogoRef.current;
-        const sectionPrecios = sectionPreciosRef.current;
-
-        if (!sectionLogo || !sectionPrecios) return;
-
-        const onWheel = (e: any) => {
-            // Si el scroll es hacia abajo (deltaY positivo)
-            if (e.deltaY > 0) {
-                e.preventDefault(); // prevenir scroll normal
-                sectionPrecios.scrollIntoView({ behavior: 'smooth' });
-            }
-        };
-
-        sectionLogo.addEventListener('wheel', onWheel, { passive: false });
-
-        return () => {
-            sectionLogo.removeEventListener('wheel', onWheel);
-        };
-    }, []);
     return (
         <div className="container text-center mb-5" style={{ marginTop: '-50px' }}>
-            <section id="sectionLogo" className='d-flex justify-content-center align-items-center' style={{ height: '100vh' }} ref={sectionLogoRef}>
+            <section id="sectionLogo" className='d-flex justify-content-center align-items-center' style={{ height: '100vh' }}>
                 <img alt="Logo Conexion Residencial"  src={logo} style={{ width: '80%', marginTop: '-25px' }} />
             </section>
-            <section id="sectionPrecios" ref={sectionPreciosRef}>
+            <section id="sectionPrecios">
                 <h1 className="text-primary titulo-precios">PRECIOS</h1>
                 <h2 className="text-danger spacing mb-4">COMUNIDADES</h2>
                 <div className="row justify-content-center">

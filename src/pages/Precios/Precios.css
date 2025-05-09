@@ -103,4 +103,8 @@
     font-size: 3rem;
     margin-bottom: 0;
   }
+
+  #sectionPrecios {
+    scroll-margin-top: -80px; /* Ajusta 80px al alto de tu header */
+  }
   
