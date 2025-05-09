@@ -58,8 +58,8 @@ const Precios = () => {
                     {/* Plan 3 */}
                     <div className="col-md-3 mx-4 card-pricing bg-orange shadow ">
                         <div className="ribbon">
-                            <span className='color-orange'>300+ USUARIOS</span>
-                            <h2 className="price color-orange">$330</h2>
+                            <span className='color-orange'>+200 USUARIOS</span>
+                            <h2 className="price color-orange">$300</h2>
                             <p className="subtext color-orange">Por Usuario</p>
                         </div>
                         <ul className="text-start caracteristicas">
