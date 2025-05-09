@@ -11,9 +11,21 @@ import iconeditar from './../../components/utils/img/editar.png';
 import iconborrar from './../../components/utils/img/iconborrar.png';
 import notificar from './../../components/utils/img/notificar.png';
 import logo from './../../components/utils/img/logo.png';
+import axios from 'axios';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
+import ImageUploader from "../../components/ImageUploader";
+interface SafeSearchAnnotation {
+    adult: string;
+    violence: string;
+    sexualContent: string;
+    medical: string;
+    racy: string;
+}
+
+const API_KEY = 'AIzaSyCdexoCXGuhE2--pejbSZgTeiIUBjE_UyM';
+
 const chileTime = new Intl.DateTimeFormat("es-CL", {
     timeZone: "America/Santiago",
     hour12: false,
@@ -228,6 +240,54 @@ const Condominio = () => {
     }
 
     const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
+
+    const [result, setResult] = useState<SafeSearchAnnotation | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleImage = (files: File[]) => {
+        if (files.length === 0) return;
+        const file = files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = async () => {
+            if (!reader.result || typeof reader.result !== 'string') {
+                setError('No se pudo leer la imagen');
+                return;
+            }
+
+            // Extraemos solo el base64 sin el prefijo data:image/...
+            const base64 = reader.result.split(',')[1];
+
+            const body = {
+                requests: [
+                    {
+                        image: { content: base64 },
+                        features: [{ type: 'SAFE_SEARCH_DETECTION' }],
+                    },
+                ],
+            };
+
+            setLoading(true);
+            setError(null);
+
+            try {
+                const response = await axios.post(
+                    `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`,
+                    body
+                );
+                const safeSearch = response.data.responses[0].safeSearchAnnotation;
+                setResult(safeSearch);
+            } catch (err) {
+                setError('Error al analizar la imagen');
+                setResult(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        reader.readAsDataURL(file);
+    };
+
 
     //const [imgError, setImgError] = useState("https://img.freepik.com/vector-premium/imagen-no-es-conjunto-iconos-disponibles-simbolo-vectorial-stock-fotos-faltante-defecto-estilo-relleno-delineado-negro-signo-no-encontro-imagen_268104-6708.jpg");
 
@@ -1788,9 +1848,10 @@ const Condominio = () => {
             NombreUsuario: usuario.nombre,
             IdAnuncio: dataDetalle.id,
             Mensaje: newComentario,
-            Fecha: new Date(chileTime)
+            Fecha: new Date()
         };
         setNewComentario("");
+        console.log(comentarioAnuncio);
         CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, comentarioAnuncio, localStorage.getItem("idCondominio")!.toString());
     }
     const selcrearComentarioAnuncio = (error: Boolean, err: string, data: any) => {
@@ -3535,6 +3596,24 @@ const Condominio = () => {
                 </div>
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 <div className="container pb-5 mb-5">
+                    {/*<div>
+                        <h2>Sube una imagen para analizar contenido inapropiado</h2>
+                        <ImageUploader onDrop={handleImage} />
+                        {loading && <p>Analizando imagen...</p>}
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
+                        {result && (
+                            <div>
+                                <h3>Resultados de Safe Search Detection:</h3>
+                                <ul>
+                                    <li>Adulto: {result.adult}</li>
+                                    <li>Violencia: {result.violence}</li>
+                                    <li>Contenido sexual: {result.sexualContent}</li>
+                                    <li>Riesgo médico: {result.medical}</li>
+                                    <li>Contenido ofensivo: {result.racy}</li>
+                                </ul>
+                            </div>
+                        )}
+                    </div>*/}
                     <div className="row px-3 justify-content-around">
                         {
                             dataCondominios.length > 1 && !enComunidad ?
