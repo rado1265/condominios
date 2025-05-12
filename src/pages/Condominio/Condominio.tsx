@@ -15,6 +15,8 @@ import axios from 'axios';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
+import filtro from './../../components/utils/img/flechas-arriba-y-abajo.png';
+
 interface SafeSearchAnnotation {
     adult: string;
     violence: string;
@@ -220,14 +222,28 @@ const Condominio = () => {
         setImgSelect("");
     };
 
-    /* {
-        id: 0,
-                idUsuario: 0,
-                idAnuncio: 0,
-                mensaje: "",
-                nombreUsuario: "",
-                fecha: new Date()
-            } */
+    const [orden, setOrden] = useState<'asc' | 'desc'>('asc');
+    const [criterio, setCriterio] = useState<'fechaDesde' | 'likes' | 'cantComentarios' | 'cabecera'>('fechaDesde');
+    const ordenarListado = (data: any) => {
+        return [...data].sort((a, b) => {
+            const valorA = a[criterio];
+            const valorB = b[criterio];
+
+            if (criterio === 'cabecera') {
+                return orden === 'asc'
+                    ? valorA.localeCompare(valorB)
+                    : valorB.localeCompare(valorA);
+            }
+
+            if (criterio === 'fechaDesde') {
+                return orden === 'asc'
+                    ? new Date(valorA).getTime() - new Date(valorB).getTime()
+                    : new Date(valorB).getTime() - new Date(valorA).getTime();
+            }
+
+            return orden === 'asc' ? valorA - valorB : valorB - valorA;
+        });
+    };
 
     const limpiarAnuncio = () => {
         setAnuncio({
@@ -601,11 +617,15 @@ const Condominio = () => {
                 /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 /* setTipo(1) */
             }
-            setDataFull(data);
-            setMisAnuncios(data.anuncios);
-            setActualizarMisAnuncios(true);
-            setActualizarData(true);
-            setLoading(false);
+            if (verMisAnuncios) {
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString())
+            } else {
+                setDataFull(data);
+                /* setMisAnuncios(data.anuncios);
+                setActualizarMisAnuncios(true); */
+                setActualizarData(true);
+                setLoading(false);
+            }
         } catch (er) {
             //ErrorMessage("Credenciales incorrectas", "")
             toast.error('Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos', {
@@ -2277,10 +2297,16 @@ const Condominio = () => {
     }
 
     const filtrarDataFull = (ev: any) => {
-        let parselistadoDataFull = dataFull.anuncios.filter((e) => e.organizador.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()) || e.cabecera.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()));
+        const texto = ev.target.value.toLowerCase();
+
+        const filtrado = dataFull.anuncios.filter((item: any) => {
+            const cabecera = item.cabecera?.toLowerCase() || '';
+            const organizador = item.organizador?.toLowerCase() || '';
+            return cabecera.includes(texto) || organizador.includes(texto);
+        });
         setDataFullParse(prev => ({
             ...prev,
-            ['anuncios']: parselistadoDataFull
+            ['anuncios']: filtrado
         }));
     }
 
@@ -3198,7 +3224,7 @@ const Condominio = () => {
             try {
                 const registration = await navigator.serviceWorker.register('/service-worker.js');
                 console.log('SW registrado:', registration);
-
+ 
                 const readyReg = await navigator.serviceWorker.ready;
                 console.log('SW listo:', readyReg);
                 setEstadoServiceWorker('SW listo:' + readyReg.toString())

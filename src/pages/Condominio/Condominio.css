@@ -1758,3 +1758,11 @@ a:hover {
 .Toastify__toast-container--bottom-left {
   bottom: 80px !important;
 }
+.iconoFiltro {
+  outline: none !important;
+  width: 35px;
+  justify-content: center;
+  margin-top: -10px;
+  border: 0;
+  background: transparent;
+}
