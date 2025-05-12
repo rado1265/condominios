@@ -80,6 +80,7 @@ const Condominio = () => {
     const [newTextRich, setNewTextRich] = useState("");
     const [textRichEditado, setTextRichEditado] = useState(false);
     const [verDetalleAvisos, setVerDetalleAvisos] = useState(false);
+    const [colorAviso, setColorAviso] = useState("");
     const [tipoSubir, setTipoSubir] = useState(0);
     const [dataCondominios, setDataCondominios] = useState([]);
     const [dataArchivosComunidad, setDataArchivosComunidad] = useState([{ nombre: "test", url: "test" }]);
@@ -836,8 +837,11 @@ const Condominio = () => {
                 fecha: newFecha,//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
                 mensaje: mensajeAviso,
                 idUsuario: usuario.id,
+                color: colorAviso,
                 idCondominio: localStorage.getItem("idCondominio")!.toString()
             }
+
+            console.log(aviso);
             CrearAvisosLogic(selCrearAvisos, aviso, false)
         } catch (er) {
         }
@@ -883,6 +887,7 @@ const Condominio = () => {
                 setEditarAvisos(false);
                 setMensajeAviso('');
                 setFechaAviso('');
+                setColorAviso("");
                 setHoraAviso(new Date().toLocaleTimeString());
                 setIdAviso(0);
                 toast.success('Aviso creado correctamente', {
@@ -2920,9 +2925,11 @@ const Condominio = () => {
                                                                 hora={horaAviso}
                                                                 mes={mes}
                                                                 año={año}
+                                                                colorEvento={colorAviso}
                                                                 onCambiarMes={cambiarMes}
+                                                                onChangeColor={(e) => setColorAviso(e)}
                                                                 onChangeMensaje={(e) => setMensajeAviso(e.target.value)}
-                                                                onChangeFecha={(e) => setFechaAviso(e.target.value)}
+                                                                onChangeFecha={(e) => setFechaAviso(e)}
                                                                 onChangeHora={(e) => setHoraAviso(e.target.value)}
                                                                 onCrear={CrearAviso}
                                                                 onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje)}

@@ -15,9 +15,11 @@ interface Props {
     hora: string;
     año: number;
     mes: number;
+    colorEvento: string;
     onChangeMensaje: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onChangeFecha: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChangeFecha: (e: string) => void;
     onChangeHora: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChangeColor: (e: string) => void;
     onCrear: () => void;
     onEliminar: (aviso: Aviso) => void;
     onCambiarMes: (mes: any, anio: any) => void;
@@ -32,6 +34,7 @@ const AvisoPanel: React.FC<Props> = ({
     hora,
     año,
     mes,
+    colorEvento,
     onChangeMensaje,
     onChangeFecha,
     onChangeHora,
@@ -39,9 +42,11 @@ const AvisoPanel: React.FC<Props> = ({
     onEliminar,
     onCambiarMes,
     onEnviarNotificacion,
+    onChangeColor,
     loading = false
 }) => {
     const [idEdit, setIdEdit] = useState<number | null>(null);
+    const [crearEvento, setCrearEvento] = useState(false);
     const [monthTitle, setMonthTitle] = useState('');
     const [days, setDays] = useState([]);
     const [avisosParse, setAvisosParse] = useState<Aviso[]>();
@@ -58,6 +63,7 @@ const AvisoPanel: React.FC<Props> = ({
         const avisosDeHoy = avisos.filter((a) => (new Date(a.fecha)).getTime() === (new Date(año + '/' + mes + '/' + dia)).getTime());
         const avisosOrdenados = avisosDeHoy.slice().sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         setAvisosParse(avisosOrdenados);
+        onChangeFecha(`${año}-${mes.toString().padStart(2, '0')}-${dia}`);
     }
 
     useEffect(() => {
@@ -65,6 +71,12 @@ const AvisoPanel: React.FC<Props> = ({
         const avisosDeHoy = avisos.filter((a, b) => new Date(a.fecha).getTime() === new Date().getTime());
         const avisosOrdenados = avisosDeHoy.slice().sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         setAvisosParse(avisosOrdenados);
+        if(diaMesSelect.dia > 0){
+            getObtenerAvisosDia(diaMesSelect.dia, diaMesSelect.mes);
+        }else{
+            setDiaMesSelect({ dia: new Date().getDate(), mes: new Date().getMonth() + 1, anio: new Date().getFullYear() })
+        }
+        setCrearEvento(false);
     }, [avisos]);
 
     const generarCalendario = () => {
@@ -111,7 +123,7 @@ const AvisoPanel: React.FC<Props> = ({
 
                 <div key={`dia-${dia}`} className="dia" onClick={() => { getObtenerAvisosDia(dia, mes + 1) }}>
                     {fechaTexto === fechaActualParse ?
-                        <div className={`fecha diaActual`}>{dia}</div>
+                        <div className={`fecha diaActual ${avisosDelDia.length > 0 ? "dia-con-algo" : ""}`}>{dia}</div>
                         :
                         avisosDelDia.length > 0 ?
                             <div className={`fecha ${avisosDelDia.length > 0 ? "dia-con-algo" : ""}`}>{dia}</div>
@@ -123,6 +135,11 @@ const AvisoPanel: React.FC<Props> = ({
         }
 
         setDays(celdas);
+    };
+
+
+    const handleSave = () => {
+        setCrearEvento(false);
     };
 
     return (
@@ -168,19 +185,67 @@ const AvisoPanel: React.FC<Props> = ({
                 </div>
             </div>
             <div>
-                <h5 className='title-eventosdeldia'>Eventos del mes</h5>
+                <div className='container-title-eventosdelDia'>
+                    <h5 className='title-eventosdeldia'>Eventos {diaMesSelect.dia} de {monthTitle}</h5>
+                    <button className="avisos-add" title="Agregar Evento" onClick={() => { setCrearEvento(true) }}>
+                        <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
+                            <circle cx="9" cy="9" r="9" fill="#0a9e5e" />
+                            <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                    </button>
+                </div>
                 {avisosParse?.map((a: any, i: number) => {
                     return (
                         <div className='avisos-dia' key={i} style={{ borderBottom: `4px solid ${a.color}`, background: `${a.color}12`, color: a.color }}>
                             <span>{a.mensaje}</span>
                             <div style={{ display: 'flex', alignItems: 'center', marginTop: '5px' }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#9a9a9a">
                                     <path d="M580-240q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z" />
                                 </svg>
-                                <span style={{ color: 'grey', fontWeight: '500', marginLeft: '5px' }}>{new Date(a.fecha).toLocaleDateString()}</span>
+                                <span style={{ color: '#9a9a9a', fontWeight: '500', marginLeft: '5px' }}>{new Date(a.fecha).toLocaleDateString()}</span>
                             </div>
                         </div>);
                 })}
+                {avisosParse?.length == 0 && (
+                    <div className='sinEventos'>
+                        <span>Sin eventos para este día</span>
+                    </div>
+                )}
+            </div>
+            <div className={`modal-overlay ${crearEvento ? "" : "d-none"}`}>
+                <div className="modal-content">
+                    <h5 className="modal-title">Crear evento <br></br>{diaMesSelect.dia} de {monthTitle}</h5>
+                    <input
+                        className="modal-input"
+                        type="text"
+                        placeholder="Escribe tu mensaje..."
+                        value={mensaje}
+                        onChange={onChangeMensaje}
+                    />
+                    <select
+                        id="colorEvento"
+                        style={{color: colorEvento, fontWeight: 600}}
+                        className="modal-select"
+                        value={colorEvento}
+                        onChange={(e) => onChangeColor(e.target.value)}
+                    >
+                        <option value="" disabled>Selecciona un color</option>
+                        <option value="#e74c3c" style={{ color: "#e74c3c", fontWeight: 700 }}>Rojo</option>
+                        <option value="#3498db" style={{ color: "#3498db", fontWeight: 700 }}>Azul</option>
+                        <option value="#f1c40f" style={{ color: "#f1c40f", fontWeight: 700 }}>Amarillo</option>
+                        <option value="#27ae60" style={{ color: "#27ae60", fontWeight: 700 }}>Verde</option>
+                        <option value="#e67e22" style={{ color: "#e67e22", fontWeight: 700 }}>Naranja</option>
+                        <option value="#9b59b6" style={{ color: "#9b59b6", fontWeight: 700 }}>Morado</option>
+                    </select>
+                    <div className="modal-actions">
+                        <button className="modal-btn modal-btn-green" onClick={onCrear}>
+                            Guardar
+                        </button>
+                        <button className="modal-btn modal-btn-close" onClick={() => { setCrearEvento(false) }}>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
