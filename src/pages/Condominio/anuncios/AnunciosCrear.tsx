@@ -20,15 +20,16 @@ interface Props {
     anuncio?: Anuncio; // null para nuevo, lleno para editar
     onGuardar: (anuncio: Anuncio, archivoAdjunto: File | null) => void;
     onCancelar: () => void;
+    usuario: any;
 }
 
-const AnunciosCrear: React.FC<Props> = ({ anuncio, onGuardar, onCancelar }) => {
+const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancelar }) => {
     const [form, setForm] = useState<Anuncio>({
         id: 0,
         cabecera: '',
         descripcion: '',
         telefono: '',
-        organizador: "",
+        organizador: usuario.nombre,
         amedida: '',
         fechaDesde: new Date(),
         fechaHasta: new Date(),
@@ -36,13 +37,18 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, onGuardar, onCancelar }) => {
         esVideo: false,
         ...(anuncio || {}),
         idCondominio: localStorage.getItem("idCondominio"),
-        idUsuario: 0,
+        idUsuario: usuario.id,
         activo: true,
     });
-
+    console.log(form, usuario, anuncio)
     const [archivo, setArchivo] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (anuncio != null && anuncio?.id > 0) {
+            setForm(anuncio)
+        }
+    }, [anuncio])
     useEffect(() => {
         if (archivo) {
             const url = URL.createObjectURL(archivo);
@@ -78,7 +84,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, onGuardar, onCancelar }) => {
         e.preventDefault();
         onGuardar(form, archivo);
     };
-
+    console.log(form)
     return (
         <form onSubmit={handleSubmit} className="anuncio-form">
             <h2 className="mb-4 text-center">{anuncio != null && anuncio.id > 0 ? 'Editar Anuncio' : 'Nuevo Anuncio'}</h2>
@@ -136,18 +142,6 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, onGuardar, onCancelar }) => {
                     onChange={handleChange}
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
-                <label>Hasta</label>
-                <input
-                    type="datetime-local"
-                    name="fechaHasta"
-                    value={new Date(form.fechaHasta).toISOString().slice(0, 16)}
-                    onChange={(e) =>
-                        setForm(prev => ({
-                            ...prev,
-                            fechaHasta: new Date(e.target.value)
-                        }))
-                    }
-                />
 
                 <label>Imagen o Video</label>
                 <input type="file" accept="image/*,video/*" onChange={handleArchivo} />
@@ -173,7 +167,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, onGuardar, onCancelar }) => {
                         type="submit"
                         className="search-button mt-2"
                     >
-                        {anuncio != null && anuncio.id > 0 ? "Crear" : "Editar"}
+                        {anuncio != null && anuncio.id > 0 ? "Editar" : "Crear"}
                     </button>
                     {/* <button type="submit">Guardar</button> */}
                     <button type="button" className="search-button mt-2" onClick={onCancelar}>Cancelar</button>
