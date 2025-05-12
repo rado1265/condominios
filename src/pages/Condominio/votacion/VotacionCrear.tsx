@@ -13,21 +13,18 @@ interface Votacion {
 }
 
 interface Props {
-    onCrear: (cabecera: string, descripcion: string, opciones: string[]) => void;
+    onCrear: (cabecera: string, descripcion: string, opciones: Opcion[]) => void;
     loading?: boolean;
 }
 
 const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
     const [cabecera, setCabecera] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [nuevaOpcion, setNuevaOpcion] = useState('');
-    const [opciones, setOpciones] = useState<string[]>([]);
-
     const [options, setOptions] = useState<Opcion[]>([
         { id: 1, value: '' },
         { id: 2, value: '' },
     ]);
-     const handleAddOption = () => {
+    const handleAddOption = () => {
         const newOption = {
             id: options.length + 1,
             value: '',
@@ -36,11 +33,14 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
     };
 
     const crearVotacion = () => {
-        if (cabecera && opciones.length >= 2) {
-            onCrear(cabecera, descripcion, opciones);
+        if (cabecera && options.length >= 2) {
+            onCrear(cabecera, descripcion, options);
             setCabecera('');
             setDescripcion('');
-            setOpciones([]);
+            setOptions([
+                { id: 1, value: '' },
+                { id: 2, value: '' },
+            ]);
         } else {
             alert('Debe agregar al menos 2 opciones y un título.');
         }

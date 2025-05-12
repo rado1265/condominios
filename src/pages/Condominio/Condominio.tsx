@@ -24,6 +24,8 @@ import Emergencia from "./emergencias/Emergencia";
 import AvisoPanel from "./avisos/AvisoPanel";
 import VotacionCrear from "./votacion/VotacionCrear";
 import VotacionPanel from "./votacion/VotacionPanel";
+import DetalleAnuncioPanel from "./anuncios/DetalleAnuncioPanel";
+import ReglasNormasPanel from "./reglas/ReglasNormasPanel";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -230,7 +232,7 @@ const Condominio = () => {
         setImgSelect("");
     };
 
-    const [orden, setOrden] = useState<'asc' | 'desc'>('asc');
+    const [orden, setOrden] = useState<'asc' | 'desc'>('desc');
     const [criterio, setCriterio] = useState<'fechaDesde' | 'likes' | 'cantComentarios' | 'cabecera'>('fechaDesde');
     const ordenarListado = (data: any) => {
         return [...data].sort((a, b) => {
@@ -259,13 +261,13 @@ const Condominio = () => {
             idCondominio: localStorage.getItem("idCondominio"),
             cabecera: "",
             descripcion: "",
-            organizador: "",
+            organizador: usuario.nombre,
             telefono: "",
             amedida: "",
             fechaDesde: new Date(),
             fechaHasta: new Date(),
             idTipo: 1,
-            idUsuario: 0,
+            idUsuario: usuario.id,
             activo: true,
             esVideo: false
         })
@@ -789,9 +791,9 @@ const Condominio = () => {
         };
     };
 
-    const CrearAnuncio = () => {
+    const CrearAnuncio = (form: any) => {
         guardarArchivo();
-        let anuncioParse = anuncio;
+        let anuncioParse = form;
         if (archivoTemp) {
             anuncioParse.amedida = archivoTemp.name
         }
@@ -1249,6 +1251,7 @@ const Condominio = () => {
     }
     const cargarAnuncioParaEdit = (a: any) => {
         setTipoSubir(0);
+        setEditar(true)
         setAnuncio(a);
     }
 
@@ -1353,8 +1356,8 @@ const Condominio = () => {
 
             var votacion: any = {
                 Id: 0,
-                Cabecera: question,
-                Descripcion: questionDesc,
+                Cabecera: cabecera,
+                Descripcion: descripcion,
                 Activo: true,
                 IdUsuario: usuario.id,
                 IdCondominio: localStorage.getItem("idCondominio"),
@@ -1653,39 +1656,6 @@ const Condominio = () => {
 
         </div>
     }
-    type Option = {
-        id: number;
-        value: string;
-    };
-
-    const [question, setQuestion] = useState('');
-    const [questionDesc, setQuestionDesc] = useState('');
-    const [options, setOptions] = useState<Option[]>([
-        { id: 1, value: '' },
-        { id: 2, value: '' },
-    ]);
-
-    const handleAddOption = () => {
-        const newOption = {
-            id: options.length + 1,
-            value: '',
-        };
-        setOptions([...options, newOption]);
-    };
-
-    const handleOptionChange = (id: number, value: string) => {
-        const updatedOptions = options.map(opt =>
-            opt.id === id ? { ...opt, value } : opt
-        );
-        setOptions(updatedOptions);
-    };
-
-
-    const handleRemoveOption = (id: number) => {
-        const filteredOptions = options.filter(opt => opt.id !== id);
-        setOptions(filteredOptions);
-        //setShowAddButton(true);
-    };
 
     const cambiarVoto = (ev: any) => {
         setLoading(true);
@@ -1876,88 +1846,6 @@ const Condominio = () => {
                 );
             })}
         </div>
-    }
-
-
-    const panelDetalleAnuncio = () => {
-        return (
-            <div className="mx-3">
-                <button type="button" className="iconoVolver" onClick={() => {
-                    setVerDetalle(false)
-                }}>
-                    <img width={35} src={volver} alt="Icono volver" />
-                </button>
-                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{dataDetalle.cabecera}</h4>
-                <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
-                <div className="anuncio-footer">
-                    <div className="anuncio-organizador">
-                        <span>Creado por: </span>
-                        <span className="ml-1">{dataDetalle.organizador}</span>
-                    </div>
-                    <span className="anuncio-telefono">{dataDetalle.telefono}</span>
-                </div>
-                {dataDetalle.amedida && dataDetalle.esVideo ?
-                    <div className="anuncio-img-wrapper">
-                        <video id="videoAnuncio3" src={dataDetalle.amedida} controls width="300" />
-                    </div>
-                    : dataDetalle.amedida && !dataDetalle.esVideo ?
-                        <div className="anuncio-img-wrapper">
-                            <img id="imgAnuncio3" className="anuncio-img"
-                                onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.onerror = null;
-                                    target.src = imgError;
-                                }}
-                                src={dataDetalle.amedida} alt="Foto" />
-                        </div>
-                        : ""
-                }
-                <div className="d-flex align-items-center w-100" style={{ justifyContent: 'space-between' }}>
-                    <small className="anuncio-fecha" style={{ position: 'relative', marginLeft: '20px', bottom: '0', fontSize: '12px' }}>
-                        Fecha publicación: {new Date(dataDetalle.fechaDesde).toLocaleDateString() + " " + new Date(dataDetalle.fechaDesde).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                    </small>
-                    <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }}>
-                        <svg className="like-icon" viewBox="0 0 24 24" onClick={() => handleLike(dataDetalle.id, true, true)}>
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
-             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
-             22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        <span className="like-count">{dataDetalle.likes === 0 ? "" : dataDetalle.likes}</span>
-                    </div>
-                </div>
-                <div className="comments-container">
-                    <h2 className="comments-title">Comentarios</h2>
-                    {dataDetalle.comentarios ? dataDetalle.comentarios.map((j: any) => {
-                        return <div key={j.id} className="comment-box">
-                            <div className="comment-header">
-                                <span className="comment-author">{j.nombreUsuario}</span>
-                                <div>
-                                    <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
-                                    <span className="comment-date ml-2">{new Date(j.fecha).toLocaleTimeString().split(":").slice(0, 2).join(":")}</span>
-                                </div>
-                            </div>
-                            <p className="comment-content">{j.mensaje}</p>
-                        </div>
-                    }) : ""}
-                    <textarea
-                        className="comment-textarea"
-                        placeholder="Escribe tu comentario..."
-                        value={newComentario}
-                        onChange={(e) => setNewComentario(e.target.value)}
-                        rows={3}
-                        maxLength={500}
-                    />
-                    <button
-                        type="button"
-                        className="search-button w-100 mt-1"
-                        onClick={crearComentarioAnuncio}
-                    >
-                        Publicar comentario
-                    </button>
-                </div>
-            </div>
-        );
     }
 
     const filtrarUsuarios = (ev: any) => {
@@ -2151,11 +2039,11 @@ const Condominio = () => {
 
     const editorRef = useRef<HTMLDivElement>(null);
 
-    const handleInput = (ev: any) => {
+    const handleInput = () => {
         //setNewTextRich(ev.target.children[0].outerHTML);
         setTextRichEditado(true);
     };
-    const handleBlur = (ev: any) => {
+    const handleBlur = () => {
         if (editorRef.current) {
             setNewTextRich(editorRef.current.innerHTML);
         }
@@ -2363,308 +2251,148 @@ const Condominio = () => {
         setLoading(true)
         ObtenerAvisosLogic(selListadoAvisos, (a + 1).toString(), localStorage.getItem("idCondominio")!.toString(), b.toString());
     }
-
-    const panelAvisos = () => {
-        return verDetalleAvisos ?
-            <div className="w-100 login-box py-3">
-                <button type="button" className="iconoVolver" onClick={() => {
-                    setVerDetalleAvisos(false)
-                }}>
-                    <img width={35} src={volver} alt="Icono volver" />
-                </button>
-                <h3 style={{ textAlign: 'center' }}>Avisos día {diaMesSelect.dia} de {obtenerNombreMes(diaMesSelect.mes)} del {diaMesSelect.anio}</h3>
-                <div className="login-box py-3">
-                    {
-                        avisos.filter((a: any) => new Date(a.fecha).getDate() === diaMesSelect.dia).map((e: any) => {
-                            return (
-                                <div className="container-avisos">
-                                    <div className="d-block">
-                                        <span><strong>{e.mensaje}</strong></span><br />
-                                        {/* <span>{new Date(e.fecha).toLocaleTimeString()}</span> */}
-                                    </div>
-                                    <div style={{ position: 'absolute', right: '25px' }}>
-                                        {
-                                            usuario.rol === "ADMINISTRADOR" &&
-                                            <>
-                                                <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                                    EnviarNotifAviso(e.mensaje)
-                                                }}>
-                                                    <img src={notificar} />
-                                                </button>
-
-                                                <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                                    setEditarAvisos(true);
-                                                    setCrear(false);
-                                                    setVerDetalleAvisos(false);
-                                                    setFechaAviso(e.fecha.toString().substring(0, 10));
-                                                    setHoraAviso(e.fecha.toString().substring(11));
-                                                    setMensajeAviso(e.mensaje);
-                                                    setIdAviso(e.id)
-                                                }}>
-                                                    <img src={iconeditar} />
-                                                </button>
-                                                <button type="button" className="iconoVolver" style={{ background: 'transparent' }} onClick={() => {
-                                                    EliminarAviso(e.id, e.fecha, e.mensaje)
-                                                }}>
-                                                    <img src={iconborrar} />
-                                                </button>
-                                            </>
-                                        }
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
-                    {
-                        usuario.rol === "ADMINISTRADOR" &&
-                        <button type="button" className="search-button mt-2" onClick={() => {
-                            setEditarAvisos(true)
-                            setVerDetalleAvisos(false);
-                            setFechaAviso(new Date(diaMesSelect.anio, diaMesSelect.mes - 1, diaMesSelect.dia).toISOString().substring(0, 10));
-                            setHoraAviso("");
-                            setMensajeAviso('');
-                            setIdAviso(0)
-                        }}>
-                            Crear aviso
-                        </button>
-                    }
-                </div>
-            </div> : editarAvisos ?
-                <div className="px-2">
-                    <div className="login-box py-3 w-100">
-                        <button type="button" className="iconoVolver" onClick={() => {
-                            setEditarAvisos(false)
-                        }}>
-                            <img width={35} src={volver} alt="Icono volver" />
-                        </button>
-                        <label htmlFor="textfield" className="search-label-admin">
-                            Mensaje Aviso
-                        </label>
-                        <textarea
-                            rows={4}
-                            cols={50}
-                            name="descripcion"
-                            className="search-input"
-                            value={mensajeAviso}
-                            onChange={(e: any) => setMensajeAviso(e.target.value)}
-                        />
-                        <label htmlFor="textfield" className="search-label-admin mt-3">
-                            Fecha Aviso
-                        </label>
-                        <div className="d-inline-flex" style={{ justifyContent: 'space-between' }}>
-                            <input
-                                type="date"
-                                name="fechaAviso"
-                                className="typeDate"
-                                disabled
-                                value={fechaAviso ? fechaAviso.toString() : ""}
-                                style={{ padding: '8px', fontSize: '16px', width: '100%' }}
-                            />
-
-                            {/*  <input
-                                type="time"
-                                name="fechaAviso"
-                                className="typeDate"
-                                value={horaAviso ? horaAviso.toString() : ""}
-                                //onChange={(e: any) => {setFechaAviso(e.target.value);}}
-                                onChange={(e: any) => { changeFechaTime(e) }}
-                                style={{ padding: '8px', fontSize: '16px', width: '48%' }}
-                            /> */}
-                        </div>
-                        <button
-                            type="button"
-                            className="search-button mt-2"
-                            onClick={CrearAviso}
-                        >
-                            Aceptar
-                        </button>
-                    </div>
-                </div>
-                :
-                <div className="login-box py-3 px-3 w-100">
-                    <h1 className="mb-0" style={{ textAlign: 'center' }}>Calendario</h1>
-                    <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
-                        <button
-                            onClick={() => {
-                                const nuevoMes = mes === 1 ? 12 : mes - 1;
-                                const nuevoAño = mes === 1 ? año - 1 : año;
-                                cambiarMes(nuevoMes, nuevoAño);
-                            }}
-                            aria-label="Iquierda"
-                            className="iconFlecha"
-                        >
-                            <svg fill="#fff" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 330 330">
-                                <path id="XMLID_92_" d="M111.213,165.004L250.607,25.607c5.858-5.858,5.858-15.355,0-21.213c-5.858-5.858-15.355-5.858-21.213,0.001
-	l-150,150.004C76.58,157.211,75,161.026,75,165.004c0,3.979,1.581,7.794,4.394,10.607l150,149.996
-	C232.322,328.536,236.161,330,240,330s7.678-1.464,10.607-4.394c5.858-5.858,5.858-15.355,0-21.213L111.213,165.004z"/>
-                            </svg>
-                        </button>
-                        <h4 className="m-0">{monthTitle}</h4>
-                        <button
-                            onClick={() => {
-                                const nuevoMes = mes === 12 ? 1 : mes + 1;
-                                const nuevoAño = mes === 12 ? año + 1 : año;
-                                cambiarMes(nuevoMes, nuevoAño);
-                            }}
-                            aria-label="Derecha"
-                            className="iconFlecha"
-                        >
-                            <svg fill="#fff" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 330.002 330.002">
-                                <path id="XMLID_103_" d="M233.252,155.997L120.752,6.001c-4.972-6.628-14.372-7.97-21-3c-6.628,4.971-7.971,14.373-3,21
-	l105.75,140.997L96.752,306.001c-4.971,6.627-3.627,16.03,3,21c2.698,2.024,5.856,3.001,8.988,3.001
-	c4.561,0,9.065-2.072,12.012-6.001l112.5-150.004C237.252,168.664,237.252,161.33,233.252,155.997z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div className="calendario">
-                        {days}
-                    </div>
-                </div>
-    }
-
-    const panelCrearAnuncio = () => {
-        return <div key={2} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
-            {!crear && (
-                <button type="button" className="iconoVolver" onClick={() => {
-                    setCrear(false);
-                    setEditar(false);
-                    setVerDetalle(false);
-                }}>
-                    <img width={35} src={volver} alt="Icono volver" />
-                </button>
-            )}
-            <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {!crear ? tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio" : ""}</h2>
-
-            <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                <label htmlFor="textfield" className="search-label-admin">
-                    Cabecera
-                </label>
-                <input
-                    type="text"
-                    name="cabecera"
-                    className="search-input"
-                    value={anuncio.cabecera}
-                    onChange={handleChangeAnuncio}
-                />
-                <label htmlFor="textfield" className="search-label-admin">
-                    Descripción
-                </label>
-                <textarea
-                    rows={4}
-                    cols={50}
-                    name="descripcion"
-                    className="search-input"
-                    value={anuncio.descripcion}
-                    onChange={handleChangeAnuncio}
-                />
-                <label htmlFor="textfield" className="search-label-admin">
-                    Organizador
-                </label>
-                <input
-                    type="text"
-                    name="organizador"
-                    className="search-input"
-                    value={usuario.nombre}
-                    disabled
-                    onChange={handleChangeAnuncio}
-                />
-                <label htmlFor="textfield" className="search-label-admin">
-                    Teléfono
-                </label>
-                <input
-                    type="text"
-                    name="telefono"
-                    className="search-input"
-                    value={anuncio.telefono}
-                    onChange={handleChangeAnuncio}
-                />
-                <label htmlFor="textfield" className="search-label-admin mt-3">
-                    Fecha Hasta
-                </label>
-                <input
-                    type="date"
-                    name="fechaHasta"
-                    className="typeDate"
-                    value={anuncio.fechaHasta ? anuncio.fechaHasta.toString().substring(0, 10) : ''}
-                    onChange={handleChangeAnuncio}
-                    style={{ padding: '8px', fontSize: '16px' }}
-                />
-
-                {(crear || (!crear && !anuncio.amedida)) && (
-                    <div>
-                        <label>Subir archivo</label>
-                        <div className="radio-group">
-                            <label className="radio-label">
-                                <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
-                                <span>🖼️</span>
-                                <span className="text">Imagen</span>
-                            </label>
-
-                            <label className="radio-label">
-                                <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
-                                <span>🎥</span>
-                                <span className="text">Video</span>
-                            </label>
-                        </div>
-                    </div>
+    /* 
+        const panelCrearAnuncio = () => {
+            return <div key={2} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
+                {!crear && (
+                    <button type="button" className="iconoVolver" onClick={() => {
+                        setCrear(false);
+                        setEditar(false);
+                        setVerDetalle(false);
+                    }}>
+                        <img width={35} src={volver} alt="Icono volver" />
+                    </button>
                 )}
-
-                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
-                    <label htmlFor="textfield" className="search-label-admin mt-3">
-                        Cargar imagen
+                <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {!crear ? tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio" : ""}</h2>
+    
+                <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Cabecera
                     </label>
-                )}
-                {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
-                    <input type="file" accept="image/*" className="w-100" onChange={handleImage} />
-                )}
-                <div id="containerViewImg" className={anuncio.amedida && !anuncio.esVideo ? "" : "d-none"}>
-                    <h3>Vista previa Imagen:</h3>
-                    <img
-                        id="visualizadorImg"
-                        src={!crear ? anuncio.amedida : ""}
-                        onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = imgError;
-                        }}
-                        alt="Vista previa"
-                        style={{ maxWidth: '300px', marginTop: '10px' }}
+                    <input
+                        type="text"
+                        name="cabecera"
+                        className="search-input"
+                        value={anuncio.cabecera}
+                        onChange={handleChangeAnuncio}
                     />
-                </div>
-
-
-                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
-                    <label htmlFor="textfield" className="search-label-admin mt-3">
-                        Cargar video
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Descripción
                     </label>
-                )}
-                {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
-                    <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
-                )}
-                <div id="containerViewVideo" className={anuncio.amedida && anuncio.esVideo ? "" : "d-none"}>
-                    <h3>Vista previa Video:</h3>
-                    <video id="visualizadorVideo" src={!crear ? anuncio.amedida : ""} controls width="300" />
+                    <textarea
+                        rows={4}
+                        cols={50}
+                        name="descripcion"
+                        className="search-input"
+                        value={anuncio.descripcion}
+                        onChange={handleChangeAnuncio}
+                    />
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Organizador
+                    </label>
+                    <input
+                        type="text"
+                        name="organizador"
+                        className="search-input"
+                        value={usuario.nombre}
+                        disabled
+                        onChange={handleChangeAnuncio}
+                    />
+                    <label htmlFor="textfield" className="search-label-admin">
+                        Teléfono
+                    </label>
+                    <input
+                        type="text"
+                        name="telefono"
+                        className="search-input"
+                        value={anuncio.telefono}
+                        onChange={handleChangeAnuncio}
+                    />
+                    <label htmlFor="textfield" className="search-label-admin mt-3">
+                        Fecha Hasta
+                    </label>
+                    <input
+                        type="date"
+                        name="fechaHasta"
+                        className="typeDate"
+                        value={anuncio.fechaHasta ? anuncio.fechaHasta.toString().substring(0, 10) : ''}
+                        onChange={handleChangeAnuncio}
+                        style={{ padding: '8px', fontSize: '16px' }}
+                    />
+    
+                    {(crear || (!crear && !anuncio.amedida)) && (
+                        <div>
+                            <label>Subir archivo</label>
+                            <div className="radio-group">
+                                <label className="radio-label">
+                                    <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
+                                    <span>🖼️</span>
+                                    <span className="text">Imagen</span>
+                                </label>
+    
+                                <label className="radio-label">
+                                    <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
+                                    <span>🎥</span>
+                                    <span className="text">Video</span>
+                                </label>
+                            </div>
+                        </div>
+                    )}
+    
+                    {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
+                        <label htmlFor="textfield" className="search-label-admin mt-3">
+                            Cargar imagen
+                        </label>
+                    )}
+                    {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
+                        <input type="file" accept="image/*" className="w-100" onChange={handleImage} />
+                    )}
+                    <div id="containerViewImg" className={anuncio.amedida && !anuncio.esVideo ? "" : "d-none"}>
+                        <h3>Vista previa Imagen:</h3>
+                        <img
+                            id="visualizadorImg"
+                            src={!crear ? anuncio.amedida : ""}
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = imgError;
+                            }}
+                            alt="Vista previa"
+                            style={{ maxWidth: '300px', marginTop: '10px' }}
+                        />
+                    </div>
+    
+    
+                    {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
+                        <label htmlFor="textfield" className="search-label-admin mt-3">
+                            Cargar video
+                        </label>
+                    )}
+                    {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
+                        <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
+                    )}
+                    <div id="containerViewVideo" className={anuncio.amedida && anuncio.esVideo ? "" : "d-none"}>
+                        <h3>Vista previa Video:</h3>
+                        <video id="visualizadorVideo" src={!crear ? anuncio.amedida : ""} controls width="300" />
+                    </div>
+                    <label htmlFor="textfield" className="search-label mt-3">
+                        Tipo
+                    </label>
+                    <select id="miCombo" value={anuncio.idTipo} className="typeDate" name="idTipo" onChange={handleChangeAnuncio}>
+                        <option value="1">Anuncio</option>
+                        <option value="0">Ventas</option>
+                        <option value="2">Recordatorio</option>
+                    </select>
+                    <button
+                        type="button"
+                        className="search-button mt-2"
+                        onClick={CrearAnuncio}
+                    >
+                        {crear ? "Crear" : "Editar"}
+                    </button>
                 </div>
-                <label htmlFor="textfield" className="search-label mt-3">
-                    Tipo
-                </label>
-                <select id="miCombo" value={anuncio.idTipo} className="typeDate" name="idTipo" onChange={handleChangeAnuncio}>
-                    <option value="1">Anuncio</option>
-                    <option value="0">Ventas</option>
-                    <option value="2">Recordatorio</option>
-                </select>
-                <button
-                    type="button"
-                    className="search-button mt-2"
-                    onClick={CrearAnuncio}
-                >
-                    {crear ? "Crear" : "Editar"}
-                </button>
             </div>
-        </div>
-    }
+        } */
     const iconNotificaciones = (activa: boolean) => {
         return <label className="switch">
             <input
@@ -2790,6 +2518,9 @@ const Condominio = () => {
                 position: posicionAlertas,
             });
         }
+    }
+    const changeComentario = (ev: any) => {
+        setNewComentario(ev)
     }
 
     // eslint-disable-next-line
@@ -3068,7 +2799,7 @@ const Condominio = () => {
                                 </svg>
                                 Calendario
                             </button>
-                            <button type="button" onClick={() => {
+                            {/* <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, false, false, true)
                                 setCrear(false)
                             }}>
@@ -3076,7 +2807,7 @@ const Condominio = () => {
                                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
                                 </svg>
                                 Puntos de Interes
-                            </button>
+                            </button> */}
                             <button type="button" onClick={() => {
                                 cerrarMenu(false, false, false, false, false, false, true)
                                 setCrear(false)
@@ -3129,13 +2860,14 @@ const Condominio = () => {
                                                 onGuardar={(form: any, archivo: any) => {
                                                     setArchivoTemp(archivo);
                                                     setAnuncio(form);
-                                                    CrearAnuncio();
+                                                    CrearAnuncio(form);
                                                 }}
                                                 onCancelar={() => {
                                                     limpiarAnuncio();
                                                     setCrear(false);
                                                     setEditar(false);
                                                 }}
+                                                usuario={usuario}
                                             />
                                         </>
                                         : votaciones ?
@@ -3215,12 +2947,49 @@ const Condominio = () => {
                                                                 :
                                                                 verReglasNormas ?
                                                                     <>
-                                                                        {panelReglasNormas()}
+                                                                        <ReglasNormasPanel
+                                                                            normas={dataFull.normas}
+                                                                            editando={editarTextRich}
+                                                                            onChangeNormas={(e) => setNewTextRich(e.target.value)}
+                                                                            onGuardar={() => {
+                                                                                setLoading(true);
+                                                                                CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
+                                                                            }}
+                                                                            onEditarToggle={() => setEditarTextRich(true)}
+                                                                            onCancelar={() => {setEditarTextRich(false);setNewTextRich(dataFull.normas);}}
+                                                                            loading={loading}
+                                                                            puedeEditar={usuario.rol === "ADMINISTRADOR"}
+                                                                            editorRef={editorRef}
+                                                                            handleInput={handleInput}
+                                                                            handleBlur={handleBlur}
+                                                                            newTextRich={newTextRich}
+                                                                        />
                                                                     </>
                                                                     :
                                                                     verDetalle && tipo !== 2 ?
                                                                         <>
-                                                                            {panelDetalleAnuncio()}
+                                                                            <DetalleAnuncioPanel
+                                                                                anuncio={dataDetalle}
+                                                                                comentario={newComentario}
+                                                                                onChangeComentario={changeComentario}
+                                                                                onComentar={() => {
+                                                                                    if (newComentario.trim()) {
+                                                                                        CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, {
+                                                                                            Id: 0,
+                                                                                            IdUsuario: usuario.id,
+                                                                                            NombreUsuario: usuario.nombre,
+                                                                                            IdAnuncio: dataDetalle.id,
+                                                                                            Mensaje: newComentario,
+                                                                                            Fecha: new Date()
+                                                                                        }, localStorage.getItem("idCondominio")!.toString());
+                                                                                        setNewComentario('');
+                                                                                    }
+                                                                                }}
+                                                                                onLike={() => handleLike(dataDetalle.id, true, true)}
+                                                                                onCerrar={() => setVerDetalle(false)}
+                                                                                loading={loading}
+                                                                                imgError={imgError}
+                                                                            />
                                                                         </>
                                                                         :
                                                                         verMisAnuncios ?
@@ -3238,6 +3007,7 @@ const Condominio = () => {
                                                                                         onVerDetalle={(anuncio: any) => {
                                                                                             setDataDetalle(anuncio);
                                                                                             setVerDetalle(true);
+                                                                                            ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
                                                                                         }}
                                                                                         onLike={(id: any) => handleLike(id, true, false)}
                                                                                         imgErrorUrl={imgError}
@@ -3286,23 +3056,26 @@ const Condominio = () => {
                                                                                         </div>
                                                                                     </div>
                                                                                 }
-                                                                                {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => (
-                                                                                    <AnunciosPanel
-                                                                                        key={i}
-                                                                                        anuncio={a}
-                                                                                        usuarioId={usuario.id}
-                                                                                        usuarioRol={usuario.rol}
-                                                                                        onEditar={cargarAnuncioParaEdit}
-                                                                                        onEliminar={EliminarAnuncio}
-                                                                                        onDeshabilitar={DeshabilitarAnuncio}
-                                                                                        onVerDetalle={(anuncio: any) => {
-                                                                                            setDataDetalle(anuncio);
-                                                                                            setVerDetalle(true);
-                                                                                        }}
-                                                                                        onLike={(id: any) => handleLike(id, true, false)}
-                                                                                        imgErrorUrl={imgError}
-                                                                                    />
-                                                                                ))}
+                                                                                {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
+                                                                                    if (Number(tipo) === Number(a.idTipo))
+                                                                                        return <AnunciosPanel
+                                                                                            key={i}
+                                                                                            anuncio={a}
+                                                                                            usuarioId={usuario.id}
+                                                                                            usuarioRol={usuario.rol}
+                                                                                            onEditar={cargarAnuncioParaEdit}
+                                                                                            onEliminar={EliminarAnuncio}
+                                                                                            onDeshabilitar={DeshabilitarAnuncio}
+                                                                                            onVerDetalle={(anuncio: any) => {
+                                                                                                setDataDetalle(anuncio);
+                                                                                                setVerDetalle(true);
+                                                                                                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
+                                                                                            }}
+                                                                                            onLike={(id: any) => handleLike(id, true, false)}
+                                                                                            imgErrorUrl={imgError}
+                                                                                        />
+                                                                                }
+                                                                                )}
                                                                             </>
                         }
                     </div>

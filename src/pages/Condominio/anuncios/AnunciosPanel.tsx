@@ -44,7 +44,6 @@ const AnunciosPanel: React.FC<Props> = ({
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = imgErrorUrl;
     };
-
     return (
         <div className="v2-anuncio card-shadow col-12 my-3 pb-5">
             <div className="v2-anuncio-header">

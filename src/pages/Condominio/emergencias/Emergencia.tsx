@@ -34,7 +34,7 @@ const Emergencia: React.FC<Props> = ({
     modoEdicion = false
 }) => {
     return (
-        <form onSubmit={(e) => { e.preventDefault(); onGuardar(); }} className="emergencia-form">
+        <form onSubmit={(e) => { e.preventDefault(); onGuardar(); }}>
             {modoEdicion ?
                 <div className="w-100 px-3">
                     <div className="login-box py-3">
