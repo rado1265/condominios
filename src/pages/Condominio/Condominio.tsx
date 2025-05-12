@@ -3727,6 +3727,9 @@ const Condominio = () => {
                                                                     mensaje={mensajeAviso}
                                                                     fecha={fechaAviso}
                                                                     hora={horaAviso}
+                                                                    mes={mes}
+                                                                    año={año}
+                                                                    onCambiarMes={cambiarMes}
                                                                     onChangeMensaje={(e) => setMensajeAviso(e.target.value)}
                                                                     onChangeFecha={(e) => setFechaAviso(e.target.value)}
                                                                     onChangeHora={(e) => setHoraAviso(e.target.value)}

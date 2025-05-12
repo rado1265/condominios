@@ -932,28 +932,13 @@ body {
 .calendario {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-top: 20px;
-  background: #00000000;
-  border-radius: 10px;
-  border: 1px solid #8080803d;
 }
 
-.dia,
-.encabezado {
-  background-color: #f9f9f9;
-  padding: 6px;
-  min-height: 80px;
-  border: 1px solid #ddd;
-  font-size: 12px;
-  box-sizing: border-box;
-}
-
-.encabezado {
-  background-color: #1a952cc7 !important;
-  font-weight: bold;
-  text-align: center;
-  color: white !important;
-  font-size: 13px !important;
+.container-calendario {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 10px;
+  display: contents;
 }
 
 .fecha {
@@ -975,7 +960,7 @@ body {
 }
 
 .iconFlecha {
-  background: #1a952cc7 !important;
+  background: transparent !important;
   border: 0;
   border-radius: 50%;
   height: 30px;
@@ -986,23 +971,36 @@ body {
   padding: 8px;
 }
 
+.dia-con-algo {
+  background: #0a9e5e;
+  color: white;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px !important;
+  min-height: 14px;
+  margin: auto;
+  justify-content: center;
+  align-items: anchor-center;
+  display: flex;
+}
+
 @media (max-width: 600px) {
-  .calendario {
-    grid-template-columns: repeat(7, minmax(30px, 1fr));
-  }
 
   .dia,
   .encabezado {
-    min-height: 60px;
-    padding: 4px;
+    min-height: 40px;
     font-size: 12px;
     border: 0;
-    color: #696767;
-    background: transparent;
+    color: #9a9a9a;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
   }
 
   .mensaje {
     font-size: 9px;
+    display: none;
   }
 
   h1 {
@@ -1689,7 +1687,7 @@ a:hover {
   padding: 10px 20px;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
-  box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
 }
 
 .search-button:hover {
@@ -1697,24 +1695,25 @@ a:hover {
   transform: translateY(-2px) scale(1.03);
 }
 
-.condominioList{
+.condominioList {
   padding: 10px 25px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.condominioList.disabled{
+.condominioList.disabled {
   opacity: 0.8;
   background: #80808014;
   border-color: #b0b0b0;
   pointer-events: none !important;
 }
-.condominioList.disabled > #nomComunidad{
+
+.condominioList.disabled>#nomComunidad {
   color: rgb(174, 173, 173);
 }
 
-.condominioList.disabled > #imgComunidad{
+.condominioList.disabled>#imgComunidad {
   opacity: 0.3;
 }
 
@@ -1749,7 +1748,7 @@ a:hover {
   align-items: center;
 }
 
-.newAlertas{
+.newAlertas {
   position: fixed;
   z-index: 99;
   bottom: 75px;
@@ -1758,6 +1757,7 @@ a:hover {
 .Toastify__toast-container--bottom-left {
   bottom: 80px !important;
 }
+
 .iconoFiltro {
   outline: none !important;
   width: 35px;
@@ -1765,4 +1765,24 @@ a:hover {
   margin-top: -10px;
   border: 0;
   background: transparent;
+}
+
+.avisos-dia {
+  padding: 14px 15px;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+}
+
+.title-eventosdeldia {
+  margin-top: 20px;
+  color: #3e3e3e;
+}
+
+.diaActual {
+  color: #ff0000 !important;
+  font-weight: 700;
+  scale: 1.1;
 }
