@@ -3713,17 +3713,46 @@ const Condominio = () => {
                                                                                 </>
                                                                                 :
                                                                                 <>
-                                                                                    <div className="buscaruser-search-container mt-3">
-                                                                                        <label className="buscaruser-search-label">Buscar por título o creador</label>
-                                                                                        <input
-                                                                                            type="search"
-                                                                                            id="buscar-datafull"
-                                                                                            value={buscarDataFull}
-                                                                                            className="buscaruser-search-input"
-                                                                                            placeholder="Escribe para buscar..."
-                                                                                            onChange={(ev) => { filtrarDataFull(ev); setBuscarDataFull(ev.target.value) }}
-                                                                                        />
-                                                                                    </div>
+                                                                                    {
+                                                                                        <div className="mt-1">
+                                                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                                                <label style={{ fontSize: '12px', marginRight: '10%' }} className="block mb-1 font-medium text-xs">Buscar por título o creador</label>
+                                                                                                <label style={{ fontSize: '12px' }} className="text-sm font-medium">Ordenar por:</label>
+                                                                                            </div>
+                                                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                                                <input
+                                                                                                    type="search"
+                                                                                                    id="buscar-datafull"
+                                                                                                    value={buscarDataFull}
+                                                                                                    placeholder="Buscar..."
+                                                                                                    onChange={(ev) => {
+                                                                                                        filtrarDataFull(ev);
+                                                                                                        setBuscarDataFull(ev.target.value);
+                                                                                                    }}
+                                                                                                    style={{ width: '45%', marginRight: '5%' }}
+                                                                                                    className="border rounded px-3 py-1 text-sm"
+                                                                                                />
+                                                                                                <select
+                                                                                                    value={criterio}
+                                                                                                    onChange={(e: any) => setCriterio(e.target.value)}
+                                                                                                    className="border rounded px-2 py-1 text-sm"
+                                                                                                >
+                                                                                                    <option value="fechaDesde">Fecha</option>
+                                                                                                    <option value="likes">Likes</option>
+                                                                                                    <option value="cantComentarios">Comentarios</option>
+                                                                                                    <option value="cabecera">Nombre</option>
+                                                                                                </select>
+
+                                                                                                <button
+                                                                                                    onClick={() => setOrden(orden === 'asc' ? 'desc' : 'asc')}
+                                                                                                    className="iconoFiltro"
+                                                                                                    title="Cambiar orden"
+                                                                                                >
+                                                                                                    <img src={filtro} />{/* {orden === 'asc' ? '⬆️' : '⬇️'} */}
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
                                                                                     {dataFullParse.anuncios !== null && dataFullParse.anuncios.map((a: any, i) => (
                                                                                         panelAnuncios(a, i)
                                                                                     ))}
