@@ -3753,7 +3753,7 @@ const Condominio = () => {
                                                                                             </div>
                                                                                         </div>
                                                                                     }
-                                                                                    {dataFullParse.anuncios !== null && dataFullParse.anuncios.map((a: any, i) => (
+                                                                                    {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i) => (
                                                                                         panelAnuncios(a, i)
                                                                                     ))}
                                                                                 </>
