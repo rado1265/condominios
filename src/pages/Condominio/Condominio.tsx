@@ -16,6 +16,12 @@ import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
 import filtro from './../../components/utils/img/flechas-arriba-y-abajo.png';
+import AnunciosPanel from "./anuncios/AnunciosPanel";
+import AnunciosCrear from "./anuncios/AnunciosCrear";
+import Login from "./login/Login";
+import PerfilUsuario from "./usuarios/PerfilUsuario";
+import Emergencia from "./emergencias/Emergencia";
+import AvisoPanel from "./avisos/AvisoPanel";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -982,6 +988,10 @@ const Condominio = () => {
             handleConfirmMessageEliminarEmergencia()
         } catch (er) {
         }
+    }
+    const SeleccionarEmergencia = (e: any) => {
+        setEmergenciaDetalle(e);
+        setEditarEmergencia(true);
     }
     const handleConfirmMessageEliminarEmergencia = async () => {
         const msg: any = await ConfirmMessage(`Eliminar número de emergencia`, `¿Esta seguro de querer eliminar el número de emergencia?`);
@@ -3224,7 +3234,7 @@ const Condominio = () => {
             try {
                 const registration = await navigator.serviceWorker.register('/service-worker.js');
                 console.log('SW registrado:', registration);
- 
+     
                 const readyReg = await navigator.serviceWorker.ready;
                 console.log('SW listo:', readyReg);
                 setEstadoServiceWorker('SW listo:' + readyReg.toString())
@@ -3653,12 +3663,30 @@ const Condominio = () => {
                                 :
                                 iniciarSesion ?
                                     <>
-                                        {panelInicioSesion()}
+                                        <Login
+                                            usuario={loguear.usuario}
+                                            clave={loguear.clave}
+                                            onChange={handleChangeLogin}
+                                            onLogin={login}
+                                            loading={loading}
+                                        />
                                     </>
                                     :
                                     crear || editar ?
                                         <>
-                                            {panelCrearAnuncio()}
+                                            <AnunciosCrear
+                                                anuncio={anuncio}
+                                                onGuardar={(form: any, archivo: any) => {
+                                                    setArchivoTemp(archivo);
+                                                    setAnuncio(form);
+                                                    CrearAnuncio();
+                                                }}
+                                                onCancelar={() => {
+                                                    limpiarAnuncio();
+                                                    setCrear(false);
+                                                    setEditar(false);
+                                                }}
+                                            />
                                         </>
                                         : votaciones ?
                                             <>
@@ -3666,7 +3694,20 @@ const Condominio = () => {
                                             </>
                                             : verEmergencia ?
                                                 <>
-                                                    {panelEmergencia()}
+                                                    <Emergencia
+                                                        emergencia={emergencia}
+                                                        emergencias={emergenciaDetalle}
+                                                        onChange={handleChangeEmergencia}
+                                                        onGuardar={CrearEmergencia}
+                                                        onEliminar={EliminarEmergencia}
+                                                        onCancelar={() => {
+                                                            setEditarEmergencia(false);
+                                                        }}
+                                                        onSelect={SeleccionarEmergencia}
+                                                        rolUsuario={usuario.rol}
+                                                        loading={loading}
+                                                        modoEdicion={editarEmergencia}
+                                                    />
                                                 </>
                                                 :
                                                 verPuntosInteres ?
@@ -3681,12 +3722,31 @@ const Condominio = () => {
                                                         :
                                                         verAvisos ?
                                                             <>
-                                                                {panelAvisos()}
+                                                                <AvisoPanel
+                                                                    avisos={avisos}
+                                                                    mensaje={mensajeAviso}
+                                                                    fecha={fechaAviso}
+                                                                    hora={horaAviso}
+                                                                    onChangeMensaje={(e) => setMensajeAviso(e.target.value)}
+                                                                    onChangeFecha={(e) => setFechaAviso(e.target.value)}
+                                                                    onChangeHora={(e) => setHoraAviso(e.target.value)}
+                                                                    onCrear={CrearAviso}
+                                                                    onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje)}
+                                                                    onEnviarNotificacion={EnviarNotifAviso}
+                                                                    loading={loading}
+                                                                />
                                                             </>
                                                             :
                                                             verPerfil ?
                                                                 <>
-                                                                    {panelPerfil()}
+                                                                    <PerfilUsuario
+                                                                        usuario={usuarioDetalle}
+                                                                        onChange={handleChangePerfil}
+                                                                        onGuardar={EditarPerfil}
+                                                                        onCancelar={() => setEditarPerfil(false)}
+                                                                        onImagenSeleccionada={(file) => setArchivoTemp(file)}
+                                                                        loading={loading}
+                                                                    />
                                                                 </>
                                                                 :
                                                                 verUsuarios ?
@@ -3753,8 +3813,25 @@ const Condominio = () => {
                                                                                             </div>
                                                                                         </div>
                                                                                     }
-                                                                                    {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i) => (
+                                                                                    {/* {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i) => (
                                                                                         panelAnuncios(a, i)
+                                                                                    ))} */}
+                                                                                    {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => (
+                                                                                        <AnunciosPanel
+                                                                                            key={i}
+                                                                                            anuncio={a}
+                                                                                            usuarioId={usuario.id}
+                                                                                            usuarioRol={usuario.rol}
+                                                                                            onEditar={cargarAnuncioParaEdit}
+                                                                                            onEliminar={EliminarAnuncio}
+                                                                                            onDeshabilitar={DeshabilitarAnuncio}
+                                                                                            onVerDetalle={(anuncio: any) => {
+                                                                                                setDataDetalle(anuncio);
+                                                                                                setVerDetalle(true);
+                                                                                            }}
+                                                                                            onLike={(id: any) => handleLike(id, true, false)}
+                                                                                            imgErrorUrl={imgError}
+                                                                                        />
                                                                                     ))}
                                                                                 </>
                         }
