@@ -554,10 +554,10 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async CrearUsuario(usuario: any): Promise<IServiceResult<any>> {
+    public static async CrearUsuario(usuario: any, eliminar: boolean): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/crearUsuarioComunidad";
+        const url: string = _ruta + "Condominios/crearUsuarioComunidad?eliminar=" + eliminar;
 
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
