@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ObtenerAvisosLogic } from '../../../presentation/view-model/Anuncio.logic';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 interface Aviso {
     id: number;
@@ -45,6 +48,8 @@ const AvisoPanel: React.FC<Props> = ({
     onChangeColor,
     loading = false
 }) => {
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
     const [idEdit, setIdEdit] = useState<number | null>(null);
     const [crearEvento, setCrearEvento] = useState(false);
     const [monthTitle, setMonthTitle] = useState('');
@@ -68,13 +73,15 @@ const AvisoPanel: React.FC<Props> = ({
 
     useEffect(() => {
         generarCalendario();
+        const fechaChile = dayjs().tz("America/Santiago");
+        console.log(fechaChile,diaMesSelect)
         const avisosDeHoy = avisos.filter((a, b) => new Date(a.fecha).getTime() === new Date().getTime());
         const avisosOrdenados = avisosDeHoy.slice().sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         setAvisosParse(avisosOrdenados);
-        if(diaMesSelect.dia > 0){
+        if (diaMesSelect.dia > 0) {
             getObtenerAvisosDia(diaMesSelect.dia, diaMesSelect.mes);
-        }else{
-            setDiaMesSelect({ dia: new Date().getDate(), mes: new Date().getMonth() + 1, anio: new Date().getFullYear() })
+        } else {
+            setDiaMesSelect({ dia: parseInt(fechaChile.format('DD')), mes: parseInt(fechaChile.format('MM')), anio: parseInt(fechaChile.format('YYYY')) })
         }
         setCrearEvento(false);
     }, [avisos]);
@@ -114,7 +121,8 @@ const AvisoPanel: React.FC<Props> = ({
             return `${_año}-${(_mes + 1).toString().padStart(2, '0')}-${_dia.toString().padStart(2, '0')}`;
         }
         // Días con avisos
-        let fechaActualParse = new Date().toISOString().split("T")[0];
+        const fechaActualParse = dayjs().tz("America/Santiago").toISOString().split("T")[0];
+        //let fechaActualParse = new Date().toISOString().split("T")[0];
         for (let dia = 1; dia <= diasEnMes; dia++) {
             const fechaTexto = `${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
             const avisosDelDia = avisos.filter((a: any) => formatoFecha(a.fecha) === fechaTexto && a.mensaje !== "");
@@ -224,7 +232,7 @@ const AvisoPanel: React.FC<Props> = ({
                     />
                     <select
                         id="colorEvento"
-                        style={{color: colorEvento, fontWeight: 600}}
+                        style={{ color: colorEvento, fontWeight: 600 }}
                         className="modal-select"
                         value={colorEvento}
                         onChange={(e) => onChangeColor(e.target.value)}
