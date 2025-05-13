@@ -43,7 +43,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     imgError
 }) => {
     console.log(anuncio)
-    return (
+    return <>{!loading &&
         <div className="mx-3">
             <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{anuncio.cabecera}</h4>
             <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: anuncio.descripcion }} />
@@ -115,8 +115,8 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                 </button>
             </div>
         </div>
-
-    );
+    }
+    </>
 };
 
 export default DetalleAnuncioPanel;

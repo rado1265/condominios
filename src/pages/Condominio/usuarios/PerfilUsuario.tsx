@@ -71,7 +71,7 @@ const PerfilUsuario: React.FC<Props> = ({
     };
 
     return (
-        <form onSubmit={(e) => { e.preventDefault(); onGuardar(); }} className="perfil-form">
+        <form onSubmit={(e) => { e.preventDefault(); onGuardar(); setEditarPerfil(false); }} className="perfil-form">
             {
                 editarPerfil ?
                     <>
@@ -155,7 +155,7 @@ const PerfilUsuario: React.FC<Props> = ({
                         </div>
                     </>
                     :
-                    <div className="perfil-box w-100">
+                    !loading && <div className="perfil-box w-100">
                         <button
                             type="button"
                             className="perfil-edit-btn"

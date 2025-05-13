@@ -13,6 +13,11 @@ const Login: React.FC<Props> = ({ usuario, clave, onChange, onLogin, loading = f
         e.preventDefault();
         onLogin();
     };
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            onLogin();
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit} className="login-form">
@@ -42,6 +47,7 @@ const Login: React.FC<Props> = ({ usuario, clave, onChange, onLogin, loading = f
                     <button
                         type="submit"
                         className="search-button"
+                        
                     >
                         {loading ? 'Ingresando...' : 'Ingresar'}
                     </button>

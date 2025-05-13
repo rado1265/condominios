@@ -22,7 +22,7 @@ interface Props {
 }
 
 const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiarVoto, loading = false, usuario = "" }) => {
-    return <div style={{ fontFamily: 'Arial, sans-serif' }}>
+    return <>{!loading && <div style={{ fontFamily: 'Arial, sans-serif' }}>
         <h4 className="mt-3 mb-4 text-center">VOTACIONES</h4>
         {votaciones.map((a: any, i: number) => {
             return (
@@ -59,6 +59,8 @@ const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiar
             );
         })}
     </div>
-};
+    }
+    </>
+}
 
 export default VotacionPanel;
