@@ -4,8 +4,8 @@
     left: 0;
     right: 0;
     height: 65px;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
+    background-color: var(--colorFondo);
+    border-top: 1px solid var(--colorSecundarioVarianteDos);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -20,22 +20,20 @@
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 8px;
-    color: #666666;
+    color: var(--colorNeutro);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: color 0.3s ease;
     font-size: 24px;
-    /* para que svg herede tamaño */
 }
 
 .nav-button:hover {
-    color: #28a745;
+    color: var(--colorSecundarioVariante);
 }
 
 .nav-button.active {
-    color: #28a745;
+    color: var(--colorSecundario);
 }
 
 /* Botón central crear */
@@ -47,14 +45,14 @@
 }
 
 .create-button {
-    background-color: #28a745;
+    background-color: var(--colorSecundario);
     border-radius: 50%;
     width: 60px;
     height: 60px;
     margin-top: -25px;
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
     transition: background-color 0.3s ease, transform 0.3s ease;
-    color: white;
+    color: var(--colorFondo);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,7 +61,7 @@
 }
 
 .create-button:hover {
-    background-color: #218838;
+    background-color: var(--colorSecundarioVariante);
 }
 
 .create-button.open {
@@ -94,12 +92,12 @@
 }
 
 .dropdown-option {
-    background-color: #fff;
+    background-color: var(--colorFondo);
     border-radius: 30px;
     padding: 8px 16px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     border: none;
-    color: #333;
+    color: var(--colorBlack);
     font-weight: 600;
     font-size: 14px;
     display: flex;
@@ -111,8 +109,8 @@
 }
 
 .dropdown-option:hover {
-    background-color: #28a745;
-    color: white;
+    background-color: var(--colorSecundarioVariante);
+    color: var(--colorFondo);
 }
 
 .option-text {
@@ -130,7 +128,7 @@
 }
 
 .icon-crear {
-    stroke: white;
+    stroke: var(--colorFondo);
     stroke-width: 3;
 }
 
@@ -142,12 +140,12 @@
 /* Para evitar que el menú se corte en pantallas pequeñas */
 @media (max-width: 400px) {
     .create-dropdown {
-        bottom: 65px;
+        bottom: 80px;
     }
 }
 
 .container-custom-menu {
-    background: #919191a3;
+    background: var(--colorNeutro);
     position: fixed;
     z-index: 999;
     left: 0;
@@ -158,7 +156,7 @@
 
 .custom-menu {
     position: absolute;
-    background: white;
+    background: var(--colorFondo);
     color: var(--colorNeutro);
     border: 1px solid var(--colorNeutroVariante);
     border-radius: 0.5rem 0 0 0;
@@ -182,7 +180,7 @@
     background: none;
     border: none;
     border-bottom: 1px solid var(--colorNeutroVariante);
-    color: #666;
+    color: var(--colorNeutro);
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
     outline: none;
@@ -210,4 +208,48 @@
     margin-right: 0.7em;
     flex-shrink: 0;
     fill: currentColor;
+}
+
+.filaOpciones {
+    display: ruby;
+    text-align: center;
+}
+
+.container-Opcion {
+    display: grid;
+    text-align: center;
+    justify-content: center;
+    width: 20%;
+    margin: 5px 8px;
+}
+
+.container-Opcion>img {
+    margin: 0 auto;
+    width: 30px;
+}
+
+.txtOpcion {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--colorSecundarioVarianteBlack);
+}
+
+.fullContainerOpciones {
+    border: 1px solid var(--colorSecundario);
+    background: var(--colorFondo);
+    border-radius: 10px;
+    padding: 10px 2px;
+    max-width: 95vw;
+}
+
+.container-submenu.visual {
+    justify-content: center;
+    display: inline-flex;
+    position: fixed;
+    background: #74868496;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9;
 }

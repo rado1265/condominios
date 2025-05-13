@@ -7,9 +7,10 @@
   --colorSecundario: #009688; /*Iconos, botones secundarios, acentos*/
   --colorSecundarioVariante: #66B2A9; /*Hover, fondos de secciones*/
   --colorSecundarioVarianteDos: #B2DFDB; /*Fondos suaves, notificaciones*/
+  --colorSecundarioVarianteBlack: #07564d;
   --colorNeutro: #4A4A4A; /*Texto principal*/
   --colorNeutroVariante: #CCCCCC; /*Bordes, líneas divisorias*/
-  --colorBlack: #222;
+  --colorBlack: #1c1b29;
   --colorRed: #f34646;
 }
 

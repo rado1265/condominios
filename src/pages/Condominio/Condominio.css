@@ -1365,7 +1365,7 @@ a:hover {
 .v2-anuncio {
   background: var(--colorFondo);
   border-radius: 12px;
-  box-shadow: 0 6px 15px var(--colorBlack);
+  box-shadow: 0 6px 15px var(--colorSecundarioVarianteDos);
   padding: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
@@ -1376,7 +1376,7 @@ a:hover {
 
 .v2-anuncio:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 25px var(--colorBlack);
+  box-shadow: 0 12px 25px var(--colorSecundarioVarianteDos);
 }
 
 .v2-anuncio-header {
@@ -1393,7 +1393,7 @@ a:hover {
   top: 0;
   padding: 5px 10px;
   border-radius: 0px 5px 0px 5px;
-  background: var(--colorNeutroVariante);
+  background: var(--colorFondo);
   border: 1px solid var(--colorSecundarioVarianteDos);
 }
 
