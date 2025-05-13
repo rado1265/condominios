@@ -11,7 +11,7 @@
     right: 0;
     width: auto;
     height: auto;
-    background: #000000ab;
+    background: var(--colorBlack);
 }
 
 #loader {
@@ -24,7 +24,7 @@
     margin: -75px 0 0 -75px;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: #c56404;
+    border-top-color: var(--colorPrincipal);
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
 }
@@ -38,7 +38,7 @@
     bottom: 5px;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: #f27900;
+    border-top-color: var(--colorPrincipalVariante);
     -webkit-animation: spin 3s linear infinite;
     animation: spin 3s linear infinite;
 }
@@ -52,7 +52,7 @@
     bottom: 15px;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: #ffffff;
+    border-top-color: var(--colorFondo);
     -webkit-animation: spin 1.5s linear infinite;
     animation: spin 1.5s linear infinite;
 }

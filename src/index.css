@@ -1,26 +1,20 @@
 :root {
-  --primaryColor: #44a55f;
-  --secondColor: #5ead66;
-  --primaryColorHover: #33853b;
-  --secondColorHover: #106b2a;
-  --colorRed: #a92013;
-  --color-bg: #fff;
-  --color-border: #e5e7eb;
-  --color-text: #1f2937;
-  --color-hover-bg: #f1f5f9;
-  --color-hover-text: #2563eb;
-  --color-focus-ring: #2563eb;
-  --color-dark-bg: #374151;
-  --color-dark-border: #4b5563;
-  --color-dark-text: #fff;
-  --color-dark-hover-bg: #4b5563;
-  --color-dark-hover-text: #fff;
-  --color-dark-focus-ring: #6b7280;
-  --fuenteWeb: 'Overpass', Arial, sans-serif;
+  --fuenteWeb: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --colorFondo: #FFFFFF; /*Fondo principal*/
+  --colorPrincipal: #003366; /*Botones, encabezados, enlaces*/
+  --colorPrincipalVariante: #336699; /*Hover, fondos secundarios*/
+  --colorPrincipalVarianteDos: #99CCFF; /*Fondos de tarjetas, resaltados*/
+  --colorSecundario: #009688; /*Iconos, botones secundarios, acentos*/
+  --colorSecundarioVariante: #66B2A9; /*Hover, fondos de secciones*/
+  --colorSecundarioVarianteDos: #B2DFDB; /*Fondos suaves, notificaciones*/
+  --colorNeutro: #4A4A4A; /*Texto principal*/
+  --colorNeutroVariante: #CCCCCC; /*Bordes, líneas divisorias*/
+  --colorBlack: #222;
+  --colorRed: #f34646;
 }
 
 .body {
-  color: white;
+  color: var(--colorFondo);
   font-size: 5px;
 }
 

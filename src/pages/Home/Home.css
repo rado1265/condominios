@@ -9,7 +9,7 @@
     font-weight: 500;
     margin-bottom: 12px;
     display: block;
-    color: #333;
+    color: var(--colorBlack);
   }
   
   .search-box {
@@ -21,7 +21,7 @@
   .search-input {
     flex: 1;
     padding: 10px 14px;
-    border: 1.5px solid #d1d5db;
+    border: 1.5px solid var( --colorNeutroVariante);
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s;
@@ -29,13 +29,13 @@
   }
   
   .search-input:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px #6366f133;
+    border-color: var(--colorSecundarioVariante);
+    box-shadow: 0 0 0 2px var(--colorSecundario);
   }
   
   .search-button {
-    background: linear-gradient(90deg, var(--primaryColor), var(--secondColor));
-    color: #fff;
+    background: linear-gradient(90deg, var(--colorPrincipal), var(--colorPrincipalVariante));
+    color: var(--colorFondo);
     font-weight: 600;
     border: none;
     border-radius: 8px;
@@ -46,7 +46,7 @@
   }
   
   .search-button:hover {
-    background: linear-gradient(90deg, var(--primaryColorHover), var(--secondColorHover));
+    background: linear-gradient(90deg, var(--colorPrincipalVariante), var(--colorPrincipalVarianteDos));
     transform: translateY(-2px) scale(1.03);
   }
   

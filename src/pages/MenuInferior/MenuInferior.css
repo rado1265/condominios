@@ -159,8 +159,8 @@
 .custom-menu {
     position: absolute;
     background: white;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+    color: var(--colorNeutro);
+    border: 1px solid var(--colorNeutroVariante);
     border-radius: 0.5rem 0 0 0;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -181,7 +181,7 @@
     font-weight: 500;
     background: none;
     border: none;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--colorNeutroVariante);
     color: #666;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
@@ -199,8 +199,8 @@
 
 .custom-menu button:hover,
 .custom-menu button:focus {
-    background: var(--color-hover-bg);
-    color: var(--primaryColor);
+    background: var(--colorPrincipalVarianteDos);
+    color: var(--colorPrincipal);
     z-index: 1;
 }
 
