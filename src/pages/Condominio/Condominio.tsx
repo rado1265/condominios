@@ -86,7 +86,6 @@ const Condominio = () => {
     const [dataCondominios, setDataCondominios] = useState([]);
     const [dataArchivosComunidad, setDataArchivosComunidad] = useState([{ nombre: "test", url: "test" }]);
     const [enComunidad, setEnComunidad] = useState(false);
-    const [open, setOpen] = useState(false);
     const [dataFull, setDataFull] = useState<DataFull>({
         anuncios: [],
         nombre: "",
@@ -490,7 +489,7 @@ const Condominio = () => {
 
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
-            /* alert((serviceWorker as any).endpoint) */
+            setLoading(true)
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
         }
     }
@@ -1177,16 +1176,16 @@ const Condominio = () => {
             [name]: value
         }));
     };
-    const changeMenu = (a: number, b: boolean = false, c: boolean = false, d: boolean = false, e: boolean = false, f: boolean = false) => {
+    const changeMenu = (a: number) => {
         window.scrollTo(0, 0);
         setAlerta({ tipo: 1, mensaje: "" })
         setAlertaCerrada(false);
         setVerDetalle(false);
         setTipo(a);
-        setIniciarSesion(b);
-        setCrear(c);
-        setEditar(d);
-        setEncuesta(e);
+        setIniciarSesion(false);
+        setCrear(false);
+        setEditar(false);
+        setEncuesta(false);
         setVerDetalle(false)
         setVerPerfil(false);
         setEditarPerfil(false);
@@ -1204,8 +1203,6 @@ const Condominio = () => {
         } else {
             setVotaciones(false);
         }
-        if (c)
-            limpiarAnuncio()
     }
     const cargarAnuncioParaEdit = (a: any) => {
         setTipoSubir(0);
@@ -1387,33 +1384,33 @@ const Condominio = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
                 <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => {
-                    cerrarMenu(false); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                    cerrarMenu(); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
                 }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
                     </svg>
                     <span className="text">Anuncios</span>
                 </button>
-                <button aria-label="Ventas" type="button" className={tipo === 0 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(0) }}>
+                <button aria-label="Ventas" type="button" className={tipo === 0 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(0) }}>
                     <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M6 2a1 1 0 0 0-1 1v2H3a1 1 0 0 0-1 1v2h20V6a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1H6Zm1 3V4h10v1H7Zm-4 5v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10H3Zm7 3a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Zm4 0a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Z" />
                     </svg>
                     <span className="text">Ventas</span>
                 </button>
-                <button aria-label="Recordatorios" type="button" className={tipo === 2 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(2) }}>
+                <button aria-label="Recordatorios" type="button" className={tipo === 2 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(2) }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                         <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm-.5-9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V7z" />
                     </svg>
                     <span className="text">Recordatorios</span>
                 </button>
                 {
-                    usuario.nombre.length > 0 ? <button type="button" className={tipo === 5 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(5, false, false) }}>
+                    usuario.nombre.length > 0 ? <button type="button" className={tipo === 5 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(5); setVotaciones(true) }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                             <path d="M4 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4zm1 3h10v2H5V6zm0 4h10v2H5v-2zm0 4h6v2H5v-2z" />
                         </svg>
                         <span className="text">Votaciones</span>
                     </button> :
-                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(false); changeMenu(4, true); }}>
+                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(4); setVerPerfil(true) }}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
                                 <path d="M10 0a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
                             </svg>
@@ -1586,172 +1583,174 @@ const Condominio = () => {
 
 
     const panelUsuarios = () => {
-        return (
-            <div className="w-100 px-3">
-                {
-                    agregarUsuario ?
-                        <>
-                            <div className="w-100 px-3 mt-2">
-                                <div className="login-box py-3">
-                                    <h2 className="text-center">Agregar Usuario</h2>
-                                    <label htmlFor="textfield" className="search-label-admin">
-                                        Nombre
-                                    </label>
-                                    <input
-                                        name="nombre"
-                                        className="search-input"
-                                        value={newUser.nombre}
-                                        onChange={(e: any) => handleChangeNewUser(e)}
-                                    />
-                                    <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
-                                        Clave
-                                    </label>
-                                    <input
-                                        name="clave"
-                                        className="search-input"
-                                        value={newUser.clave}
-                                        onChange={(e: any) => handleChangeNewUser(e)}
-                                    />
-                                    <label htmlFor="textfield" className="search-label-admin">
-                                        Rol
-                                    </label>
-                                    <select id="rol" className="typeDate" name="rol" onChange={(e: any) => { handleChangeNewUser(e) }}>
-                                        <option value="VECINO" selected>Vecino</option>
-                                        <option value="ADMINISTRADOR">Administrador</option>
-                                    </select>
-                                    <button
-                                        type="button"
-                                        disabled={newUser.nombre === "" || newUser.clave === ""}
-                                        className="search-button mt-2"
-                                        onClick={CrearUsuario}
-                                    >
-                                        Aceptar
-                                    </button>
-                                </div>
-                            </div>
-                        </> :
-                        !verUsuarioInd ?
+        return <>
+            {!loading &&
+                <div className="w-100 px-3">
+                    {
+                        agregarUsuario ?
                             <>
-                                <div className="usuariosContainer">
-                                    <h4 className="usuarios-title">Listado Usuarios</h4>
-                                    {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
-                                        <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
-                                            setAgregarUsuario(true); setNewUser({ nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
-                                        }}>
-                                            <button className="cupo-usuarios-add" title="Agregar usuario">
-                                                <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
-                                                    <circle cx="9" cy="9" r="9" fill="#05c724" />
-                                                    <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-                                                </svg>
-                                            </button>
-                                            <span className="cupo-usuarios">
-                                                {cupoUsuarios.usados}/{cupoUsuarios.cupo}
-                                            </span>
-                                        </div>
-                                        :
-                                        <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }}>
-                                            <span className="cupo-usuarios">
-                                                {cupoUsuarios.usados}/{cupoUsuarios.cupo}
-                                            </span>
-                                        </div>
-                                    }
-                                    <div className="buscaruser-search-container">
-                                        <label className="buscaruser-search-label">Buscar Usuario</label>
+                                <div className="w-100 px-3 mt-2">
+                                    <div className="login-box py-3">
+                                        <h2 className="text-center">Agregar Usuario</h2>
+                                        <label htmlFor="textfield" className="search-label-admin">
+                                            Nombre
+                                        </label>
                                         <input
-                                            type="search"
-                                            id="buscar-usuario"
-                                            className="buscaruser-search-input"
-                                            placeholder="Escribe para buscar..."
-                                            onChange={(ev) => { filtrarUsuarios(ev) }}
+                                            name="nombre"
+                                            className="search-input"
+                                            value={newUser.nombre}
+                                            onChange={(e: any) => handleChangeNewUser(e)}
                                         />
+                                        <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
+                                            Clave
+                                        </label>
+                                        <input
+                                            name="clave"
+                                            className="search-input"
+                                            value={newUser.clave}
+                                            onChange={(e: any) => handleChangeNewUser(e)}
+                                        />
+                                        <label htmlFor="textfield" className="search-label-admin">
+                                            Rol
+                                        </label>
+                                        <select id="rol" className="typeDate" name="rol" onChange={(e: any) => { handleChangeNewUser(e) }}>
+                                            <option value="VECINO" selected>Vecino</option>
+                                            <option value="ADMINISTRADOR">Administrador</option>
+                                        </select>
+                                        <button
+                                            type="button"
+                                            disabled={newUser.nombre === "" || newUser.clave === ""}
+                                            className="search-button mt-2"
+                                            onClick={CrearUsuario}
+                                        >
+                                            Aceptar
+                                        </button>
                                     </div>
-                                    <div>
-                                        {listadousuariosParse.map((a, idx) => (
-                                            <div className="usuarios-listado" key={idx} onClick={() => { setDataUserSelect(a); setVerUserInd(true); }}>
-                                                <div className="usuarios-item">
-                                                    <span className="usuarios-item-title">Nombre</span>
-                                                    <span className="usuarios-item-value">{a.nombre}</span>
-                                                </div>
-                                                <div className="usuarios-item">
-                                                    <span className="usuarios-item-title">Rol</span>
-                                                    <span className="usuarios-item-value">{a.rol}</span>
-                                                </div>
-                                                <div className="usuarios-item">
-                                                    <span className="usuarios-item-title">Fecha Caducidad</span>
-                                                    <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
-                                                </div>
-                                                <div className="usuarios-item">
-                                                    <span className="usuarios-item-title">Estado</span>
-                                                    <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
-                                                </div>
+                                </div>
+                            </> :
+                            !verUsuarioInd ?
+                                <>
+                                    <div className="usuariosContainer">
+                                        <h4 className="usuarios-title">Listado Usuarios</h4>
+                                        {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
+                                            <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
+                                                setAgregarUsuario(true); setNewUser({ nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
+                                            }}>
+                                                <button className="cupo-usuarios-add" title="Agregar usuario">
+                                                    <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
+                                                        <circle cx="9" cy="9" r="9" fill="#05c724" />
+                                                        <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                                                    </svg>
+                                                </button>
+                                                <span className="cupo-usuarios">
+                                                    {cupoUsuarios.usados}/{cupoUsuarios.cupo}
+                                                </span>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </>
-                            :
-                            <div className="perfil-box w-100" style={{ padding: '20px' }}>
-                                <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
-                                    setVerUserInd(false)
-                                }}>
-                                    <img width={35} src={volver} alt="Icono volver" />
-                                </button>
-                                <div className="perfil-avatar">
-                                    {dataUserSelect.imagen ? (
-                                        <img
-                                            id="imgPerfilSelect1"
-                                            src={dataUserSelect.imagen}
-                                            alt="Vista previa"
-                                        />
-                                    ) : (
-                                        <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
-                                            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-                                        </svg>
-                                    )}
-                                </div>
-                                <h4 className="perfil-nombre">{dataUserSelect.nombre}</h4>
-                                <div className="perfil-info">
-                                    <div className="w-100">
-                                        <div className="container-dataPerfil">
-                                            <span>Rol</span>
-                                            {dataUserSelect.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
+                                            :
+                                            <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }}>
+                                                <span className="cupo-usuarios">
+                                                    {cupoUsuarios.usados}/{cupoUsuarios.cupo}
+                                                </span>
+                                            </div>
+                                        }
+                                        <div className="buscaruser-search-container">
+                                            <label className="buscaruser-search-label">Buscar Usuario</label>
+                                            <input
+                                                type="search"
+                                                id="buscar-usuario"
+                                                className="buscaruser-search-input"
+                                                placeholder="Escribe para buscar..."
+                                                onChange={(ev) => { filtrarUsuarios(ev) }}
+                                            />
                                         </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Dirección</span>
-                                            {dataUserSelect.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
-                                        </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Teléfono</span>
-                                            {dataUserSelect.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
-                                        </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Notif. Anuncios</span>
-                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
-                                        </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Notif. Mensajes</span>
-                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
-                                        </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Notif. Votaciones</span>
-                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
-                                        </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Notif. Calendario</span>
-                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
-                                        </div>
-                                        <div className="container-dataPerfil">
-                                            <span>Fecha Caducidad</span>
-                                            {dataUserSelect.fechaCaducidad && (
-                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(dataUserSelect.fechaCaducidad).toLocaleDateString()}</span>
-                                            )}
+                                        <div>
+                                            {listadousuariosParse.map((a, idx) => (
+                                                <div className="usuarios-listado" key={idx} onClick={() => { setDataUserSelect(a); setVerUserInd(true); }}>
+                                                    <div className="usuarios-item">
+                                                        <span className="usuarios-item-title">Nombre</span>
+                                                        <span className="usuarios-item-value">{a.nombre}</span>
+                                                    </div>
+                                                    <div className="usuarios-item">
+                                                        <span className="usuarios-item-title">Rol</span>
+                                                        <span className="usuarios-item-value">{a.rol}</span>
+                                                    </div>
+                                                    <div className="usuarios-item">
+                                                        <span className="usuarios-item-title">Fecha Caducidad</span>
+                                                        <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
+                                                    </div>
+                                                    <div className="usuarios-item">
+                                                        <span className="usuarios-item-title">Estado</span>
+                                                        <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
+                                </>
+                                :
+                                <div className="perfil-box w-100" style={{ padding: '20px' }}>
+                                    <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
+                                        setVerUserInd(false)
+                                    }}>
+                                        <img width={35} src={volver} alt="Icono volver" />
+                                    </button>
+                                    <div className="perfil-avatar">
+                                        {dataUserSelect.imagen ? (
+                                            <img
+                                                id="imgPerfilSelect1"
+                                                src={dataUserSelect.imagen}
+                                                alt="Vista previa"
+                                            />
+                                        ) : (
+                                            <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
+                                                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
+                                            </svg>
+                                        )}
+                                    </div>
+                                    <h4 className="perfil-nombre">{dataUserSelect.nombre}</h4>
+                                    <div className="perfil-info">
+                                        <div className="w-100">
+                                            <div className="container-dataPerfil">
+                                                <span>Rol</span>
+                                                {dataUserSelect.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Dirección</span>
+                                                {dataUserSelect.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Teléfono</span>
+                                                {dataUserSelect.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Notif. Anuncios</span>
+                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Notif. Mensajes</span>
+                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Notif. Votaciones</span>
+                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Notif. Calendario</span>
+                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <span>Fecha Caducidad</span>
+                                                {dataUserSelect.fechaCaducidad && (
+                                                    <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(dataUserSelect.fechaCaducidad).toLocaleDateString()}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                }
-            </div>
-        );
+                    }
+                </div>
+            }
+        </>
     }
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -1857,7 +1856,7 @@ const Condominio = () => {
                     </button>
                 )}
                 <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {!crear ? tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio" : ""}</h2>
-    
+     
                 <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                     <label htmlFor="textfield" className="search-label-admin">
                         Cabecera
@@ -1912,7 +1911,7 @@ const Condominio = () => {
                         onChange={handleChangeAnuncio}
                         style={{ padding: '8px', fontSize: '16px' }}
                     />
-    
+     
                     {(crear || (!crear && !anuncio.amedida)) && (
                         <div>
                             <label>Subir archivo</label>
@@ -1922,7 +1921,7 @@ const Condominio = () => {
                                     <span>🖼️</span>
                                     <span className="text">Imagen</span>
                                 </label>
-    
+     
                                 <label className="radio-label">
                                     <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
                                     <span>🎥</span>
@@ -1931,7 +1930,7 @@ const Condominio = () => {
                             </div>
                         </div>
                     )}
-    
+     
                     {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
                         <label htmlFor="textfield" className="search-label-admin mt-3">
                             Cargar imagen
@@ -1954,8 +1953,8 @@ const Condominio = () => {
                             style={{ maxWidth: '300px', marginTop: '10px' }}
                         />
                     </div>
-    
-    
+     
+     
                     {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
                         <label htmlFor="textfield" className="search-label-admin mt-3">
                             Cargar video
@@ -2023,7 +2022,7 @@ const Condominio = () => {
     }
 
 
-    const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
+    /* const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
         setAlerta({ tipo: 1, mensaje: "" })
         setAlertaCerrada(false);
         setMenuOpciones(a)
@@ -2037,6 +2036,25 @@ const Condominio = () => {
         setVerUsuarios(i);
         setVerMisAnuncios(false);
         setAgregarUsuario(false);
+    } */
+    const cerrarMenu = () => {
+        setAlerta({ tipo: 1, mensaje: "" })
+        setAlertaCerrada(false);
+        setMenuOpciones(false)
+        setVerPerfil(false)
+        setVerMisAnuncios(false);
+        setCrear(false)
+        setEditar(false)
+        setVerUsuarios(false);
+        setVerReglasNormas(false);
+        setVerAvisos(false)
+        setEditarAvisos(false)
+        setVerPuntosInteres(false)
+        setVerEmergencia(false)
+        setVotaciones(false);
+        setAgregarUsuario(false);
+        setOpenCrear(false);
+        setEncuesta(false);
     }
 
     const selSuscribir2 = (error: Boolean, err: string, data: any) => {
@@ -2118,7 +2136,6 @@ const Condominio = () => {
             if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
                 if (event.target.id !== "iconoMenuSup") {
                     setMenuOpciones(false);
-                    setOpen(false);
                     setOpenNotificaciones(false);
                 }
             }
@@ -2187,10 +2204,8 @@ const Condominio = () => {
                     {menuOpciones && (
                         <div ref={menuRef} className="custom-menu">
                             <button type="button" onClick={() => {
-                                cerrarMenu(false, true)
-                                setCrear(false)
-                                setLoading(true);
-
+                                cerrarMenu()
+                                setVerPerfil(true)
                                 Perfil()
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -2199,10 +2214,10 @@ const Condominio = () => {
                                 Perfil
                             </button>
                             <button type="button" onClick={() => {
-                                cerrarMenu(false); changeMenu(999);
-                                setLoading(true);
+                                cerrarMenu();
                                 setVerMisAnuncios(true)
                                 setTipo(8);
+                                setLoading(true);
                                 ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -2210,7 +2225,6 @@ const Condominio = () => {
                                 </svg>
                                 Mis Publicaciones
                             </button>
-                            {/*  {usuario.rol === "ADMINISTRADOR" && ( */}
                             <button
                                 type="button"
                                 onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
@@ -2233,17 +2247,14 @@ const Condominio = () => {
                                     <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
                                 </svg>
                             </button>
-                            {/*  )} */}
-                            {openCrear && /* usuario.rol === "ADMINISTRADOR" &&  */(
+                            {openCrear && (
                                 <div className="submenu">
                                     <button
                                         type="button"
                                         onClick={() => {
                                             setTipo(1);
-                                            setOpenCrear(false);
-                                            changeMenu(3, false, true);
-                                            cerrarMenu(false)
-                                            setOpen(false);
+                                            cerrarMenu()
+                                            setCrear(true)
                                         }}
                                         className="submenu-item ml-3"
                                     >
@@ -2253,10 +2264,9 @@ const Condominio = () => {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setOpenCrear(false);
-                                                cerrarMenu(false);
-                                                changeMenu(3, false, false, false, true);
-                                                setOpen(false);
+                                                cerrarMenu();
+                                                changeMenu(3);
+                                                setEncuesta(true);
                                             }}
                                             className="submenu-item ml-3"
                                         >
@@ -2268,8 +2278,9 @@ const Condominio = () => {
                             {
                                 usuario.rol === "Administrador" || usuario.rol === "ADMINISTRADOR" && (
                                     <button type="button" onClick={() => {
-                                        cerrarMenu(false, false, false, false, false, false, false, false, true)
-                                        setCrear(false);
+                                        cerrarMenu()
+                                        changeMenu(999);
+                                        setVerUsuarios(true)
                                         setLoading(true);
                                         ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
                                     }}>
@@ -2325,9 +2336,9 @@ const Condominio = () => {
                             )}
 
                             <button type="button" onClick={() => {
-                                cerrarMenu(false, false, true);
-                                setCrear(false)
-                                setEncuesta(false);
+                                cerrarMenu();
+                                changeMenu(999);
+                                setVerReglasNormas(true);
                                 setNewTextRich(dataFull.normas);
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -2336,8 +2347,9 @@ const Condominio = () => {
                                 Reglas y Normas
                             </button>
                             <button type="button" onClick={() => {
-                                cerrarMenu(false, false, false, true)
+                                cerrarMenu()
                                 changeMenu(999)
+                                setVerAvisos(true)
                                 setLoading(true)
                                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                             }}>
@@ -2362,8 +2374,9 @@ const Condominio = () => {
                                 Puntos de Interes
                             </button> */}
                             <button type="button" onClick={() => {
-                                cerrarMenu(false, false, false, false, false, false, true)
-                                setCrear(false)
+                                cerrarMenu()
+                                changeMenu(999);
+                                setVerEmergencia(true)
                                 setLoading(true)
                                 ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
                             }}>
@@ -2374,7 +2387,8 @@ const Condominio = () => {
                                 Núm. Emergencias
                             </button>
                             <button type="button" onClick={() => {
-                                cerrarMenu(false)
+                                cerrarMenu()
+                                changeMenu(999);
                                 cerrarSesion()
                             }}>
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -2390,251 +2404,266 @@ const Condominio = () => {
                 <div className="container pb-5 mb-5">
                     <div className="row px-3 justify-content-around">
                         {
-                            dataCondominios.length > 1 && !enComunidad ?
-                                <>
-                                    {panelPrincipal()}
-                                </>
-                                :
-                                iniciarSesion ?
-                                    <>
-                                        <Login
-                                            usuario={loguear.usuario}
-                                            clave={loguear.clave}
-                                            onChange={handleChangeLogin}
-                                            onLogin={login}
+                            dataCondominios.length > 1 && !enComunidad &&
+                            <>
+                                {panelPrincipal()}
+                            </>
+                        }
+                        {
+                            iniciarSesion &&
+                            <>
+                                <Login
+                                    usuario={loguear.usuario}
+                                    clave={loguear.clave}
+                                    onChange={handleChangeLogin}
+                                    onLogin={login}
+                                    loading={loading}
+                                />
+                            </>
+                        }
+                        {
+                            (crear || editar) &&
+                            <>
+                                <AnunciosCrear
+                                    anuncio={anuncio}
+                                    onGuardar={(form: any, archivo: any) => {
+                                        setArchivoTemp(archivo);
+                                        setAnuncio(form);
+                                        CrearAnuncio(form);
+                                    }}
+                                    onCancelar={() => {
+                                        limpiarAnuncio();
+                                        setCrear(false);
+                                        setEditar(false);
+                                    }}
+                                    usuario={usuario}
+                                />
+                            </>
+                        }
+                        {
+                            votaciones &&
+                            <>
+                                <VotacionPanel
+                                    votaciones={dataVotaciones}
+                                    onCambiarEstado={(votacion, activo) => {
+                                        setLoading(true);
+                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, votacion, activo, localStorage.getItem("idCondominio")!.toString(), usuario.id);
+                                    }}
+                                    onCambiarVoto={cambiarVoto}
+                                    usuario={usuario}
+                                    loading={loading}
+                                />
+                            </>
+                        }
+                        {
+                            verEmergencia &&
+                            <>
+                                <Emergencia
+                                    emergencia={emergencia}
+                                    emergencias={emergenciaDetalle}
+                                    onChange={handleChangeEmergencia}
+                                    onGuardar={CrearEmergencia}
+                                    onEliminar={EliminarEmergencia}
+                                    onCancelar={() => {
+                                        setEditarEmergencia(false);
+                                    }}
+                                    onSelect={SeleccionarEmergencia}
+                                    rolUsuario={usuario.rol}
+                                    loading={loading}
+                                    modoEdicion={editarEmergencia}
+                                />
+                            </>
+                        }
+                        {
+                            encuesta &&
+                            <>
+                                <VotacionCrear
+                                    onCrear={(cabecera, descripcion, opciones) => {
+                                        crearVotacion(cabecera, descripcion, opciones);
+                                    }}
+                                    loading={loading}
+                                />
+                            </>
+                        }
+                        {
+                            verAvisos &&
+                            <>
+                                <AvisoPanel
+                                    avisos={avisos}
+                                    mensaje={mensajeAviso}
+                                    fecha={fechaAviso}
+                                    hora={horaAviso}
+                                    mes={mes}
+                                    año={año}
+                                    colorEvento={colorAviso}
+                                    onCambiarMes={cambiarMes}
+                                    onChangeColor={(e) => setColorAviso(e)}
+                                    onChangeMensaje={(e) => setMensajeAviso(e.target.value)}
+                                    onChangeFecha={(e) => setFechaAviso(e)}
+                                    onChangeHora={(e) => setHoraAviso(e.target.value)}
+                                    onCrear={CrearAviso}
+                                    onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje)}
+                                    onEnviarNotificacion={EnviarNotifAviso}
+                                    loading={loading}
+                                />
+                            </>
+                        }
+                        {verPerfil &&
+                            <>
+                                <PerfilUsuario
+                                    usuario={usuarioDetalle}
+                                    onChange={handleChangePerfil}
+                                    onGuardar={EditarPerfil}
+                                    onCancelar={() => setEditarPerfil(false)}
+                                    onImagenSeleccionada={(file) => setArchivoTemp(file)}
+                                    loading={loading}
+                                />
+                            </>
+                        }
+                        {
+                            verUsuarios &&
+                            <>
+                                {panelUsuarios()}
+                            </>
+                        }
+                        {
+                            verReglasNormas &&
+                            <>
+                                <ReglasNormasPanel
+                                    normas={dataFull.normas}
+                                    editando={editarTextRich}
+                                    onChangeNormas={(e) => setNewTextRich(e.target.value)}
+                                    onGuardar={() => {
+                                        setLoading(true);
+                                        CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
+                                    }}
+                                    onEditarToggle={() => setEditarTextRich(true)}
+                                    onCancelar={() => { setEditarTextRich(false); setNewTextRich(dataFull.normas); }}
+                                    loading={loading}
+                                    puedeEditar={usuario.rol === "ADMINISTRADOR"}
+                                    editorRef={editorRef}
+                                    handleInput={handleInput}
+                                    handleBlur={handleBlur}
+                                    newTextRich={newTextRich}
+                                />
+                            </>
+                        }
+                        {verDetalle && tipo !== 2 &&
+                            <>
+                                <DetalleAnuncioPanel
+                                    anuncio={dataDetalle}
+                                    comentario={newComentario}
+                                    onChangeComentario={changeComentario}
+                                    onComentar={() => {
+                                        if (newComentario.trim()) {
+                                            CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, {
+                                                Id: 0,
+                                                IdUsuario: usuario.id,
+                                                NombreUsuario: usuario.nombre,
+                                                IdAnuncio: dataDetalle.id,
+                                                Mensaje: newComentario,
+                                                Fecha: new Date()
+                                            }, localStorage.getItem("idCondominio")!.toString());
+                                            setNewComentario('');
+                                        }
+                                    }}
+                                    onLike={() => handleLike(dataDetalle.id, true, true)}
+                                    onCerrar={() => setVerDetalle(false)}
+                                    loading={loading}
+                                    imgError={imgError}
+                                />
+                            </>
+                        }
+                        {
+                            verMisAnuncios &&
+                            <>
+                                <h4>Mis Publicaciones</h4>
+                                {misAnuncios !== null && ordenarListado(misAnuncios).map((a: any, i: any) => (
+                                    <AnunciosPanel
+                                        key={i}
+                                        anuncio={a}
+                                        usuarioId={usuario.id}
+                                        usuarioRol={usuario.rol}
+                                        onEditar={cargarAnuncioParaEdit}
+                                        onEliminar={EliminarAnuncio}
+                                        onDeshabilitar={DeshabilitarAnuncio}
+                                        onVerDetalle={(anuncio: any) => {
+                                            setDataDetalle(anuncio);
+                                            setVerDetalle(true);
+                                            ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
+                                        }}
+                                        onLike={(id: any) => handleLike(id, true, false)}
+                                        imgErrorUrl={imgError}
+                                        loading={loading}
+                                    />
+                                ))}
+                            </>
+                        }
+                        {
+                            tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar &&
+                            <>
+                                {
+                                    <div className="mt-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <label style={{ fontSize: '12px', marginRight: '10%' }} className="block mb-1 font-medium text-xs">Buscar por título o creador</label>
+                                            <label style={{ fontSize: '12px' }} className="text-sm font-medium">Ordenar por:</label>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <input
+                                                type="search"
+                                                id="buscar-datafull"
+                                                value={buscarDataFull}
+                                                placeholder="Buscar..."
+                                                onChange={(ev) => {
+                                                    filtrarDataFull(ev);
+                                                    setBuscarDataFull(ev.target.value);
+                                                }}
+                                                style={{ width: '45%', marginRight: '5%' }}
+                                                className="border rounded px-3 py-1 text-sm"
+                                            />
+                                            <select
+                                                value={criterio}
+                                                onChange={(e: any) => setCriterio(e.target.value)}
+                                                className="border rounded px-2 py-1 text-sm"
+                                            >
+                                                <option value="fechaDesde">Fecha</option>
+                                                <option value="likes">Likes</option>
+                                                <option value="cantComentarios">Comentarios</option>
+                                                <option value="cabecera">Nombre</option>
+                                            </select>
+
+                                            <button
+                                                onClick={() => setOrden(orden === 'asc' ? 'desc' : 'asc')}
+                                                className="iconoFiltro"
+                                                title="Cambiar orden"
+                                            >
+                                                <img src={filtro} />{/* {orden === 'asc' ? '⬆️' : '⬇️'} */}
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
+                                    if (Number(tipo) === Number(a.idTipo))
+                                        return <AnunciosPanel
+                                            key={i}
+                                            anuncio={a}
+                                            usuarioId={usuario.id}
+                                            usuarioRol={usuario.rol}
+                                            onEditar={cargarAnuncioParaEdit}
+                                            onEliminar={EliminarAnuncio}
+                                            onDeshabilitar={DeshabilitarAnuncio}
+                                            onVerDetalle={(anuncio: any) => {
+                                                setDataDetalle(anuncio);
+                                                setVerDetalle(true);
+                                                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
+                                            }}
+                                            onLike={(id: any) => handleLike(id, true, false)}
+                                            imgErrorUrl={imgError}
                                             loading={loading}
                                         />
-                                    </>
-                                    :
-                                    crear || editar ?
-                                        <>
-                                            <AnunciosCrear
-                                                anuncio={anuncio}
-                                                onGuardar={(form: any, archivo: any) => {
-                                                    setArchivoTemp(archivo);
-                                                    setAnuncio(form);
-                                                    CrearAnuncio(form);
-                                                }}
-                                                onCancelar={() => {
-                                                    limpiarAnuncio();
-                                                    setCrear(false);
-                                                    setEditar(false);
-                                                }}
-                                                usuario={usuario}
-                                            />
-                                        </>
-                                        : votaciones ?
-                                            <>
-                                                <VotacionPanel
-                                                    votaciones={dataVotaciones}
-                                                    onCambiarEstado={(votacion, activo) => {
-                                                        setLoading(true);
-                                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, votacion, activo, localStorage.getItem("idCondominio")!.toString(), usuario.id);
-                                                    }}
-                                                    onCambiarVoto={cambiarVoto}
-                                                    usuario={usuario}
-                                                    loading={loading}
-                                                />
-                                            </>
-                                            : verEmergencia ?
-                                                <>
-                                                    <Emergencia
-                                                        emergencia={emergencia}
-                                                        emergencias={emergenciaDetalle}
-                                                        onChange={handleChangeEmergencia}
-                                                        onGuardar={CrearEmergencia}
-                                                        onEliminar={EliminarEmergencia}
-                                                        onCancelar={() => {
-                                                            setEditarEmergencia(false);
-                                                        }}
-                                                        onSelect={SeleccionarEmergencia}
-                                                        rolUsuario={usuario.rol}
-                                                        loading={loading}
-                                                        modoEdicion={editarEmergencia}
-                                                    />
-                                                </>
-                                                :
-                                                encuesta ?
-                                                    <>
-                                                        <VotacionCrear
-                                                            onCrear={(cabecera, descripcion, opciones) => {
-                                                                crearVotacion(cabecera, descripcion, opciones);
-                                                            }}
-                                                            loading={loading}
-                                                        />
-                                                    </>
-                                                    :
-                                                    verAvisos ?
-                                                        <>
-                                                            <AvisoPanel
-                                                                avisos={avisos}
-                                                                mensaje={mensajeAviso}
-                                                                fecha={fechaAviso}
-                                                                hora={horaAviso}
-                                                                mes={mes}
-                                                                año={año}
-                                                                colorEvento={colorAviso}
-                                                                onCambiarMes={cambiarMes}
-                                                                onChangeColor={(e) => setColorAviso(e)}
-                                                                onChangeMensaje={(e) => setMensajeAviso(e.target.value)}
-                                                                onChangeFecha={(e) => setFechaAviso(e)}
-                                                                onChangeHora={(e) => setHoraAviso(e.target.value)}
-                                                                onCrear={CrearAviso}
-                                                                onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje)}
-                                                                onEnviarNotificacion={EnviarNotifAviso}
-                                                                loading={loading}
-                                                            />
-                                                        </>
-                                                        :
-                                                        verPerfil ?
-                                                            <>
-                                                                <PerfilUsuario
-                                                                    usuario={usuarioDetalle}
-                                                                    onChange={handleChangePerfil}
-                                                                    onGuardar={EditarPerfil}
-                                                                    onCancelar={() => setEditarPerfil(false)}
-                                                                    onImagenSeleccionada={(file) => setArchivoTemp(file)}
-                                                                    loading={loading}
-                                                                />
-                                                            </>
-                                                            :
-                                                            verUsuarios ?
-                                                                <>
-                                                                    {panelUsuarios()}
-                                                                </>
-                                                                :
-                                                                verReglasNormas ?
-                                                                    <>
-                                                                        <ReglasNormasPanel
-                                                                            normas={dataFull.normas}
-                                                                            editando={editarTextRich}
-                                                                            onChangeNormas={(e) => setNewTextRich(e.target.value)}
-                                                                            onGuardar={() => {
-                                                                                setLoading(true);
-                                                                                CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
-                                                                            }}
-                                                                            onEditarToggle={() => setEditarTextRich(true)}
-                                                                            onCancelar={() => { setEditarTextRich(false); setNewTextRich(dataFull.normas); }}
-                                                                            loading={loading}
-                                                                            puedeEditar={usuario.rol === "ADMINISTRADOR"}
-                                                                            editorRef={editorRef}
-                                                                            handleInput={handleInput}
-                                                                            handleBlur={handleBlur}
-                                                                            newTextRich={newTextRich}
-                                                                        />
-                                                                    </>
-                                                                    :
-                                                                    verDetalle && tipo !== 2 ?
-                                                                        <>
-                                                                            <DetalleAnuncioPanel
-                                                                                anuncio={dataDetalle}
-                                                                                comentario={newComentario}
-                                                                                onChangeComentario={changeComentario}
-                                                                                onComentar={() => {
-                                                                                    if (newComentario.trim()) {
-                                                                                        CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, {
-                                                                                            Id: 0,
-                                                                                            IdUsuario: usuario.id,
-                                                                                            NombreUsuario: usuario.nombre,
-                                                                                            IdAnuncio: dataDetalle.id,
-                                                                                            Mensaje: newComentario,
-                                                                                            Fecha: new Date()
-                                                                                        }, localStorage.getItem("idCondominio")!.toString());
-                                                                                        setNewComentario('');
-                                                                                    }
-                                                                                }}
-                                                                                onLike={() => handleLike(dataDetalle.id, true, true)}
-                                                                                onCerrar={() => setVerDetalle(false)}
-                                                                                loading={loading}
-                                                                                imgError={imgError}
-                                                                            />
-                                                                        </>
-                                                                        :
-                                                                        verMisAnuncios ?
-                                                                            <>
-                                                                                <h4>Mis Publicaciones</h4>
-                                                                                {misAnuncios !== null && ordenarListado(misAnuncios).map((a: any, i: any) => (
-                                                                                    <AnunciosPanel
-                                                                                        key={i}
-                                                                                        anuncio={a}
-                                                                                        usuarioId={usuario.id}
-                                                                                        usuarioRol={usuario.rol}
-                                                                                        onEditar={cargarAnuncioParaEdit}
-                                                                                        onEliminar={EliminarAnuncio}
-                                                                                        onDeshabilitar={DeshabilitarAnuncio}
-                                                                                        onVerDetalle={(anuncio: any) => {
-                                                                                            setDataDetalle(anuncio);
-                                                                                            setVerDetalle(true);
-                                                                                            ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
-                                                                                        }}
-                                                                                        onLike={(id: any) => handleLike(id, true, false)}
-                                                                                        imgErrorUrl={imgError}
-                                                                                    />
-                                                                                ))}
-                                                                            </>
-                                                                            :
-                                                                            <>
-                                                                                {
-                                                                                    <div className="mt-1">
-                                                                                        <div className="flex flex-wrap items-center gap-2">
-                                                                                            <label style={{ fontSize: '12px', marginRight: '10%' }} className="block mb-1 font-medium text-xs">Buscar por título o creador</label>
-                                                                                            <label style={{ fontSize: '12px' }} className="text-sm font-medium">Ordenar por:</label>
-                                                                                        </div>
-                                                                                        <div className="flex flex-wrap items-center gap-2">
-                                                                                            <input
-                                                                                                type="search"
-                                                                                                id="buscar-datafull"
-                                                                                                value={buscarDataFull}
-                                                                                                placeholder="Buscar..."
-                                                                                                onChange={(ev) => {
-                                                                                                    filtrarDataFull(ev);
-                                                                                                    setBuscarDataFull(ev.target.value);
-                                                                                                }}
-                                                                                                style={{ width: '45%', marginRight: '5%' }}
-                                                                                                className="border rounded px-3 py-1 text-sm"
-                                                                                            />
-                                                                                            <select
-                                                                                                value={criterio}
-                                                                                                onChange={(e: any) => setCriterio(e.target.value)}
-                                                                                                className="border rounded px-2 py-1 text-sm"
-                                                                                            >
-                                                                                                <option value="fechaDesde">Fecha</option>
-                                                                                                <option value="likes">Likes</option>
-                                                                                                <option value="cantComentarios">Comentarios</option>
-                                                                                                <option value="cabecera">Nombre</option>
-                                                                                            </select>
-
-                                                                                            <button
-                                                                                                onClick={() => setOrden(orden === 'asc' ? 'desc' : 'asc')}
-                                                                                                className="iconoFiltro"
-                                                                                                title="Cambiar orden"
-                                                                                            >
-                                                                                                <img src={filtro} />{/* {orden === 'asc' ? '⬆️' : '⬇️'} */}
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                }
-                                                                                {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
-                                                                                    if (Number(tipo) === Number(a.idTipo))
-                                                                                        return <AnunciosPanel
-                                                                                            key={i}
-                                                                                            anuncio={a}
-                                                                                            usuarioId={usuario.id}
-                                                                                            usuarioRol={usuario.rol}
-                                                                                            onEditar={cargarAnuncioParaEdit}
-                                                                                            onEliminar={EliminarAnuncio}
-                                                                                            onDeshabilitar={DeshabilitarAnuncio}
-                                                                                            onVerDetalle={(anuncio: any) => {
-                                                                                                setDataDetalle(anuncio);
-                                                                                                setVerDetalle(true);
-                                                                                                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
-                                                                                            }}
-                                                                                            onLike={(id: any) => handleLike(id, true, false)}
-                                                                                            imgErrorUrl={imgError}
-                                                                                        />
-                                                                                }
-                                                                                )}
-                                                                            </>
+                                }
+                                )}
+                            </>
                         }
                     </div>
                 </div>

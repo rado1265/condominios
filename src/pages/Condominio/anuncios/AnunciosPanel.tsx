@@ -26,6 +26,7 @@ interface Props {
     onVerDetalle: (anuncio: Anuncio) => void;
     onLike: (id: number) => void;
     imgErrorUrl: string;
+    loading: boolean;
 }
 
 const AnunciosPanel: React.FC<Props> = ({
@@ -37,15 +38,16 @@ const AnunciosPanel: React.FC<Props> = ({
     onDeshabilitar,
     onVerDetalle,
     onLike,
-    imgErrorUrl
+    imgErrorUrl,
+    loading
 }) => {
     const esPropietario = usuarioId === anuncio.idUsuario || usuarioRol === "ADMINISTRADOR";
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = imgErrorUrl;
     };
-    return (
-        <div className="v2-anuncio card-shadow col-12 my-3 pb-5">
+    return <>
+        {!loading && <div className="v2-anuncio card-shadow col-12 my-3 pb-5">
             <div className="v2-anuncio-header">
                 {esPropietario && (
                     <div className="v2-anuncio-actions">
@@ -147,12 +149,9 @@ const AnunciosPanel: React.FC<Props> = ({
                 </svg>
                 <span className="v2-like-count">{anuncio.likes}</span>
             </div>
-            {/*  <div className="v2-anuncio-interacciones">
-                <button onClick={() => onVerDetalle(anuncio)}>Comentarios ({anuncio.cantComentarios})</button>
-                <button onClick={() => onLike(anuncio.id)}>👍 Like</button>
-            </div> */}
         </div >
-    );
+        }
+    </>
 };
 
 export default AnunciosPanel;
