@@ -621,60 +621,6 @@ body {
   border-radius: 15px;
 }
 
-.custom-menu {
-  width: 14rem;
-  position: absolute;
-  background: var(--color-bg);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  right: 10px;
-  top: 50px;
-  height: min-content;
-}
-
-.custom-menu button {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  outline: none;
-}
-
-.custom-menu button:last-child {
-  border-bottom: none;
-  border-radius: 0 0 0.5rem 0.5rem;
-}
-
-.custom-menu button:first-child {
-  border-radius: 0.5rem 0.5rem 0 0;
-}
-
-.custom-menu button:hover,
-.custom-menu button:focus {
-  background: var(--color-hover-bg);
-  color: var(--primaryColor);
-  z-index: 1;
-}
-
-.custom-menu svg {
-  width: 1rem;
-  height: 1rem;
-  margin-right: 0.7em;
-  flex-shrink: 0;
-  fill: currentColor;
-}
-
 /* Botón para alternar modo oscuro */
 .toggle-dark {
   margin: 1rem 0;
@@ -980,8 +926,13 @@ body {
   min-height: 14px;
   margin: auto;
   justify-content: center;
-  align-items: anchor-center;
+  align-items: center;
   display: flex;
+}
+
+.dia-con-algo.diaActual{
+  color: white !important;
+  background: red !important;
 }
 
 @media (max-width: 600px) {

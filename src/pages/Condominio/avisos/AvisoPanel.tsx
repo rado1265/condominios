@@ -121,8 +121,7 @@ const AvisoPanel: React.FC<Props> = ({
             return `${_año}-${(_mes + 1).toString().padStart(2, '0')}-${_dia.toString().padStart(2, '0')}`;
         }
         // Días con avisos
-        const fechaActualParse = dayjs().tz("America/Santiago").toISOString().split("T")[0];
-        //let fechaActualParse = new Date().toISOString().split("T")[0];
+        const fechaActualParse = dayjs().tz("America/Santiago").format().split("T")[0];
         for (let dia = 1; dia <= diasEnMes; dia++) {
             const fechaTexto = `${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
             const avisosDelDia = avisos.filter((a: any) => formatoFecha(a.fecha) === fechaTexto && a.mensaje !== "");

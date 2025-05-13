@@ -1,0 +1,213 @@
+.bottom-nav {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 0;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #666666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+    font-size: 24px;
+    /* para que svg herede tamaño */
+}
+
+.nav-button:hover {
+    color: #28a745;
+}
+
+.nav-button.active {
+    color: #28a745;
+}
+
+/* Botón central crear */
+.create-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create-button {
+    background-color: #28a745;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin-top: -25px;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 20;
+}
+
+.create-button:hover {
+    background-color: #218838;
+}
+
+.create-button.open {
+    transform: rotate(45deg);
+}
+
+/* Dropdown opciones */
+.create-dropdown {
+    position: absolute;
+    bottom: 70px;
+    /* justo arriba del botón */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    background: transparent;
+    z-index: 15;
+    width: max-content;
+}
+
+.create-dropdown.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.dropdown-option {
+    background-color: #fff;
+    border-radius: 30px;
+    padding: 8px 16px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    border: none;
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-option:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+.option-text {
+    user-select: none;
+}
+
+.icon-svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    stroke: currentColor;
+}
+
+.icon-crear {
+    stroke: white;
+    stroke-width: 3;
+}
+
+.option-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Para evitar que el menú se corte en pantallas pequeñas */
+@media (max-width: 400px) {
+    .create-dropdown {
+        bottom: 65px;
+    }
+}
+
+.container-custom-menu {
+    background: #919191a3;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.custom-menu {
+    position: absolute;
+    background: white;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem 0 0 0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    right: 0px;
+    bottom: 60px;
+    width: 220px;
+    padding-bottom: 10px;
+}
+
+
+
+.custom-menu button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    color: #666;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+}
+
+.custom-menu button:last-child {
+    border-bottom: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.custom-menu button:first-child {
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.custom-menu button:hover,
+.custom-menu button:focus {
+    background: var(--color-hover-bg);
+    color: var(--primaryColor);
+    z-index: 1;
+}
+
+.custom-menu svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.7em;
+    flex-shrink: 0;
+    fill: currentColor;
+}

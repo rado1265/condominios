@@ -26,6 +26,7 @@ import VotacionCrear from "./votacion/VotacionCrear";
 import VotacionPanel from "./votacion/VotacionPanel";
 import DetalleAnuncioPanel from "./anuncios/DetalleAnuncioPanel";
 import ReglasNormasPanel from "./reglas/ReglasNormasPanel";
+import BottomNav from "../MenuInferior/MenuInferior";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -1434,7 +1435,7 @@ const Condominio = () => {
 
 
     const navegador = () => {
-        return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
+        return <div className="fixed bottom-0 left-0 z-50 w-full bg-white">
             {/*usuario.nombre.length > 0 ?
                 <div className="circular-menu">
                     <button
@@ -1453,6 +1454,9 @@ const Condominio = () => {
                     </div>
                 </div>
                 : ""*/}
+
+
+            {/*
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
                 <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => {
                     cerrarMenu(false); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
@@ -1488,7 +1492,9 @@ const Condominio = () => {
                             <span className="text">Perfil</span>
                         </button>
                 }
-            </div >
+            </div >*/}
+
+            <BottomNav/>
         </div >
     }
     const panelMisAnuncios = (a: any, i: any) => {
