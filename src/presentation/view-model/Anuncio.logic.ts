@@ -83,6 +83,6 @@ export const ObtenerMisAnuncioLogic = (selListado: any, idUsuario: string) => {
     return ObtenerMisAnuncio(selListado, idUsuario);
 }
 
-export const CrearUsuarioLogic = (selListado: any, usuario: any) => {
-    return CrearUsuario(selListado, usuario);
+export const CrearUsuarioLogic = (selListado: any, usuario: any, eliminar: boolean) => {
+    return CrearUsuario(selListado, usuario, eliminar);
 }

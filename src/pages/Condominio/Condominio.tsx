@@ -104,6 +104,7 @@ const Condominio = () => {
     const [tipo, setTipo] = useState(1)
     const [cupoUsuarios, setCupoUsuarios] = useState({ usados: 0, cupo: 0 })
     const [usuario, setUsuario] = useState({
+        usuario: '',
         nombre: "",
         tieneSuscripcionMensajes: false,
         tieneSuscripcionVotaciones: false,
@@ -112,9 +113,9 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
-    const [listadousuarios, setUsuarios] = useState([{ nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
-    const [listadousuariosParse, setUsuariosParse] = useState([{ nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
-    const [dataUserSelect, setDataUserSelect] = useState({ nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" });
+    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
+    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
+    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" });
     const [verUsuarioInd, setVerUserInd] = useState(false);
     const [usuarioDetalle, setUsuarioDetalle] = useState({
         nombre: "",
@@ -209,6 +210,8 @@ const Condominio = () => {
     })
 
     const [newUser, setNewUser] = useState({
+        id: 0,
+        usuario: '',
         nombre: '',
         clave: '',
         rol: '',
@@ -410,13 +413,13 @@ const Condominio = () => {
                 cargarDatos();
             }
             registerPush();
-            if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
-                (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
-                (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario") != 'undefined') &&
-                (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario") != 'undefined')) {
+            if ((localStorage.getItem("usuario") && localStorage.getItem("usuario") != 'undefined') &&
+                (localStorage.getItem("rolUsuario") && localStorage.getItem("rolUsuario") != 'undefined') &&
+                (localStorage.getItem("clave") && localStorage.getItem("clave") != 'undefined') &&
+                (localStorage.getItem("idUsuario") && localStorage.getItem("idUsuario") != 'undefined')) {
 
                 LoginLogic(selLogin, {
-                    usuario: localStorage.getItem("nombreUsuario"),
+                    usuario: localStorage.getItem("usuario"),
                     clave: localStorage.getItem("clave"),
                     idCondominio: 0
                 })
@@ -427,6 +430,7 @@ const Condominio = () => {
         } else {
             obtenerUltimoRegistro()
             setUsuario({
+                usuario: localStorage.getItem("usuario") ?? "",
                 nombre: localStorage.getItem("nombreUsuario") ?? "",
                 tieneSuscripcionMensajes: false,
                 tieneSuscripcionVotaciones: false,
@@ -529,6 +533,7 @@ const Condominio = () => {
 
         setDataCondominios([]);
         setUsuario({
+            usuario: '',
             nombre: "",
             tieneSuscripcionMensajes: false,
             tieneSuscripcionVotaciones: false,
@@ -628,6 +633,7 @@ const Condominio = () => {
                 setTipo(1)
                 setIniciarSesion(false)
                 localStorage.setItem("nombreUsuario", data.nombre);
+                localStorage.setItem("usuario", data.usuario);
                 localStorage.setItem("clave", data.clave);
                 localStorage.setItem("rolUsuario", data.rol);
                 localStorage.setItem("idUsuario", data.id);
@@ -911,11 +917,21 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const CrearUsuario = () => {
+    const CrearUsuario = (eliminar: boolean) => {
         try {
-            if (newUser.nombre.length > 0) {
+            if (newUser.nombre.length > 0 && newUser.usuario.length > 3 && newUser.clave.length > 3) {
                 setLoading(true);
-                CrearUsuarioLogic(selCrearUsuario, newUser)
+                CrearUsuarioLogic(selCrearUsuario, newUser, eliminar)
+            }
+        } catch (er) {
+        }
+    }
+    const EliminarUsuario = (user: any) => {
+        try {
+            if (user.id > 0) {
+                setLoading(true);
+                setVerUserInd(false)
+                CrearUsuarioLogic(selCrearUsuario, user, true)
             }
         } catch (er) {
         }
@@ -977,19 +993,21 @@ const Condominio = () => {
                 ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
                 setAgregarUsuario(false);
                 setNewUser({
+                    id: 0,
+                    usuario: '',
                     nombre: '',
                     clave: '',
                     rol: '',
                     idCondominio: 0
                 })
-                toast.success('Usuario creado correctamente', {
+                toast.success(err?'Usuario eliminado correctamente':'Usuario creado correctamente', {
                     position: posicionAlertas,
                 });
             }
             else {
                 setLoading(false);
                 //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Usuario. Comuníquese con el Administrador.")
-                toast.info('Error al crear usuario. Comuníquese con el Administrador.', {
+                toast.info(err?'Error al eliminar usuario. Comuníquese con el Administrador.':'Error al crear usuario. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
@@ -1610,8 +1628,22 @@ const Condominio = () => {
                         agregarUsuario ?
                             <>
                                 <div className="w-100 px-3 mt-2">
+                                    <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
+                                        setVerUserInd(false); setAgregarUsuario(false);
+                                    }}>
+                                        <img width={35} src={volver} alt="Icono volver" />
+                                    </button>
                                     <div className="login-box py-3">
                                         <h2 className="text-center">Agregar Usuario</h2>
+                                        <label htmlFor="textfield" className="search-label-admin">
+                                            Usuario
+                                        </label>
+                                        <input
+                                            name="usuario"
+                                            className="search-input"
+                                            value={newUser.usuario}
+                                            onChange={(e: any) => handleChangeNewUser(e)}
+                                        />
                                         <label htmlFor="textfield" className="search-label-admin">
                                             Nombre
                                         </label>
@@ -1641,9 +1673,17 @@ const Condominio = () => {
                                             type="button"
                                             disabled={newUser.nombre === "" || newUser.clave === ""}
                                             className="search-button mt-2"
-                                            onClick={CrearUsuario}
+                                            onClick={() => CrearUsuario(false)}
                                         >
                                             Aceptar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={newUser.nombre === "" || newUser.clave === ""}
+                                            className="search-button mt-2"
+                                            onClick={() => setAgregarUsuario(false)}
+                                        >
+                                            Cancelar
                                         </button>
                                     </div>
                                 </div>
@@ -1654,7 +1694,7 @@ const Condominio = () => {
                                         <h4 className="usuarios-title">Listado Usuarios</h4>
                                         {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
                                             <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
-                                                setAgregarUsuario(true); setNewUser({ nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
+                                                setAgregarUsuario(true); setNewUser({ id: 0, usuario: '', nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
                                             }}>
                                                 <button className="cupo-usuarios-add" title="Agregar usuario">
                                                     <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
@@ -1713,6 +1753,22 @@ const Condominio = () => {
                                         setVerUserInd(false)
                                     }}>
                                         <img width={35} src={volver} alt="Icono volver" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="perfil-edit-btn"
+                                        onClick={() => { EliminarUsuario({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
+                                        aria-label="Editar perfil"
+                                    >
+                                        <img src={iconborrar} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="perfil-edit-btn mr-5"
+                                        onClick={() => { setAgregarUsuario(true); setNewUser({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
+                                        aria-label="Editar perfil"
+                                    >
+                                        <img src={iconeditar} />
                                     </button>
                                     <div className="perfil-avatar">
                                         {dataUserSelect.imagen ? (
@@ -2086,6 +2142,7 @@ const Condominio = () => {
                     position: posicionAlertas,
                 });
                 setUsuario({
+                    usuario: usuario.usuario,
                     nombre: usuario.nombre,
                     tieneSuscripcionMensajes: err === "2" ? true : usuario.tieneSuscripcionMensajes,
                     tieneSuscripcionVotaciones: err === "3" ? true : usuario.tieneSuscripcionVotaciones,
@@ -2124,6 +2181,7 @@ const Condominio = () => {
                     position: posicionAlertas,
                 });
                 setUsuario({
+                    usuario: usuario.usuario,
                     nombre: usuario.nombre,
                     tieneSuscripcionMensajes: err === "2" ? false : usuario.tieneSuscripcionMensajes,
                     tieneSuscripcionVotaciones: err === "3" ? false : usuario.tieneSuscripcionVotaciones,
@@ -2620,7 +2678,7 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar &&
+                            tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad &&
                             <>
                                 {
                                     <div className="mt-1">
