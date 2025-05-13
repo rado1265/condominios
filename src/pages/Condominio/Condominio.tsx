@@ -26,6 +26,7 @@ import VotacionCrear from "./votacion/VotacionCrear";
 import VotacionPanel from "./votacion/VotacionPanel";
 import DetalleAnuncioPanel from "./anuncios/DetalleAnuncioPanel";
 import ReglasNormasPanel from "./reglas/ReglasNormasPanel";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -331,53 +332,6 @@ const Condominio = () => {
         reader.readAsDataURL(file);
     };
 
-
-    //const [imgError, setImgError] = useState("https://img.freepik.com/vector-premium/imagen-no-es-conjunto-iconos-disponibles-simbolo-vectorial-stock-fotos-faltante-defecto-estilo-relleno-delineado-negro-signo-no-encontro-imagen_268104-6708.jpg");
-
-    /*const obtenerAchivosComunidad = () => {
-        const folderRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/`);
-        console.log(folderRef);
-        let arrayArchivos: any = [];
-        listAll(folderRef)
-            .then((res: any) => {
-                res.items.forEach((itemRef: any) => {
-                    // Obtener el nombre del archivo
-                    const nombreArchivo = itemRef.name;
-
-                    // Obtener la URL de descarga
-                    getDownloadURL(itemRef).then((url) => {
-                        arrayArchivos.push({
-                            nombre: nombreArchivo,
-                            url: url
-                        })
-                    });
-                });
-            })
-            .catch((error: any) => {
-                console.error('Error al listar archivos:', error);
-            });
-
-        setDataArchivosComunidad(arrayArchivos)
-    }
-
-    useEffect(() => {
-        if (actualizarData) {
-            obtenerAchivosComunidad();
-            let newDataFull = dataFull;
-            newDataFull.anuncios.map((a: any) => {
-                let matchArchivo = dataArchivosComunidad.filter((b: any) => b.nombre === a.amedida.replace("video-", "").replace("img-", ""));
-                if (matchArchivo[0]) {
-                    a.amedida = matchArchivo[0].url;
-                }
-            })
-
-            if (JSON.stringify(newDataFull) !== JSON.stringify(dataFull)) {
-                setDataFull(newDataFull);
-            }
-        }
-
-    }, [actualizarData])*/
-
     const obtenerArchivosComunidad = async (idCondominio: string) => {
         const folderRef = ref(storage, `comunidad-${idCondominio}/`);
         try {
@@ -452,40 +406,44 @@ const Condominio = () => {
     }, [actualizarData]);
 
     useEffect(() => {
-        if (localStorage.getItem("idCondominio")) {
-            const cargarDatos = async () => {
-                const archivos = await obtenerArchivosComunidad(localStorage.getItem("idCondominio")!);
-                setDataArchivosComunidad(archivos);
+        if (navigator.onLine) {
+            if (localStorage.getItem("idCondominio")) {
+                const cargarDatos = async () => {
+                    const archivos = await obtenerArchivosComunidad(localStorage.getItem("idCondominio")!);
+                    setDataArchivosComunidad(archivos);
+                }
+                cargarDatos();
             }
-            cargarDatos();
-        }
-        registerPush();
-        if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
-            /*localStorage.getItem("tieneSuscripcionMensajes") &&
-            localStorage.getItem("tieneSuscripcionVotaciones") &&
-            localStorage.getItem("tieneSuscripcionAnuncios") &&
-            localStorage.getItem("tieneSuscripcionAvisos") &&*/
-            (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
-            (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario") != 'undefined') &&
-            (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario") != 'undefined')) {
+            registerPush();
+            if ((localStorage.getItem("nombreUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+                (localStorage.getItem("rolUsuario") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+                (localStorage.getItem("clave") && localStorage.getItem("nombreUsuario") != 'undefined') &&
+                (localStorage.getItem("idUsuario") && localStorage.getItem("nombreUsuario") != 'undefined')) {
 
-            LoginLogic(selLogin, {
-                usuario: localStorage.getItem("nombreUsuario"),
-                clave: localStorage.getItem("clave"),
-                idCondominio: 0
-            })
-            /*setUsuario({
+                LoginLogic(selLogin, {
+                    usuario: localStorage.getItem("nombreUsuario"),
+                    clave: localStorage.getItem("clave"),
+                    idCondominio: 0
+                })
+            }
+            else {
+                cerrarSesion()
+            }
+        } else {
+            obtenerUltimoRegistro()
+            setUsuario({
                 nombre: localStorage.getItem("nombreUsuario") ?? "",
-                tieneSuscripcionMensajes: localStorage.getItem("tieneSuscripcionMensajes") === "true",
-                tieneSuscripcionVotaciones: localStorage.getItem("tieneSuscripcionVotaciones") === "true",
-                tieneSuscripcionAnuncios: localStorage.getItem("tieneSuscripcionAnuncios") === "true",
-                tieneSuscripcionAvisos: localStorage.getItem("tieneSuscripcionAvisos") === "true",
+                tieneSuscripcionMensajes: false,
+                tieneSuscripcionVotaciones: false,
+                tieneSuscripcionAnuncios: false,
+                tieneSuscripcionAvisos: false,
                 rol: localStorage.getItem("rolUsuario") ?? "",
                 id: parseInt(localStorage.getItem("idUsuario") ?? "")
-            })*/
-        }
-        else {
-            cerrarSesion()
+            })
+            setTipo(1)
+            setIniciarSesion(false)
+            setEnComunidad(true)
+            setLoading(false)
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -558,8 +516,6 @@ const Condominio = () => {
                     applicationServerKey: urlBase64ToUint8Array("BDhWFTbhmhdKANFtk6FZsIE4gQE1eHAiCPvwXsE8UGCKa-U-vVh3cTzOCFtNy01QBc08mP8GcUeCLybWsD-5No0"),
                 });
             }
-
-            // Envía la suscripción al backend
             setServiceWorker(subscription)
 
 
@@ -567,17 +523,11 @@ const Condominio = () => {
         }
     }
 
-
-
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/service-worker.js').catch(console.error);
         });
     }
-
-
-
-    ///////////////////////////////////////////////////////////////////
 
     const cerrarSesion = () => {
         localStorage.clear();
@@ -613,27 +563,19 @@ const Condominio = () => {
     const selEliminarAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                //SuccessMessage("Anuncio eliminado correctamente.")
                 toast.success('Anuncio eliminado correctamente', {
                     position: posicionAlertas,
                 });
-                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
-                /* setTipo(1) */
             }
             else {
-                //ErrorMessage("Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos")
                 toast.error('Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos', {
                     position: posicionAlertas,
                 });
-                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
-                /* setTipo(1) */
             }
             if (verMisAnuncios) {
                 ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString())
             } else {
                 setDataFull(data);
-                /* setMisAnuncios(data.anuncios);
-                setActualizarMisAnuncios(true); */
                 setActualizarData(true);
                 setLoading(false);
             }
@@ -695,6 +637,7 @@ const Condominio = () => {
                 localStorage.setItem("rolUsuario", data.rol);
                 localStorage.setItem("idUsuario", data.id);
                 setDataCondominios(data.condominios);
+                guardarUltimoRegistro(data.condominios, 'condominios')
                 if (localStorage.getItem("idCondominio")) {
                     let condSelect = data.condominios.filter((a: any) => a.id.toString() === localStorage.getItem("idCondominio")!.toString());
                     if (new Date(condSelect[0].fechaCaducidad) < new Date()) {
@@ -718,16 +661,6 @@ const Condominio = () => {
                 }
             }
             else {
-                /*setUsuario({
-                    nombre: "",
-                    tieneSuscripcionMensajes: false,
-                    tieneSuscripcionVotaciones: false,
-                    tieneSuscripcionAnuncios: false,
-                    tieneSuscripcionAvisos: false,
-                    rol: "",
-                    id: 0
-                });*/
-                //ErrorMessage("Credenciales incorrectas", "")
                 toast.info('Credenciales incorrectas', {
                     position: posicionAlertas,
                 });
@@ -1135,12 +1068,32 @@ const Condominio = () => {
                 }
                 setDataFull(data);
                 setActualizarData(true);
+                guardarUltimoRegistro(data, 'anuncios')
             }
             setLoading(false);
         } catch (er) {
         }
     }
+    const guardarUltimoRegistro = async (ultimoRegistro: any, nombre: string) => {
+        try {
 
+            await AsyncStorage.setItem(nombre, JSON.stringify(ultimoRegistro));
+
+            /* console.log('Último registro guardado', JSON.stringify(ultimoRegistro)); */
+        } catch (error) {
+            console.error('Error al guardar el registro:', error);
+        }
+    };
+    const obtenerUltimoRegistro = async () => {
+        const jsonanuncios = await AsyncStorage.getItem('anuncios');
+        const registroanuncios = jsonanuncios != null ? JSON.parse(jsonanuncios) : null;
+        const jsoncondominios = await AsyncStorage.getItem('condominios');
+        const registrocondominios = jsoncondominios != null ? JSON.parse(jsoncondominios) : null;
+        setDataFull(registroanuncios);
+        setDataFullParse(registroanuncios);
+        setDataCondominios(registrocondominios)
+        setEnComunidad(false)
+    };
     useEffect(() => {
         const cargarDatos = async () => {
             if (!actualizarMisAnuncios) return;
@@ -1325,8 +1278,6 @@ const Condominio = () => {
         setLoading(false);
         try {
             if (data) {
-                /* setLoading(true); */
-                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 setDataFull(data);
                 setActualizarData(true);
                 setLoading(false);
@@ -1334,7 +1285,6 @@ const Condominio = () => {
             else {
             }
         } catch (er) {
-            //ErrorMessage("Error dar Like", "Favor comuniquese con el administrador.")
             toast.info('Error al dar like. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1435,24 +1385,6 @@ const Condominio = () => {
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
-            {/*usuario.nombre.length > 0 ?
-                <div className="circular-menu">
-                    <button
-                        className={`menu-button ${open ? "open" : ""}`}
-                        onClick={() => setOpen(!open)}
-                        aria-label="Abrir menú"
-                    >
-                        <img width={50} src={iconmas} alt="icono de menu" />
-                    </button>
-                    <div className={`menu-items ${open ? "open" : ""}`}>
-                        <button disabled={!open} className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
-                        {
-                            usuario.rol === "ADMINISTRADOR" &&
-                            <button disabled={!open} className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
-                        }
-                    </div>
-                </div>
-                : ""*/}
             <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
                 <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => {
                     cerrarMenu(false); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
@@ -1491,156 +1423,6 @@ const Condominio = () => {
             </div >
         </div >
     }
-    const panelMisAnuncios = (a: any, i: any) => {
-        return <div
-            key={i}
-            className="v2-anuncio card-shadow col-12 my-3 pb-5"
-        >
-            <div className="v2-anuncio-header">
-                {usuario.nombre.length > 0 && (
-                    <div className="v2-anuncio-actions">
-                        {(usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR") && (
-                            <>
-                                {!a.activo ?
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 -960 960 960"
-                                        className="v2-icon verInput inactivo"
-                                        fill="currentColor"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            DeshabilitarAnuncio(a);
-                                        }}
-                                    >
-                                        <path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z" />
-                                    </svg>
-                                    :
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 -960 960 960"
-                                        fill="currentColor"
-                                        className="v2-icon verInput activo"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            DeshabilitarAnuncio(a);
-                                        }}
-                                    >
-                                        <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
-                                    </svg>
-                                }
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                    className="v2-icon editarInput"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        changeMenu(a.idTipo, false, false, true);
-                                        cargarAnuncioParaEdit(a);
-                                    }}
-                                >
-                                    <path d="M17.414 2.586a2 2 0 0 0-2.828 0L14 3.586 16.414 6l.586-.586a2 2 0 0 0 0-2.828zM2 15.586V18h2.414l11-11-2.414-2.414-11 11z" />
-                                </svg>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                    className="v2-icon deleteInput"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        EliminarAnuncio(a.id);
-                                    }}
-                                >
-                                    <path d="M5 3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h3a1 1 0 0 1 0 2h-1v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5H1a1 1 0 0 1 0-2h3V3zm1 0v1h8V3H6zm-1 3h10v12H5V6z" />
-                                </svg>
-                            </>
-                        )}
-                    </div>
-                )}
-                <h3 className={(usuario.id === a.idUsuario || usuario.rol === "ADMINISTRADOR") ? "v2-anuncio-title mt-4" : "v2-anuncio-title"}>{a.cabecera}</h3>
-            </div>
-
-            <div className="v2-anuncio-body" dangerouslySetInnerHTML={{ __html: a.descripcion }} />
-
-            {(a.amedida && (
-                <div className="v2-anuncio-media-wrapper">
-                    {a.esVideo ? (
-                        <video src={a.amedida} controls />
-                    ) : (
-                        <img src={a.amedida} alt="Foto Mis Anuncios"
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null;
-                                target.src = imgError;
-                            }}
-                            onClick={() => openModalImg(a.amedida)} />
-                    )}
-                </div>
-            )) || null}
-
-            <div className="v2-anuncio-footer">
-                <div className="v2-anuncio-organizador">
-                    <span>Creado por:</span>
-                    <span className="ml-1">{a.organizador}</span>
-                </div>
-                <span className="v2-anuncio-telefono">{a.telefono}</span>
-            </div>
-
-            <small className="v2-anuncio-fecha">
-                Fecha publicación: {new Date(a.fechaDesde).toLocaleDateString() + " " + new Date(a.fechaDesde).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-            </small>
-
-            {a.idTipo !== 2 && (
-                <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
-                    <svg fill="#28bd06" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                        width="24px" height="24px" viewBox="0 0 483.789 483.789" onClick={() => {
-                            //setLoading(true);
-                            ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
-                            setDataDetalle(a);
-                            setVerDetalle(true);
-                        }}>
-                        <g>
-                            <g>
-                                <polygon points="434.77,405.332 465.895,405.332 465.895,122.667 329.895,122.667 329.895,280.288 329.895,293.333 
-			316.073,293.333 167.228,293.333 167.228,405.332 361.895,405.332 361.895,483.789 		"/>
-                                <path d="M17.895,280h30.88l73.12,79.973V280h45.333h149.333V122.667V0H17.895V280z M266.138,116.6
-			c6.267,0,11.989,3.4,16.407,6.067c5.43,5.333,8.885,11.845,8.885,19.549c0,13.968-11.325,25.453-25.292,25.453
-			c-13.968,0-25.294-11.565-25.294-25.533c0-7.701,3.453-14.133,8.886-19.467C254.145,120,259.867,116.6,266.138,116.6z
-			 M199.927,116.6c6.267,0,11.99,3.4,16.408,6.067c5.429,5.333,8.886,11.845,8.886,19.549c0,13.968-11.326,25.453-25.294,25.453
-			c-13.968,0-25.293-11.565-25.293-25.533c0-7.701,3.454-14.133,8.886-19.467C187.937,120,193.66,116.6,199.927,116.6z
-			 M133.715,117.243c13.971,0,25.293,11.326,25.293,25.293c0,13.968-11.325,25.293-25.293,25.293
-			c-13.968,0-25.293-11.325-25.293-25.293C108.422,128.565,119.748,117.243,133.715,117.243z M67.507,117.243
-			c13.968,0,25.293,11.326,25.293,25.293c0,13.968-11.326,25.293-25.293,25.293c-13.971,0-25.293-11.325-25.293-25.293
-			C42.214,128.565,53.538,117.243,67.507,117.243z"/>
-                            </g>
-                        </g>
-                    </svg>
-                    <span className="v2-comment-count">{a.cantComentarios}</span>
-                </div>
-            )}
-
-            <div className="v2-anuncio-like" onClick={(e) => e.stopPropagation()}>
-                <svg
-                    className="v2-like-icon"
-                    viewBox="0 0 24 24"
-                    onClick={() => handleLike(a.id, true, false)}
-                >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-                  2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
-                  C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
-                  22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                <span className="v2-like-count">{a.likes}</span>
-            </div>
-        </div>
-
-    }
-
-    const handleKeyDown = (e: any) => {
-        if (e.key === 'Enter') {
-            login();
-        }
-    };
 
     const panelPrincipal = () => {
         return <div className="container">
@@ -1679,19 +1461,7 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const crearComentarioAnuncio = () => {
-        var comentarioAnuncio: any = {
-            Id: 0,
-            IdUsuario: usuario.id,
-            NombreUsuario: usuario.nombre,
-            IdAnuncio: dataDetalle.id,
-            Mensaje: newComentario,
-            Fecha: new Date()
-        };
-        setNewComentario("");
-        console.log(comentarioAnuncio);
-        CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, comentarioAnuncio, localStorage.getItem("idCondominio")!.toString());
-    }
+
     const selcrearComentarioAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -1793,64 +1563,6 @@ const Condominio = () => {
             setLoading(false);
         } catch (er) {
         }
-    }
-
-    const selObteneCondominio = (error: Boolean, err: string, data: any) => {
-        try {
-            setLoading(false);
-            if (data === 0) {
-                //ErrorMessage("Código Incorrecto", "El código ingresado es incorrecto");
-                toast.info('Código Incorrecto', {
-                    position: posicionAlertas,
-                });
-            } else {
-                window.location.href = "/" + data + "/comunidad"
-            }
-        } catch (er) {
-        }
-    }
-
-    const panelVotaciones = () => {
-        return <div style={{ fontFamily: 'Arial, sans-serif' }}>
-            <h4 className="mt-3 mb-4 text-center">VOTACIONES</h4>
-            {dataVotaciones.map((a: any, i: number) => {
-                return (
-                    <div key={i} className="cardVotacion my-4" style={!a.activo ? { opacity: '0.8' } : {}}>
-                        {usuario.rol === "ADMINISTRADOR" && (
-                            <label className="checkbox-container">
-                                <input
-                                    type="checkbox"
-                                    checked={!!a.activo}
-                                    onChange={() => {
-                                        setLoading(true);
-                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, a.id, !a.activo, localStorage.getItem("idCondominio")!.toString(), usuario.id)
-                                    }}
-                                />
-                                <span className="checkmark"></span>
-                            </label>
-                        )}
-                        <h4 className="text-center">{a.cabecera}</h4>
-                        <span className="mb-3 text-center d-block">{a.descripcion}</span>
-                        {a.opcionesVotacion.map((b: any, o: number) => {
-                            let percentage = a.total && b.votaciones.length ? (b.votaciones.length / a.total) * 100 : 0;
-                            return (<div key={o} style={{ marginBottom: '10px' }}>
-                                <div className="d-flex" style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                    <span>{b.descripcion}</span>
-                                    <small style={{ color: 'grey' }}>{b.votaciones.length} votos</small>
-                                </div>
-                                <div className={!a.activo ? "disabled-click" : ""} id={b.id} style={{ background: '#ddd', height: '25px', width: '100%', borderRadius: '5px', marginTop: '5px' }} onClick={(ev) => { cambiarVoto(ev); }}>
-                                    <div style={{ background: '#4caf50', height: '100%', width: `${percentage}%`, borderRadius: '5px', textAlign: 'center' }}>
-                                        {b.votaciones.find((votacion: any) => votacion.idUsuario === usuario.id) ?
-                                            <span style={{ color: 'white', display: 'block', width: '55px', margin: '0 auto' }}>Votado</span>
-                                            : ""}
-                                    </div>
-                                </div>
-                            </div>);
-                        })}
-                    </div>
-                );
-            })}
-        </div>
     }
 
     const filtrarUsuarios = (ev: any) => {
@@ -2053,9 +1765,6 @@ const Condominio = () => {
             setNewTextRich(editorRef.current.innerHTML);
         }
     };
-    const cambiarNormas = () => {
-        CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
-    }
     const selCambiarNormas = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -2081,111 +1790,6 @@ const Condominio = () => {
             });
         }
     }
-    const panelReglasNormas = () => {
-        return (
-            <div className="login-box py-3 px-3 ">
-                <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>Reglas y Normas</h4>
-                <div className="containerReglas">
-                    {
-                        usuario.rol !== "ADMINISTRADOR" ?
-                            <div
-                                dangerouslySetInnerHTML={{ __html: dataFull.normas }}
-                            /> :
-                            editarTextRich ?
-                                <div
-                                    dangerouslySetInnerHTML={{ __html: dataFull.normas }}
-                                />
-                                :
-                                <div>
-                                    <div
-                                        className="rich-text-input"
-                                        contentEditable
-                                        ref={editorRef}
-                                        onInput={handleInput}
-                                        onBlur={handleBlur}
-                                        suppressContentEditableWarning={true}
-                                        dangerouslySetInnerHTML={{ __html: newTextRich }}
-                                        spellCheck={true}
-                                        aria-label="Editor de texto enriquecido"
-                                    />
-                                    {textRichEditado ?
-                                        <button type="button" className="search-button mt-2 w-100" onClick={() => {
-                                            setTextRichEditado(false);
-                                            cambiarNormas();
-                                        }}>
-                                            Guardar cambios
-                                        </button>
-                                        : ""}
-                                    {textRichEditado ?
-                                        <button type="button" className="search-button mt-2 w-100" onClick={() => {
-                                            setNewTextRich(dataFull.normas);
-                                            setTextRichEditado(false);
-                                        }}>
-                                            Descartar cambios
-                                        </button>
-                                        : ""}
-                                </div>
-                    }
-
-                </div>
-            </div>
-        );
-    }
-    useEffect(() => {
-        generarCalendario();
-    }, [avisos]);
-
-    const generarCalendario = () => {
-        const nombresDias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-        const primerDia = new Date(año, mes, 1);
-        const diasEnMes = new Date(año, mes + 1, 0).getDate();
-
-        let diaSemana = primerDia.getDay(); // domingo = 0
-        diaSemana = diaSemana === 0 ? 6 : diaSemana - 1; // lunes = 0
-
-        const fechaActual = new Date(año, mes);
-        const nombreMes = fechaActual.toLocaleString('es-ES', {
-            month: 'long',
-            year: 'numeric',
-        });
-        setMonthTitle(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1));
-
-        const celdas: any = [];
-
-        // Encabezados
-        for (let i = 0; i < 7; i++) {
-            celdas.push(<div key={`head-${i}`} className="encabezado">{nombresDias[i]}</div>);
-        }
-
-        // Vacíos antes del 1
-        for (let i = 0; i < diaSemana; i++) {
-            celdas.push(<div key={`empty-${i}`} className="dia"></div>);
-        }
-
-        const formatoFecha = (fecha: any) => {
-            let _fecha: Date = new Date(fecha);
-            const _año = _fecha.getFullYear();
-            const _mes = _fecha.getMonth();
-            const _dia = _fecha.getDate();
-            return `${_año}-${(_mes + 1).toString().padStart(2, '0')}-${_dia.toString().padStart(2, '0')}`;
-        }
-        // Días con avisos
-        for (let dia = 1; dia <= diasEnMes; dia++) {
-            const fechaTexto = `${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
-            const avisosDelDia = avisos.filter((a: any) => formatoFecha(a.fecha) === fechaTexto);
-
-            celdas.push(
-                <div key={`dia-${dia}`} className="dia" onClick={() => { getObtenerAvisosDia(dia, mes + 1) }}>
-                    <div className="fecha">{dia}</div>
-                    {avisosDelDia.map((a: any, i: any) => (
-                        <div key={i} className="mensaje">{a.mensaje}</div>
-                    ))}
-                </div>
-            );
-        }
-
-        setDays(celdas);
-    };
 
     const getObtenerAvisosDia = (dia: number, mes: number) => {
         setDiaMesSelect({ dia: dia, mes: mes, anio: año })
@@ -2234,22 +1838,6 @@ const Condominio = () => {
         );
     }
 
-    function obtenerNombreMes(numeroMes: any) {
-        const nombresMeses = [
-            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        ];
-
-        if (numeroMes >= 1 && numeroMes <= 12) {
-            return nombresMeses[numeroMes - 1];
-        } else {
-            return "Mes inválido";
-        }
-    }
-
-    const changeFechaTime = (ev: any) => {
-        setHoraAviso(ev.target.value);
-    }
     const cambiarMes = (a: any, b: any) => {
         setMes(a)
         setAño(b)
@@ -2409,28 +1997,6 @@ const Condominio = () => {
             <span className="switch-slider" />
         </label>
     }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /* if ('serviceWorker' in navigator) {
-        window.addEventListener('load', async () => {
-            try {
-                const registration = await navigator.serviceWorker.register('/service-worker.js');
-                console.log('SW registrado:', registration);
-     
-                const readyReg = await navigator.serviceWorker.ready;
-                console.log('SW listo:', readyReg);
-                setEstadoServiceWorker('SW listo:' + readyReg.toString())
-                setServiceWorker(readyReg)
-                // Aquí puedes continuar con pushManager.subscribe...
-            } catch (error) {
-                console.error('Error al registrar o preparar el Service Worker:', error);
-            }
-        });
-    } else {
-        console.warn('El navegador no soporta Service Workers');
-    } */
-
     async function solicitarPermisoNotificaciones() {
         const permiso = await Notification.requestPermission();
 
@@ -2472,25 +2038,7 @@ const Condominio = () => {
         setVerMisAnuncios(false);
         setAgregarUsuario(false);
     }
-    // eslint-disable-next-line
-    const selSuscribir = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, err, data)
-            }
-            else {
-                //ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
-                toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            //ErrorMessage("Error crear suscripción", "Favor comuniquese con el administrador.")
-            toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
+
     const selSuscribir2 = (error: Boolean, err: string, data: any) => {
         setLoading(false);
         try {
@@ -2966,7 +2514,7 @@ const Condominio = () => {
                                                                                 CambiarNormasLogic(selCambiarNormas, newTextRich, localStorage.getItem("idCondominio")!.toString())
                                                                             }}
                                                                             onEditarToggle={() => setEditarTextRich(true)}
-                                                                            onCancelar={() => {setEditarTextRich(false);setNewTextRich(dataFull.normas);}}
+                                                                            onCancelar={() => { setEditarTextRich(false); setNewTextRich(dataFull.normas); }}
                                                                             loading={loading}
                                                                             puedeEditar={usuario.rol === "ADMINISTRADOR"}
                                                                             editorRef={editorRef}
