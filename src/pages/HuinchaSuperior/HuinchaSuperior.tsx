@@ -3,14 +3,16 @@ import './HuinchaSuperior.css';
 import back from './../../components/utils/img/menuInferior/back.png';
 import logout from './../../components/utils/img/menuInferior/logout.png';
 import perfilSelect from './../../components/utils/img/menuInferior/perfil-select.png';
+import personFull from './../../components/utils/img/menuInferior/personFull.png';
 
 interface Props {
     enComunidad: boolean;
     imagenPerfil: string;
     onChangeAtras: () => void;
+    onChangeMenu: (e: string) => void;
 }
 
-const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPerfil }) => {
+const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPerfil, onChangeMenu }) => {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -39,7 +41,11 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPe
                         aria-haspopup="true"
                         type="button"
                     >
-                        <img src={imagenPerfil} />
+                        { imagenPerfil != "" ?
+                            <img src={imagenPerfil} />
+                            :
+                            <img src={personFull} />
+                        }
                     </button>
 
                     {open && (
@@ -50,11 +56,11 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPe
                                 tabIndex={0}
                                 onClick={() => {
                                     setOpen(false);
-                                    alert("Ir a Mi Perfil");
+                                    onChangeMenu('perfil');
                                 }}
                                 onKeyDown={(e) => e.key === "Enter" && alert("Ir a Mi Perfil")}
                             >
-                                <img className='mr-1' src={perfilSelect}/> Mi Perfil
+                                <img className='mr-1' src={perfilSelect} /> Mi Perfil
                             </div>
                             <div
                                 className="huincha-dropdown-item"
@@ -62,11 +68,11 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPe
                                 tabIndex={0}
                                 onClick={() => {
                                     setOpen(false);
-                                    alert("Cerrar Sesión");
+                                    onChangeMenu('cerrarSesion');
                                 }}
                                 onKeyDown={(e) => e.key === "Enter" && alert("Cerrar Sesión")}
                             >
-                                <img className='mr-1' src={logout}/> Cerrar Sesión
+                                <img className='mr-1' src={logout} /> Cerrar Sesión
                             </div>
                         </div>
                     )}

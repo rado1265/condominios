@@ -1255,11 +1255,16 @@ const Condominio = () => {
                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                 break;
             case "numEmergencias":
-                cerrarMenu()
+                cerrarMenu();
                 changeMenu(999);
-                setVerEmergencia(true)
-                setLoading(true)
+                setVerEmergencia(true);
+                setLoading(true);
                 ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
+                break;
+            case "cerrarSesion":
+                cerrarMenu();
+                changeMenu(999);
+                cerrarSesion();
                 break;
             default:
 
@@ -1794,7 +1799,7 @@ const Condominio = () => {
                                         <button
                                             type="button"
                                             disabled={newUser.nombre === "" || newUser.clave === ""}
-                                            className="search-button mt-2"
+                                            className="modal-btn modal-btn-close mt-2"
                                             onClick={() => setAgregarUsuario(false)}
                                         >
                                             Cancelar
@@ -2587,6 +2592,7 @@ const Condominio = () => {
                     enComunidad={enComunidad}
                     onChangeAtras={handleVolverAtras}
                     imagenPerfil={imagenPerfil}
+                    onChangeMenu={handleChangeMenu}
                 />
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 <div className="container pb-5 mb-5">

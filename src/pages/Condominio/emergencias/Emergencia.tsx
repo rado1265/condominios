@@ -104,7 +104,7 @@ const Emergencia: React.FC<Props> = ({
                         }
                         {
                             rolUsuario === "ADMINISTRADOR" &&
-                            <button type="button" className="search-button mt-2" onClick={() => {
+                            <button type="button" className="modal-btn modal-btn-green mt-2" onClick={() => {
                                 onSelect({
                                     id: 0,
                                     descripcion: '',

@@ -18,6 +18,19 @@
   color: var(--colorFondo);
   font-size: 5px;
 }
+h1,
+h2,
+h3,
+h4,
+h5{
+  color: var(--colorSecundario);
+}
+
+span,
+p,
+li{
+  color: var(--colorBlack);
+}
 
 h1,
 h2,

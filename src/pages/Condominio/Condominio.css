@@ -461,7 +461,7 @@ body {
 .input-group label {
   display: block;
   margin-bottom: 8px;
-  color: var(--colorPrincipalVariante);
+  color: var(--colorSecundario);
   font-weight: 500;
 }
 
@@ -569,7 +569,7 @@ body {
   }
 
   .creator-title {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .input-group textarea {
@@ -965,11 +965,6 @@ body {
   margin-bottom: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 5px var(--colorSecundarioVarianteDos);
-}
-
-h2 {
-  color: var(--colorPrincipal);
-  margin-top: 0;
 }
 
 ul {
@@ -1725,7 +1720,6 @@ a:hover {
 .diaActual {
   color: var(--colorRed) !important;
   font-weight: 700;
-  scale: 1.1;
 }
 
 .sinEventos {
@@ -1791,7 +1785,7 @@ a:hover {
   border: 1.5px solid var(--colorSecundarioVarianteDos);
   border-radius: 10px;
   outline: none;
-  background: var(--colorNeutroVariante);
+  background: var(--colorFondo);
   transition: border-color 0.2s;
 }
 
@@ -1835,7 +1829,7 @@ a:hover {
   font-size: 1rem;
   border-radius: 10px;
   border: 1.5px solid var(--colorSecundarioVarianteDos);
-  background: var(--colorNeutroVariante);
+  background: var(--colorFondo);
   outline: none;
   transition: border-color 0.2s;
   appearance: none;

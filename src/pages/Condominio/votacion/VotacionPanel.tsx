@@ -23,7 +23,7 @@ interface Props {
 
 const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiarVoto, loading = false, usuario = "" }) => {
     return <>{!loading && <div style={{ fontFamily: 'Arial, sans-serif' }}>
-        <h4 className="mt-3 mb-4 text-center">VOTACIONES</h4>
+        <h2 className="mt-3 mb-4 text-center">VOTACIONES</h2>
         {votaciones.map((a: any, i: number) => {
             return (
                 <div key={i} className="cardVotacion my-4" style={!a.activo ? { opacity: '0.8' } : {}}>
@@ -37,7 +37,7 @@ const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiar
                             <span className="checkmark"></span>
                         </label>
                     )}
-                    <h4 className="text-center">{a.cabecera}</h4>
+                    <p className="text-center" style={{fontSize: '1.5rem', fontWeight: '600'}}>{a.cabecera}</p>
                     <span className="mb-3 text-center d-block">{a.descripcion}</span>
                     {a.opcionesVotacion.map((b: any, o: number) => {
                         let percentage = a.total && b.votaciones.length ? (b.votaciones.length / a.total) * 100 : 0;
