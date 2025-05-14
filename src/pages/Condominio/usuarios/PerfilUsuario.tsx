@@ -21,6 +21,7 @@ interface Props {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onGuardar: () => void;
     onCancelar: () => void;
+    onChangeCreateSub: (tiene: any, id: any, ev: any) => void;
     onImagenSeleccionada: (file: File) => void;
     loading?: boolean;
 }
@@ -30,6 +31,7 @@ const PerfilUsuario: React.FC<Props> = ({
     onChange,
     onGuardar,
     onCancelar,
+    onChangeCreateSub,
     onImagenSeleccionada,
     loading = false,
 }) => {
@@ -69,6 +71,18 @@ const PerfilUsuario: React.FC<Props> = ({
             }));*/
         }
     };
+
+    const iconNotificaciones = (activa: boolean) => {
+        return <label className="switch">
+            <input
+                type="checkbox"
+                checked={activa}
+                defaultChecked={activa}
+                className="switch-checkbox"
+            />
+            <span className="switch-slider" />
+        </label>
+    }
 
     return (
         <form onSubmit={(e) => { e.preventDefault(); onGuardar(); setEditarPerfil(false); }} className="perfil-form">
@@ -159,7 +173,7 @@ const PerfilUsuario: React.FC<Props> = ({
                         </div>
                     </>
                     :
-                    !loading && <div className="perfil-box w-100">
+                    !loading && <div className="perfil-box w-100 my-0">
                         <button
                             type="button"
                             className="perfil-edit-btn"
@@ -197,20 +211,36 @@ const PerfilUsuario: React.FC<Props> = ({
                                     {usuario.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                 </div>
                                 <div className="container-dataPerfil">
-                                    <span>Notif. Anuncios</span>
-                                    <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                    <button type="button" className="submenu-item" onClick={(ev) => {
+                                        onChangeCreateSub(usuario.tieneSuscripcionAnuncios, 1, ev)
+                                    }}>
+                                        Notif. Anuncios
+                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                                    </button>
                                 </div>
                                 <div className="container-dataPerfil">
-                                    <span>Notif. Mensajes</span>
-                                    <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                    <button type="button" className="submenu-item" onClick={(ev) => {
+                                        onChangeCreateSub(usuario.tieneSuscripcionMensajes, 2, ev)
+                                    }}>
+                                        Notif. Mensajes
+                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                                    </button>
                                 </div>
                                 <div className="container-dataPerfil">
-                                    <span>Notif. Votaciones</span>
-                                    <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                    <button type="button" className="submenu-item" onClick={(ev) => {
+                                        onChangeCreateSub(usuario.tieneSuscripcionVotaciones, 3, ev)
+                                    }}>
+                                        Notif. Votaciones
+                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                                    </button>
                                 </div>
                                 <div className="container-dataPerfil">
-                                    <span>Notif. Calendario</span>
-                                    <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                    <button type="button" className="submenu-item" onClick={(ev) => {
+                                        onChangeCreateSub(usuario.tieneSuscripcionAvisos, 4, ev)
+                                    }}>
+                                        Notif. Calendario
+                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                    </button>
                                 </div>
                                 <div className="container-dataPerfil">
                                     <span>Fecha Caducidad</span>

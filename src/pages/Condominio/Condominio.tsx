@@ -25,6 +25,7 @@ import BottomNav from './../MenuInferior/MenuInferior';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import iconborrar from './../../components/utils/img/iconborrar.png';
 import iconeditar from './../../components/utils/img/editar.png';
+import HuinchaSuperior from "../HuinchaSuperior/HuinchaSuperior";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -70,6 +71,7 @@ const Condominio = () => {
     const app = initializeApp(firebaseConfig);
     const storage = getStorage(app);
     const [buscarDataFull, setBuscarDataFull] = useState("");
+    const [imagenPerfil, setImagenPerfil] = useState("");
     const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
     const [editImgPerfil, setEditImgPerfil] = useState(false);
     const [agregarUsuario, setAgregarUsuario] = useState(false);
@@ -636,6 +638,22 @@ const Condominio = () => {
                 setUsuario(data);
                 setTipo(1)
                 setIniciarSesion(false)
+                if (data.imagen && !data.imagen.includes("http")) {
+                    const imageRef = ref(storage, `perfiles/${data.imagen}`);
+
+                    getDownloadURL(imageRef)
+                        .then((url) => {
+                            setImagenPerfil(url)
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+
+                } else if (data.imagen.includes("http")) {
+                    setImagenPerfil(data.imagen);
+                } else {
+                    setImagenPerfil("");
+                }
                 localStorage.setItem("nombreUsuario", data.nombre);
                 localStorage.setItem("usuario", data.usuario);
                 localStorage.setItem("clave", data.clave);
@@ -1173,6 +1191,10 @@ const Condominio = () => {
 
     const handleChangeOrden = (e: string) => {
         setOrden(orden === 'asc' ? 'desc' : 'asc');
+    }
+
+    const handleVolverAtras = () => {
+        handleChangeMenu(menuAnterior);
     }
 
     const handleChangeMenu = (e: any) => {
@@ -2357,7 +2379,7 @@ const Condominio = () => {
                     loading ?
                         <Loading />
                         : ""}
-                <div className={enComunidad ? "w-100 pb-3 mb-3 containerMenu" : "d-none"}>
+                {/*<div className={enComunidad ? "w-100 pb-3 mb-3 containerMenu" : "d-none"}>
                     <div className="containerImgMenu">
                         {
                             usuario.nombre.length > 0 && <button id="iconoMenuSup" className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
@@ -2534,15 +2556,6 @@ const Condominio = () => {
                                 </svg>
                                 Calendario
                             </button>
-                            {/* <button type="button" onClick={() => {
-                                cerrarMenu(false, false, false, false, false, true)
-                                setCrear(false)
-                            }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="red" width="24" height="24" viewBox="0 0 24 24">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-                                </svg>
-                                Puntos de Interes
-                            </button> */}
                             <button type="button" onClick={() => {
                                 cerrarMenu()
                                 changeMenu(999);
@@ -2569,7 +2582,12 @@ const Condominio = () => {
                             </button>
                         </div>
                     )}
-                </div>
+                </div>*/}
+                <HuinchaSuperior
+                    enComunidad={enComunidad}
+                    onChangeAtras={handleVolverAtras}
+                    imagenPerfil={imagenPerfil}
+                />
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 <div className="container pb-5 mb-5">
                     <div className="row px-3 justify-content-around">
@@ -2687,6 +2705,7 @@ const Condominio = () => {
                                     onCancelar={() => setEditarPerfil(false)}
                                     onImagenSeleccionada={(file) => setArchivoTemp(file)}
                                     loading={loading}
+                                    onChangeCreateSub={createSuscripcion}
                                 />
                             </>
                         }

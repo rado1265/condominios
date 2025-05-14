@@ -834,7 +834,7 @@ body {
 }
 
 .switch-checkbox:checked+.switch-slider {
-  background-color: var(--colorPrincipal);
+  background-color: var(--colorSecundario);
 }
 
 .switch-checkbox:checked+.switch-slider::before {
@@ -847,7 +847,7 @@ body {
   margin: 0;
   margin-left: 5px;
   position: absolute;
-  right: 5px;
+  right: 40px;
 }
 
 .switch-slider::before {
@@ -1003,10 +1003,6 @@ li {
   padding: 0.6rem;
   cursor: pointer;
   z-index: 2;
-}
-
-.perfil-edit-btn:hover {
-  background: var(--colorNeutroVariante);
 }
 
 .perfil-avatar {
@@ -1289,8 +1285,8 @@ a:hover {
 }
 
 .checkbox-container input:checked~.checkmark {
-  background-color: var(--colorPrincipal);
-  border-color: var(--colorPrincipal);
+  background-color: var(--colorSecundario);
+  border-color: var(--colorSecundario);
 }
 
 /* Checkmark icon */
@@ -1347,15 +1343,12 @@ a:hover {
 }
 
 .submenu-item {
-  padding: 12px 16px;
-  border: none;
+  color: var(--colorNeutro);
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  border:none;
   background: none;
-  text-align: left;
-  cursor: pointer;
-}
-
-.submenu-item:hover {
-  background: var(--colorNeutroVariante);
 }
 
 .v2-anuncio {

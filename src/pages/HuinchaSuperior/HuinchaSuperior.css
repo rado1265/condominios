@@ -1,0 +1,75 @@
+.containerMenu {
+    justify-content: space-between;
+    box-shadow: var(--colorSecundarioVariante) 0px 0px 24px 0px;
+    height: 65px;
+    background: var(--colorSecundario);
+    position: fixed;
+    z-index: 99;
+    margin-top: -80px;
+    align-items: center;
+    display: flex;
+}
+
+.tituloMenu {
+    font-size: xx-large;
+    color: white;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.huincha-profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.huincha-icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #009688;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    outline: none;
+}
+
+.huincha-icon-button:hover,
+.huincha-icon-button:focus {
+    outline: none;
+}
+
+.huincha-icon-button>img {
+    width: 100%;
+    border-radius: 50%;
+}
+
+.huincha-dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background: white;
+    border: 1px solid #009688;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 155px;
+    z-index: 1000;
+}
+
+.huincha-dropdown-item {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #009688;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s;
+}
+
+.huincha-dropdown-item:hover {
+    background-color: #b2dfdb;
+}
