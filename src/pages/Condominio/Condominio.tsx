@@ -1098,9 +1098,9 @@ const Condominio = () => {
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                if (data.avisosHoy) {
+                /* if (data.avisosHoy) {
                     setAlerta({ tipo: 1, mensaje: "Tu calendario muestra eventos programados para hoy" })
-                }
+                } */
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
@@ -2255,18 +2255,25 @@ const Condominio = () => {
                 toast.success('Su suscripción a las notificaciones fue realizada correctamente.', {
                     position: posicionAlertas,
                 });
-                setUsuario({
-                    usuario: usuario.usuario,
-                    nombre: usuario.nombre,
-                    tieneSuscripcionMensajes: err === "2" ? true : usuario.tieneSuscripcionMensajes,
-                    tieneSuscripcionVotaciones: err === "3" ? true : usuario.tieneSuscripcionVotaciones,
-                    tieneSuscripcionAnuncios: err === "1" ? true : usuario.tieneSuscripcionAnuncios,
-                    tieneSuscripcionAvisos: err === "4" ? true : usuario.tieneSuscripcionAvisos,
-                    rol: usuario.rol,
-                    id: usuario.id
-                });
-                let campo = err === "2" ? "tieneSuscripcionMensajes" : err === "3" ? "tieneSuscripcionVotaciones" : "tieneSuscripcionAnuncios";
-                localStorage.setItem(campo, "true");
+                let newData = data;
+                if (newData.imagen) {
+                    const imageRef = ref(storage, `perfiles/${newData.imagen}`);
+
+                    getDownloadURL(imageRef)
+                        .then((url) => {
+                            newData.imagen = url;
+                            setUsuarioDetalle(newData);
+                            setLoading(false);
+                        })
+                        .catch((err) => {
+                            setUsuarioDetalle(newData);
+                            console.error(err);
+                            setLoading(false);
+                        });
+                } else {
+                    setUsuarioDetalle(newData);
+                    setLoading(false);
+                }
             }
             else {
                 //ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
@@ -2789,7 +2796,7 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad &&
+                            tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle &&
                             <>
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
                                     if (Number(tipo) === Number(a.idTipo))
