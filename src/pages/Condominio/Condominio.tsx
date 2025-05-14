@@ -179,6 +179,7 @@ const Condominio = () => {
         esVideo: false
     });
     const [active, setActive] = useState('calendario');
+    const [menuAnterior, setMenuAnterior] = useState('calendario');
     const [newComentario, setNewComentario] = useState('')
     const [verPerfil, setVerPerfil] = useState(false)
     const [verUsuarios, setVerUsuarios] = useState(false)
@@ -1166,7 +1167,16 @@ const Condominio = () => {
         }));
     };
 
+    const handleChangeCriterio = (e: any) => {
+        setCriterio(e);
+    }
+
+    const handleChangeOrden = (e: string) => {
+        setOrden(orden === 'asc' ? 'desc' : 'asc');
+    }
+
     const handleChangeMenu = (e: any) => {
+        setMenuAnterior(active);
         setActive(e);
         switch (e) {
             case "perfil":
@@ -1531,6 +1541,10 @@ const Condominio = () => {
             <BottomNav
                 onChangeMenu={handleChangeMenu}
                 active={active}
+                orden={orden}
+                onChangeCriterio={handleChangeCriterio}
+                onFiltrarDataFull={filtrarDataFull}
+                onChangeOrden={handleChangeOrden}
             />
         </div >
     }
@@ -1694,6 +1708,7 @@ const Condominio = () => {
             ...prev,
             ['anuncios']: filtrado
         }));
+        setBuscarDataFull(ev.target.value);
     }
 
 
@@ -1775,7 +1790,7 @@ const Condominio = () => {
                                             }}>
                                                 <button className="cupo-usuarios-add" title="Agregar usuario">
                                                     <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
-                                                        <circle cx="9" cy="9" r="9" fill="#05c724" />
+                                                        <circle cx="9" cy="9" r="9" fill="#009688" />
                                                         <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
                                                     </svg>
                                                 </button>
@@ -2757,46 +2772,6 @@ const Condominio = () => {
                         {
                             tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad &&
                             <>
-                                {
-                                    <div className="mt-1">
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <label style={{ fontSize: '12px', marginRight: '10%' }} className="block mb-1 font-medium text-xs">Buscar por título o creador</label>
-                                            <label style={{ fontSize: '12px' }} className="text-sm font-medium">Ordenar por:</label>
-                                        </div>
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <input
-                                                type="search"
-                                                id="buscar-datafull"
-                                                value={buscarDataFull}
-                                                placeholder="Buscar..."
-                                                onChange={(ev) => {
-                                                    filtrarDataFull(ev);
-                                                    setBuscarDataFull(ev.target.value);
-                                                }}
-                                                style={{ width: '45%', marginRight: '5%' }}
-                                                className="border rounded px-3 py-1 text-sm"
-                                            />
-                                            <select
-                                                value={criterio}
-                                                onChange={(e: any) => setCriterio(e.target.value)}
-                                                className="border rounded px-2 py-1 text-sm"
-                                            >
-                                                <option value="fechaDesde">Fecha</option>
-                                                <option value="likes">Likes</option>
-                                                <option value="cantComentarios">Comentarios</option>
-                                                <option value="cabecera">Nombre</option>
-                                            </select>
-
-                                            <button
-                                                onClick={() => setOrden(orden === 'asc' ? 'desc' : 'asc')}
-                                                className="iconoFiltro"
-                                                title="Cambiar orden"
-                                            >
-                                                <img src={filtro} />{/* {orden === 'asc' ? '⬆️' : '⬇️'} */}
-                                            </button>
-                                        </div>
-                                    </div>
-                                }
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
                                     if (Number(tipo) === Number(a.idTipo))
                                         return <AnunciosPanel

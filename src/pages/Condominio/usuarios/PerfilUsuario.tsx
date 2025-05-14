@@ -146,11 +146,15 @@ const PerfilUsuario: React.FC<Props> = ({
                                 value={usuario.clave}
                                 onChange={onChange}
                             />
-                            <div className="form-actions">
+                            {/*<div className="form-actions">
                                 <button type="submit" className="search-input" disabled={loading}>
                                     {loading ? 'Guardando...' : 'Guardar'}
                                 </button>
                                 <button type="button" className="search-input" onClick={() => setEditarPerfil(false)}>Cancelar</button>
+                            </div>*/}
+                            <div className="modal-actions">
+                                <button type="submit" className="modal-btn modal-btn-green" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</button>
+                                <button className="modal-btn modal-btn-close" onClick={() => setEditarPerfil(false)}>Cancelar</button>
                             </div>
                         </div>
                     </>

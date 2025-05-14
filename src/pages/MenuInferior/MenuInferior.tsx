@@ -22,13 +22,21 @@ import rules from '../../components/utils/img/menuInferior/rules.png';
 import rulesSelect from '../../components/utils/img/menuInferior/rules-select.png';
 import emergency from '../../components/utils/img/menuInferior/emergency.png';
 import emergencySelect from '../../components/utils/img/menuInferior/emergency-select.png';
+import close from '../../components/utils/img/menuInferior/close.png';
 
 interface Props {
     active: string;
+    orden: string;
     onChangeMenu: (e: string) => void;
+    onChangeCriterio: (e: string) => void;
+    onFiltrarDataFull: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChangeOrden: (e: string) => void;
 }
 
 const icons = {
+    close: (
+        <img width={25} src={close} />
+    ),
     emergency: (
         <img width={25} src={emergency} />
     ),
@@ -103,8 +111,15 @@ const icons = {
     ),
 };
 
-const BottomNav: React.FC<Props> = ({active, onChangeMenu}) => {
+const filters = [
+    { label: "Fecha", key: "fechaDesde" },
+    { label: "Likes", key: "likes" },
+    { label: "Comentarios", key: "cantComentarios" }
+];
+
+const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCriterio, onFiltrarDataFull, onChangeOrden }) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [buscarenmenu, setBuscarEnMenu] = useState(false);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -131,113 +146,168 @@ const BottomNav: React.FC<Props> = ({active, onChangeMenu}) => {
         setMenuOpen((open) => !open);
     };
 
+    const [activeFilter, setActiveFilter] = useState("fechaDesde");
+
     return (
         <>
-            <nav className="bottom-nav">
-                <button
-                    className={`nav-button ${active === 'buscar' ? 'active' : ''}`}
-                    //onClick={() => onChangeMenu('buscar')}
-                    aria-label="Buscar"
-                >
-                    {active === 'buscar' ? icons.buscarSelect : icons.buscar}
-                </button>
-                <button
-                    className={`nav-button ${active === 'calendario' ? 'active' : ''}`}
-                    onClick={() => onChangeMenu('calendario')}
-                    aria-label="Calendario"
-                >
-                    {active === 'calendario' ? icons.calendarioSelect : icons.calendario}
-                </button>
-
-                <div className="create-container">
+            {buscarenmenu ?
+                <nav className="bottom-nav" style={{ height: '155px' }}>
+                    <img src={close} style={{ position: 'absolute', top: '7px', right: '7px' }} onClick={() => setBuscarEnMenu(false)} />
+                    <div className="search-menu-container">
+                        <div className="filters">
+                            <span
+                                key={1}
+                                className={`filter`}
+                            >
+                                Ordenar por:
+                            </span>
+                            {filters.map((f) => (
+                                <span
+                                    key={f.key}
+                                    className={`filter${activeFilter === f.key ? " active" : ""}`}
+                                    onClick={() => { onChangeCriterio(f.key); setActiveFilter(f.key) }}
+                                >
+                                    {f.label}
+                                </span>
+                            ))}
+                            <button
+                                onClick={() => { onChangeOrden(orden === 'asc' ? 'desc' : 'asc') }}
+                                className="iconoFiltro" title="Cambiar orden">
+                                <img width={20} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAACxAAAAsQHGLUmNAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAJNJREFUSIntlEEKwyAQRR+9Qwd6/zO0WYZ2W7tJCzlOssgIQ8DWxnGlHz4K6n8i+KF1CRDU4h1+BiZgUc/ApVa4K0SAtwbG0c4/ZD7XXb3XywSKAVhwyAHEg3tdgae5pd0nuvYoAfy175RDKlEHdIAvYCDdisL2g28lsMCxChjVP+VWYt9UtYZTENfwqNiKtjUb1QonJEYB7NA3+gAAAABJRU5ErkJggg==" />
+                            </button>
+                        </div>
+                        <div className="search-bar">
+                            <span className="search-icon">
+                                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                    <circle cx="11" cy="11" r="7" stroke="#222" strokeWidth="2" />
+                                    <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="Buscar por título o creador"
+                                onChange={onFiltrarDataFull}
+                            />
+                        </div>
+                    </div>
+                </nav>
+                :
+                <nav className="bottom-nav">
+                    {active === "anuncios" || active === "mispublicaciones" ?
+                        <button
+                            className={`nav-button`}
+                            onClick={() => setBuscarEnMenu(true)}
+                            aria-label="Buscar"
+                        >
+                            {icons.buscar}
+                        </button>
+                        :
+                        <button
+                            className={`nav-button ${active === 'buscar' ? 'active' : ''}`}
+                            onClick={() => setBuscarEnMenu(true)}
+                            aria-label="Buscar"
+                        >
+                            {active === 'buscar' ? icons.buscarSelect : icons.buscar}
+                        </button>
+                    }
                     <button
-                        className={`nav-button create-button ${menuOpen ? 'open' : ''}`}
-                        onClick={handleCreateClick}
-                        aria-label="Crear"
-                        aria-expanded={menuOpen}
-                        aria-haspopup="true"
+                        className={`nav-button ${active === 'calendario' ? 'active' : ''}`}
+                        onClick={() => onChangeMenu('calendario')}
+                        aria-label="Calendario"
                     >
-                        {icons.crear}
+                        {active === 'calendario' ? icons.calendarioSelect : icons.calendario}
                     </button>
-                    <div className={`${menuOpen ? 'visual' : ''} container-submenu`}>
-                        <div className={`create-dropdown ${menuOpen ? 'show' : ''} fullContainerOpciones shadow`}>
-                            <div className='filaOpciones'>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('perfil')}
-                                    aria-label="Mi Perfil"
-                                >
-                                    {icons.perfilSelect}
-                                    <span className='txtOpcion'>Mi<br></br>Perfil</span>
-                                </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('mispublicaciones')}
-                                    aria-label="Mis Publicaciones"
-                                >
-                                    {icons.mispublicacionesSelect}
-                                    <span className='txtOpcion'>Mis<br></br>Publicaciones</span>
-                                </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('comunidad')}
-                                    aria-label="Mi Comunidad"
-                                >
-                                    {icons.comunidadSelect}
-                                    <span className='txtOpcion'>Mi<br></br>Comunidad</span>
-                                </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('crearAnuncio')}
-                                    aria-label="Crear Anuncio"
-                                >
-                                    {icons.anunciosSelect}
-                                    <span className='txtOpcion'>Crear <br></br>Anuncio</span>
-                                </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('crearVotacion')}
-                                    aria-label="Crear Votación"
-                                >
-                                    {icons.votacionesSelect}
-                                    <span className='txtOpcion'>Crear <br></br>Votación</span>
-                                </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('reglas')}
-                                    aria-label="Reglas y Normas"
-                                >
-                                    {icons.rulesSelect}
-                                    <span className='txtOpcion'>Reglas y<br></br> Normas</span>
-                                </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => onChangeMenu('numEmergencias')}
-                                    aria-label="Número emergencias"
-                                >
-                                    {icons.emergencySelect}
-                                    <span className='txtOpcion'>Núm.<br></br> Emergencias</span>
-                                </button>
+
+                    <div className="create-container">
+                        <button
+                            className={`nav-button create-button ${menuOpen ? 'open' : ''}`}
+                            onClick={handleCreateClick}
+                            aria-label="Crear"
+                            aria-expanded={menuOpen}
+                            aria-haspopup="true"
+                        >
+                            {icons.crear}
+                        </button>
+                        <div className={`${menuOpen ? 'visual' : ''} container-submenu`}>
+                            <div className={`create-dropdown ${menuOpen ? 'show' : ''} fullContainerOpciones shadow`}>
+                                <div className='filaOpciones'>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('perfil')}
+                                        aria-label="Mi Perfil"
+                                    >
+                                        {icons.perfilSelect}
+                                        <span className='txtOpcion'>Mi<br></br>Perfil</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('mispublicaciones')}
+                                        aria-label="Mis Publicaciones"
+                                    >
+                                        {icons.mispublicacionesSelect}
+                                        <span className='txtOpcion'>Mis<br></br>Publicaciones</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('comunidad')}
+                                        aria-label="Mi Comunidad"
+                                    >
+                                        {icons.comunidadSelect}
+                                        <span className='txtOpcion'>Mi<br></br>Comunidad</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('crearAnuncio')}
+                                        aria-label="Crear Anuncio"
+                                    >
+                                        {icons.anunciosSelect}
+                                        <span className='txtOpcion'>Crear <br></br>Anuncio</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('crearVotacion')}
+                                        aria-label="Crear Votación"
+                                    >
+                                        {icons.votacionesSelect}
+                                        <span className='txtOpcion'>Crear <br></br>Votación</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('reglas')}
+                                        aria-label="Reglas y Normas"
+                                    >
+                                        {icons.rulesSelect}
+                                        <span className='txtOpcion'>Reglas y<br></br> Normas</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('numEmergencias')}
+                                        aria-label="Número emergencias"
+                                    >
+                                        {icons.emergencySelect}
+                                        <span className='txtOpcion'>Núm.<br></br> Emergencias</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <button
-                    className={`nav-button ${active === 'anuncios' ? 'active' : ''}`}
-                    onClick={() => onChangeMenu('anuncios')}
-                    aria-label="Anuncios"
-                >
-                    {active === 'anuncios' ? icons.anunciosSelect : icons.anuncios}
-                </button>
+                    <button
+                        className={`nav-button ${active === 'anuncios' ? 'active' : ''}`}
+                        onClick={() => onChangeMenu('anuncios')}
+                        aria-label="Anuncios"
+                    >
+                        {active === 'anuncios' ? icons.anunciosSelect : icons.anuncios}
+                    </button>
 
-                <button
-                    className={`nav-button ${active === 'votaciones' ? 'active' : ''}`}
-                    onClick={() => onChangeMenu('votaciones')}
-                    aria-label="Votaciones"
-                >
-                    {active === 'votaciones' ? icons.votacionesSelect : icons.votaciones}
-                </button>
-            </nav>
+                    <button
+                        className={`nav-button ${active === 'votaciones' ? 'active' : ''}`}
+                        onClick={() => onChangeMenu('votaciones')}
+                        aria-label="Votaciones"
+                    >
+                        {active === 'votaciones' ? icons.votacionesSelect : icons.votaciones}
+                    </button>
+                </nav>
+            }
         </>
     );
 };

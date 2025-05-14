@@ -162,15 +162,19 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     <option value="2">Recordatorio</option>
                 </select>
 
-                <div className="form-actions">
+                {/*<div className="form-actions">
                     <button
                         type="submit"
                         className="search-button mt-2"
                     >
                         {anuncio != null && anuncio.id > 0 ? "Editar" : "Crear"}
                     </button>
-                    {/* <button type="submit">Guardar</button> */}
                     <button type="button" className="search-button mt-2" onClick={onCancelar}>Cancelar</button>
+                </div>*/}
+
+                <div className="modal-actions">
+                    <button type="submit" className="modal-btn modal-btn-green">{anuncio != null && anuncio.id > 0 ? "Editar" : "Crear"}</button>
+                    <button className="modal-btn modal-btn-close" onClick={onCancelar}>Cancelar</button>
                 </div>
             </div>
         </form>

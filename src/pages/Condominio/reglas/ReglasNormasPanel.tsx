@@ -62,9 +62,7 @@ const ReglasNormasPanel: React.FC<Props> = ({
                                     </button>
                                     : ""}
                                 {textRichEditado ?
-                                    <button type="button" className="search-button mt-2 w-100" onClick={onCancelar}>
-                                        Descartar
-                                    </button>
+                                    <button className="modal-btn modal-btn-close w-100 mt-3" onClick={onCancelar}>Descartar</button>
                                     : ""}
                             </div>
                 }

@@ -114,12 +114,8 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
                     </button>
                 </div>
 
-                <button
-                    className="create-button"
-                    onClick={() => crearVotacion()}
-                >
-                    Crear Encuesta
-                </button>
+                <button className="modal-btn modal-btn-green w-100 mt-3" onClick={() => crearVotacion()}>Crear Encuesta</button>
+
             </div>
 
         </div>

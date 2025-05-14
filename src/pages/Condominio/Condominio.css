@@ -930,7 +930,7 @@ body {
   display: flex;
 }
 
-.dia-con-algo.diaActual{
+.dia-con-algo.diaActual {
   color: var(--colorFondo) !important;
   background: var(--colorRed) !important;
 }
@@ -964,7 +964,7 @@ body {
   padding: 15px;
   margin-bottom: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px var(--colorBlack);
+  box-shadow: 0 2px 5px var(--colorSecundarioVarianteDos);
 }
 
 h2 {
@@ -983,7 +983,7 @@ li {
 .perfil-box {
   background: var(--colorFondo);
   border-radius: 18px;
-  box-shadow: 0 4px 24px var(--colorBlack), 0 0 0 1px var(--colorNeutroVariante);
+  box-shadow: 0 4px 24px var(--colorSecundarioVarianteDos), 0 0 0 1px var(--colorNeutroVariante);
   padding: 2rem 1.2rem 1.6rem 1.2rem;
   max-width: 410px;
   margin: 2rem auto;
@@ -1018,9 +1018,9 @@ li {
   align-items: center;
   justify-content: center;
   margin-bottom: 1.1rem;
-  box-shadow: 0 2px 12px var(--colorBlack);
+  box-shadow: 0 2px 12px var(--colorSecundarioVarianteDos);
   overflow: hidden;
-  border: 3px solid var(--colorNeutro);
+  border: 3px solid var(--colorSecundarioVarianteDos);
 }
 
 .perfil-avatar img {
@@ -1181,7 +1181,7 @@ a:hover {
 .usuarios-listado {
   background: var(--colorFondo);
   border-radius: 14px;
-  box-shadow: 0 2px 8px var(--colorBlack);
+  box-shadow: 0 2px 8px var(--colorSecundarioVarianteDos);
   margin-bottom: 1.2rem;
   padding: 1rem 1.2rem;
   transition: box-shadow 0.2s;
@@ -1209,7 +1209,7 @@ a:hover {
 }
 
 .user-activo {
-  color: var(--colorPrincipal);
+  color: var(--colorSecundario);
 }
 
 .user-inactivo {
@@ -1233,23 +1233,19 @@ a:hover {
   width: 100%;
   padding: 12px 16px;
   font-size: 1rem;
-  border: 1px solid var(--colorNeutro);
+  border: 1px solid var(--colorNeutroVariante);
   border-radius: 10px;
   outline-offset: 2px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: inset 0 1px 3px var(--colorBlack);
+  box-shadow: inset 0 1px 3px var(--colorNeutroVariante);
   background-color: var(--colorFondo);
+  outline: none;
 }
 
 .buscaruser-search-input::placeholder {
-  color: var(--colorSecundarioVarianteDos);
+  color: var(--colorSecundarioVariante);
   font-style: italic;
-}
-
-.buscaruser-search-input:focus {
-  border-color: var(--colorPrincipal);
-  box-shadow: 0 0 8px var(--colorPrincipal);
-  background-color: var(--colorNeutroVariante);
+  outline: none;
 }
 
 /* CheckboxModern.css */
@@ -1671,12 +1667,12 @@ a:hover {
 .cupo-usuarios {
   display: inline-block;
   padding: 6px 16px;
-  background: linear-gradient(90deg, var(--colorPrincipal) 60%, var(--colorPrincipalVariante) 100%);
+  background: linear-gradient(90deg, var(--colorSecundario) 60%, var(--colorSecundarioVariante) 100%);
   color: var(--colorFondo);
   font-weight: 600;
   font-size: 1.1rem;
   border-radius: 24px;
-  box-shadow: 0 2px 8px var(--colorBlack);
+  box-shadow: 0 2px 8px var(--colorSecundarioVarianteBlack);
   letter-spacing: 0.5px;
   transition: background 0.3s;
 }
@@ -1869,6 +1865,6 @@ a:hover {
   border-color: var(--colorPrincipal);
 }
 
-.titulocalendarioAviso{
+.titulocalendarioAviso {
   color: var(--colorSecundario);
 }
