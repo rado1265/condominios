@@ -283,7 +283,6 @@ const Condominio = () => {
     const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
 
     const handleImage = (files: any) => {
-        console.log(files);
         if (files.target.files.length === 0) return;
         const file = files.target.files[0];
 
@@ -387,12 +386,16 @@ const Condominio = () => {
             const newDataFull = {
                 ...dataFull,
                 anuncios: dataFull.anuncios.map((a: any) => {
-                    const nombreBuscado = a.amedida?.replace("video-", "").replace("img-", "") || "";
+                    const nombreBuscado = a.amedida || "";
                     const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
+                    let esVideodesdeURL = false;
+                    if(!matchArchivo){
+                        esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(a.amedida)
+                    }
                     return {
                         ...a,
                         amedida: matchArchivo ? matchArchivo.url : a.amedida,
-                        esVideo: matchArchivo ? matchArchivo.esVideo : false
+                        esVideo: matchArchivo ? matchArchivo.esVideo : esVideodesdeURL
                     };
                 }),
             };
@@ -797,7 +800,6 @@ const Condominio = () => {
                 idCondominio: localStorage.getItem("idCondominio")!.toString()
             }
 
-            console.log(aviso);
             CrearAvisosLogic(selCrearAvisos, aviso, false)
         } catch (er) {
         }
@@ -1625,7 +1627,6 @@ const Condominio = () => {
     }
     const selObtenerAnuncioPorId = (error: Boolean, err: string, data: any) => {
         try {
-            console.log(data);
             if (data) {
                 let newData = data;
 
@@ -1646,6 +1647,8 @@ const Condominio = () => {
                         });
 
                 } else {
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(newData.amedida.fullPath)
+                    newData.esVideo = esVideo;
                     setDataDetalle(newData);
                     setLoading(false);
                 }
@@ -1810,7 +1813,7 @@ const Condominio = () => {
                             !verUsuarioInd ?
                                 <>
                                     <div className="usuariosContainer">
-                                        <h4 className="usuarios-title">Listado Usuarios</h4>
+                                        <h2 className="usuarios-title">Listado Usuarios</h2>
                                         {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
                                             <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
                                                 setAgregarUsuario(true); setNewUser({ id: 0, usuario: '', nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
@@ -2779,7 +2782,7 @@ const Condominio = () => {
                         {
                             verMisAnuncios &&
                             <>
-                                <h4>Mis Publicaciones</h4>
+                                <h2>Mis Publicaciones</h2>
                                 {misAnuncios !== null && ordenarListado(misAnuncios).map((a: any, i: any) => (
                                     <AnunciosPanel
                                         key={i}

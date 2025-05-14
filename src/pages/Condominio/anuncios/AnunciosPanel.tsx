@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface Anuncio {
     id: number;
@@ -46,6 +46,7 @@ const AnunciosPanel: React.FC<Props> = ({
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = imgErrorUrl;
     };
+
     return <>
         {!loading && <div className="v2-anuncio card-shadow col-12 my-3 pb-5 pt-5">
             <div className="v2-anuncio-header">
