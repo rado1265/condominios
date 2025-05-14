@@ -169,7 +169,7 @@ const AvisoPanel: React.FC<Props> = ({
 	C232.322,328.536,236.161,330,240,330s7.678-1.464,10.607-4.394c5.858-5.858,5.858-15.355,0-21.213L111.213,165.004z"/>
                         </svg>
                     </button>
-                    <h4 className="m-0" style={{ color: '#116b1d' }}>{monthTitle}</h4>
+                    <h4 className="m-0 titulocalendarioAviso">{monthTitle}</h4>
                     <button
                         onClick={() => {
                             const nuevoMes = mes === 12 ? 1 : mes + 1;
@@ -196,7 +196,7 @@ const AvisoPanel: React.FC<Props> = ({
                     <h5 className='title-eventosdeldia'>Eventos {diaMesSelect.dia} de {monthTitle}</h5>
                     <button className="avisos-add" title="Agregar Evento" onClick={() => { setCrearEvento(true) }}>
                         <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
-                            <circle cx="9" cy="9" r="9" fill="#0a9e5e" />
+                            <circle cx="9" cy="9" r="9" fill="#336699" />
                             <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                     </button>

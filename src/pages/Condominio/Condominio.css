@@ -918,7 +918,7 @@ body {
 }
 
 .dia-con-algo {
-  background: var(--colorPrincipalVariante);
+  background: var(--colorSecundario);
   color: var(--colorFondo);
   border-radius: 50%;
   width: 25px;
@@ -932,7 +932,7 @@ body {
 
 .dia-con-algo.diaActual{
   color: var(--colorFondo) !important;
-  background: red !important;
+  background: var(--colorRed) !important;
 }
 
 @media (max-width: 600px) {
@@ -942,7 +942,7 @@ body {
     min-height: 40px;
     font-size: 12px;
     border: 0;
-    color: var(--colorSecundarioVarianteDos);
+    color: var(--colorNeutro);
     text-align: center;
     align-items: center;
     display: flex;
@@ -1544,7 +1544,7 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--colorBlack);
+  background: #74868496;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1767,7 +1767,7 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--colorBlack);
+  background: #74868496;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1867,4 +1867,8 @@ a:hover {
 
 .modal-select:focus {
   border-color: var(--colorPrincipal);
+}
+
+.titulocalendarioAviso{
+  color: var(--colorSecundario);
 }

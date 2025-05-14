@@ -42,7 +42,6 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     loading = false,
     imgError
 }) => {
-    console.log(anuncio)
     return <>{!loading &&
         <div className="mx-3">
             <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{anuncio.cabecera}</h4>

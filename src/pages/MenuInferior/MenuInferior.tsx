@@ -23,6 +23,11 @@ import rulesSelect from '../../components/utils/img/menuInferior/rules-select.pn
 import emergency from '../../components/utils/img/menuInferior/emergency.png';
 import emergencySelect from '../../components/utils/img/menuInferior/emergency-select.png';
 
+interface Props {
+    active: string;
+    onChangeMenu: (e: string) => void;
+}
+
 const icons = {
     emergency: (
         <img width={25} src={emergency} />
@@ -98,53 +103,9 @@ const icons = {
     ),
 };
 
-export default function BottomNav() {
-    const [active, setActive] = useState('calendario');
+const BottomNav: React.FC<Props> = ({active, onChangeMenu}) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const containerRef = useRef(null);
-    const [openCrear, setOpenCrear] = useState(false);
-    const [usuario, setUsuario] = useState({
-        nombre: "",
-        tieneSuscripcionMensajes: false,
-        tieneSuscripcionVotaciones: false,
-        tieneSuscripcionAnuncios: false,
-        tieneSuscripcionAvisos: false,
-        rol: "",
-        id: 0
-    });
-    const [usuarioDetalle, setUsuarioDetalle] = useState({
-        nombre: "",
-        tieneSuscripcionMensajes: false,
-        tieneSuscripcionVotaciones: false,
-        tieneSuscripcionAnuncios: false,
-        tieneSuscripcionAvisos: false,
-        rol: "",
-        id: 0,
-        activo: false,
-        direccion: '',
-        telefono: '',
-        fechaCaducidad: new Date(),
-        imagen: '',
-        clave: ''
-    });
-    const [openNotificaciones, setOpenNotificaciones] = useState(false);
-
-
-    const [openEmergencias, setOpenEmergencias] = useState(false);
-    const menuRef = useRef(null);
-
-    // Cierra el menú si se hace click fuera
-    useEffect(() => {
-        function handleClickOutside(event: any) {
-            if (openEmergencias && menuRef.current && !(menuRef.current as any).contains(event.target)) {
-                if (event.target.id !== "iconoMenuInf" && event.target.id !== "moreSelect") {
-                    setOpenEmergencias(false);
-                }
-            }
-        }
-        if (openEmergencias) document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [openEmergencias]);
 
     useEffect(() => {
         function handleClickOutside(event: any) {
@@ -162,41 +123,27 @@ export default function BottomNav() {
         };
     }, [menuOpen]);
 
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [active]);
+
     const handleCreateClick = () => {
         setMenuOpen((open) => !open);
-        setActive('crear');
     };
-
-    const handleOptionClick = (option: any) => {
-        setActive(option);
-        setMenuOpen(false);
-    };
-
-    const iconNotificaciones = (activa: boolean) => {
-        return <label className="switch">
-            <input
-                type="checkbox"
-                checked={activa}
-                defaultChecked={activa}
-                className="switch-checkbox"
-            />
-            <span className="switch-slider" />
-        </label>
-    }
 
     return (
         <>
             <nav className="bottom-nav">
                 <button
                     className={`nav-button ${active === 'buscar' ? 'active' : ''}`}
-                    onClick={() => setActive('buscar')}
-                    aria-label="Calendario"
+                    //onClick={() => onChangeMenu('buscar')}
+                    aria-label="Buscar"
                 >
                     {active === 'buscar' ? icons.buscarSelect : icons.buscar}
                 </button>
                 <button
                     className={`nav-button ${active === 'calendario' ? 'active' : ''}`}
-                    onClick={() => setActive('calendario')}
+                    onClick={() => onChangeMenu('calendario')}
                     aria-label="Calendario"
                 >
                     {active === 'calendario' ? icons.calendarioSelect : icons.calendario}
@@ -217,56 +164,56 @@ export default function BottomNav() {
                             <div className='filaOpciones'>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Anuncios"
+                                    onClick={() => onChangeMenu('perfil')}
+                                    aria-label="Mi Perfil"
                                 >
                                     {icons.perfilSelect}
                                     <span className='txtOpcion'>Mi<br></br>Perfil</span>
                                 </button>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Anuncios"
+                                    onClick={() => onChangeMenu('mispublicaciones')}
+                                    aria-label="Mis Publicaciones"
                                 >
                                     {icons.mispublicacionesSelect}
                                     <span className='txtOpcion'>Mis<br></br>Publicaciones</span>
                                 </button>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Anuncios"
+                                    onClick={() => onChangeMenu('comunidad')}
+                                    aria-label="Mi Comunidad"
                                 >
                                     {icons.comunidadSelect}
                                     <span className='txtOpcion'>Mi<br></br>Comunidad</span>
                                 </button>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Anuncios"
+                                    onClick={() => onChangeMenu('crearAnuncio')}
+                                    aria-label="Crear Anuncio"
                                 >
                                     {icons.anunciosSelect}
                                     <span className='txtOpcion'>Crear <br></br>Anuncio</span>
                                 </button>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Votaciones"
+                                    onClick={() => onChangeMenu('crearVotacion')}
+                                    aria-label="Crear Votación"
                                 >
                                     {icons.votacionesSelect}
                                     <span className='txtOpcion'>Crear <br></br>Votación</span>
                                 </button>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Votaciones"
+                                    onClick={() => onChangeMenu('reglas')}
+                                    aria-label="Reglas y Normas"
                                 >
                                     {icons.rulesSelect}
-                                    <span className='txtOpcion'>Reglas <br></br>y Normas</span>
+                                    <span className='txtOpcion'>Reglas y<br></br> Normas</span>
                                 </button>
                                 <button
                                     className={`nav-button container-Opcion`}
-                                    onClick={() => setActive('buscar')}
-                                    aria-label="Votaciones"
+                                    onClick={() => onChangeMenu('numEmergencias')}
+                                    aria-label="Número emergencias"
                                 >
                                     {icons.emergencySelect}
                                     <span className='txtOpcion'>Núm.<br></br> Emergencias</span>
@@ -277,7 +224,7 @@ export default function BottomNav() {
                 </div>
                 <button
                     className={`nav-button ${active === 'anuncios' ? 'active' : ''}`}
-                    onClick={() => setActive('anuncios')}
+                    onClick={() => onChangeMenu('anuncios')}
                     aria-label="Anuncios"
                 >
                     {active === 'anuncios' ? icons.anunciosSelect : icons.anuncios}
@@ -285,7 +232,7 @@ export default function BottomNav() {
 
                 <button
                     className={`nav-button ${active === 'votaciones' ? 'active' : ''}`}
-                    onClick={() => setActive('votaciones')}
+                    onClick={() => onChangeMenu('votaciones')}
                     aria-label="Votaciones"
                 >
                     {active === 'votaciones' ? icons.votacionesSelect : icons.votaciones}
@@ -293,4 +240,6 @@ export default function BottomNav() {
             </nav>
         </>
     );
-}
+};
+
+export default BottomNav;

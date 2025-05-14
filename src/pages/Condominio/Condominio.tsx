@@ -21,8 +21,10 @@ import VotacionCrear from "./votacion/VotacionCrear";
 import VotacionPanel from "./votacion/VotacionPanel";
 import DetalleAnuncioPanel from "./anuncios/DetalleAnuncioPanel";
 import ReglasNormasPanel from "./reglas/ReglasNormasPanel";
-import BottomNav from "../MenuInferior/MenuInferior";
+import BottomNav from './../MenuInferior/MenuInferior';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import iconborrar from './../../components/utils/img/iconborrar.png';
+import iconeditar from './../../components/utils/img/editar.png';
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -176,6 +178,7 @@ const Condominio = () => {
         activo: true,
         esVideo: false
     });
+    const [active, setActive] = useState('calendario');
     const [newComentario, setNewComentario] = useState('')
     const [verPerfil, setVerPerfil] = useState(false)
     const [verUsuarios, setVerUsuarios] = useState(false)
@@ -1000,14 +1003,14 @@ const Condominio = () => {
                     rol: '',
                     idCondominio: 0
                 })
-                toast.success(err?'Usuario eliminado correctamente':'Usuario creado correctamente', {
+                toast.success(err ? 'Usuario eliminado correctamente' : 'Usuario creado correctamente', {
                     position: posicionAlertas,
                 });
             }
             else {
                 setLoading(false);
                 //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Usuario. Comuníquese con el Administrador.")
-                toast.info(err?'Error al eliminar usuario. Comuníquese con el Administrador.':'Error al crear usuario. Comuníquese con el Administrador.', {
+                toast.info(err ? 'Error al eliminar usuario. Comuníquese con el Administrador.' : 'Error al crear usuario. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
@@ -1162,6 +1165,76 @@ const Condominio = () => {
             [name]: value
         }));
     };
+
+    const handleChangeMenu = (e: any) => {
+        setActive(e);
+        switch (e) {
+            case "perfil":
+                cerrarMenu()
+                setVerPerfil(true)
+                Perfil()
+                break;
+            case "mispublicaciones":
+                cerrarMenu();
+                setVerMisAnuncios(true)
+                setTipo(8);
+                setLoading(true);
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
+                break;
+            case "comunidad":
+                cerrarMenu()
+                changeMenu(999);
+                setVerUsuarios(true)
+                setLoading(true);
+                ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
+                break;
+            case "crearAnuncio":
+                setTipo(1);
+                cerrarMenu()
+                setCrear(true)
+                break;
+            case "crearVotacion":
+                cerrarMenu();
+                changeMenu(3);
+                setEncuesta(true);
+                break;
+            case "reglas":
+                cerrarMenu();
+                changeMenu(999);
+                setVerReglasNormas(true);
+                setNewTextRich(dataFull.normas);
+                break;
+            case "anuncios":
+                cerrarMenu();
+                changeMenu(1);
+                setLoading(true);
+                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                break;
+            case "votaciones":
+                cerrarMenu();
+                changeMenu(5);
+                setVotaciones(true)
+                break;
+            case "calendario":
+                cerrarMenu()
+                changeMenu(999)
+                setVerAvisos(true)
+                setLoading(true)
+                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
+                break;
+            case "numEmergencias":
+                cerrarMenu()
+                changeMenu(999);
+                setVerEmergencia(true)
+                setLoading(true)
+                ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
+                break;
+            default:
+
+                break;
+        }
+    }
+
     const handleChangeAnuncio = (e: any) => {
         const { name, value } = e.target;
         setAnuncio(prev => ({
@@ -1455,7 +1528,10 @@ const Condominio = () => {
                 }
             </div >*/}
 
-            <BottomNav/>
+            <BottomNav
+                onChangeMenu={handleChangeMenu}
+                active={active}
+            />
         </div >
     }
 
@@ -1508,10 +1584,11 @@ const Condominio = () => {
     }
     const selObtenerAnuncioPorId = (error: Boolean, err: string, data: any) => {
         try {
+            console.log(data);
             if (data) {
                 let newData = data;
 
-                if (newData.amedida) {
+                if (newData.amedida && !newData.amedida.includes("http")) {
                     const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.amedida.replace("video-", "").replace("img-", "")}`);
 
                     const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(imageRef.fullPath)
