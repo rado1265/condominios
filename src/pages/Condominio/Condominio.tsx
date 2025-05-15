@@ -662,21 +662,25 @@ const Condominio = () => {
                 }
                 setDataCondominios(data.condominios);
                 //guardarUltimoRegistro(data.condominios, 'condominios')
+
                 if (localStorage.getItem("idCondominio")) {
                     let condSelect = data.condominios.filter((a: any) => a.id.toString() === localStorage.getItem("idCondominio")!.toString());
                     if (new Date(condSelect[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
                     } else {
                         setLoading(true);
+                        alert("tiene idCondominio " + localStorage.getItem("idCondominio")!.toString())
                         setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
                     }
                 } else {
                     if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
                         setLoading(true);
+                        alert("tiene 1 Condominio " + data.condominios[0].id + localStorage.getItem("idCondominio")!.toString())
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
+                        alert("no tiene Condominio ")
                         //ErrorMessage("Su usuario no tiene comunidades activas", "")
                         toast.info('Su usuario no tiene comunidades activas', {
                             position: posicionAlertas,
@@ -1105,7 +1109,7 @@ const Condominio = () => {
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
-                 alert("nice" + JSON.stringify(data))
+                alert("nice" + JSON.stringify(data))
             } else {
                 alert("catch" + JSON.stringify(data))
             }
