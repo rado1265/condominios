@@ -389,7 +389,7 @@ const Condominio = () => {
                     const nombreBuscado = a.amedida || "";
                     const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
                     let esVideodesdeURL = false;
-                    if(!matchArchivo){
+                    if (!matchArchivo) {
                         esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(a.amedida)
                     }
                     return {
@@ -1105,9 +1105,12 @@ const Condominio = () => {
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
+            } else {
+                alert("catch" + JSON.stringify(data))
             }
             setLoading(false);
         } catch (er) {
+            alert("catch" + er)
         }
     }
     const guardarUltimoRegistro = async (ultimoRegistro: any, nombre: string) => {
