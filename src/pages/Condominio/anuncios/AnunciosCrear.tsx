@@ -84,7 +84,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         e.preventDefault();
         onGuardar(form, archivo);
     };
-    console.log(form)
+    
     return (
         <form onSubmit={handleSubmit} className="anuncio-form">
             <h2 className="mb-4 text-center">{anuncio != null && anuncio.id > 0 ? 'Editar Anuncio' : 'Nuevo Anuncio'}</h2>

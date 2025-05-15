@@ -240,6 +240,28 @@ const Condominio = () => {
         setImgSelect("");
     };
 
+
+    const [alignment, setAlignment] = useState("Anuncios");
+
+    const handleChange = (value: any) => {
+        switch (value) {
+            case "Anuncios":
+                cerrarMenu(); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                break;
+            case "Ventas":
+                cerrarMenu(); changeMenu(0)
+                break;
+
+            case "Reclamos":
+                cerrarMenu(); changeMenu(2)
+                break;
+
+            default:
+                break;
+        }
+        setAlignment(value);
+    };
+
     const [orden, setOrden] = useState<'asc' | 'desc'>('desc');
     const [criterio, setCriterio] = useState<'fechaDesde' | 'likes' | 'cantComentarios' | 'cabecera'>('fechaDesde');
     const ordenarListado = (data: any) => {
@@ -345,7 +367,7 @@ const Condominio = () => {
                 res.items.map(async (itemRef) => {
                     const nombreArchivo = itemRef.name;
                     const url = await getDownloadURL(itemRef);
-                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(itemRef.fullPath)
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(itemRef.fullPath)
                     return { nombre: nombreArchivo, url: url, esVideo: esVideo };
                 })
             );
@@ -392,7 +414,7 @@ const Condominio = () => {
                     const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
                     let esVideodesdeURL = false;
                     if (!matchArchivo) {
-                        esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(a.amedida)
+                        esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(a.amedida)
                     }
                     return {
                         ...a,
@@ -1156,14 +1178,20 @@ const Condominio = () => {
 
             // Crear nuevo array modificando cada elemento sin mutar el original
             const newDataFull = misAnuncios.map((a: any) => {
-                const nombreBuscado = a.amedida?.replace("video-", "").replace("img-", "") || "";
+                const nombreBuscado = a.amedida || "";
                 const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
+                let esVideodesdeURL = false;
+                if (!matchArchivo) {
+                    esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(a.amedida)
+                }
                 return {
                     ...a,
                     amedida: matchArchivo ? matchArchivo.url : a.amedida,
-                    esVideo: matchArchivo ? matchArchivo.esVideo : false,
+                    esVideo: matchArchivo ? matchArchivo.esVideo : esVideodesdeURL
                 };
             });
+
+            console.log(newDataFull);
 
             setMisAnuncios(newDataFull);
             setActualizarMisAnuncios(false);
@@ -1645,7 +1673,7 @@ const Condominio = () => {
                 if (newData.amedida && !newData.amedida.includes("http")) {
                     const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.amedida.replace("video-", "").replace("img-", "")}`);
 
-                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(imageRef.fullPath)
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(imageRef.fullPath)
 
                     getDownloadURL(imageRef)
                         .then((url) => {
@@ -1659,7 +1687,7 @@ const Condominio = () => {
                         });
 
                 } else {
-                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(newData.amedida.fullPath)
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(newData.amedida.fullPath)
                     newData.esVideo = esVideo;
                     setDataDetalle(newData);
                     setLoading(false);
@@ -2053,148 +2081,6 @@ const Condominio = () => {
         setLoading(true)
         ObtenerAvisosLogic(selListadoAvisos, (a + 1).toString(), localStorage.getItem("idCondominio")!.toString(), b.toString());
     }
-    /* 
-        const panelCrearAnuncio = () => {
-            return <div key={2} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
-                {!crear && (
-                    <button type="button" className="iconoVolver" onClick={() => {
-                        setCrear(false);
-                        setEditar(false);
-                        setVerDetalle(false);
-                    }}>
-                        <img width={35} src={volver} alt="Icono volver" />
-                    </button>
-                )}
-                <h2 className="mb-4 text-center">{crear ? "Crear" : "Editar"} {!crear ? tipo === 1 ? "Anuncio" : tipo === 0 ? "Venta" : "Recordatorio" : ""}</h2>
-     
-                <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
-                    <label htmlFor="textfield" className="search-label-admin">
-                        Cabecera
-                    </label>
-                    <input
-                        type="text"
-                        name="cabecera"
-                        className="search-input"
-                        value={anuncio.cabecera}
-                        onChange={handleChangeAnuncio}
-                    />
-                    <label htmlFor="textfield" className="search-label-admin">
-                        Descripción
-                    </label>
-                    <textarea
-                        rows={4}
-                        cols={50}
-                        name="descripcion"
-                        className="search-input"
-                        value={anuncio.descripcion}
-                        onChange={handleChangeAnuncio}
-                    />
-                    <label htmlFor="textfield" className="search-label-admin">
-                        Organizador
-                    </label>
-                    <input
-                        type="text"
-                        name="organizador"
-                        className="search-input"
-                        value={usuario.nombre}
-                        disabled
-                        onChange={handleChangeAnuncio}
-                    />
-                    <label htmlFor="textfield" className="search-label-admin">
-                        Teléfono
-                    </label>
-                    <input
-                        type="text"
-                        name="telefono"
-                        className="search-input"
-                        value={anuncio.telefono}
-                        onChange={handleChangeAnuncio}
-                    />
-                    <label htmlFor="textfield" className="search-label-admin mt-3">
-                        Fecha Hasta
-                    </label>
-                    <input
-                        type="date"
-                        name="fechaHasta"
-                        className="typeDate"
-                        value={anuncio.fechaHasta ? anuncio.fechaHasta.toString().substring(0, 10) : ''}
-                        onChange={handleChangeAnuncio}
-                        style={{ padding: '8px', fontSize: '16px' }}
-                    />
-     
-                    {(crear || (!crear && !anuncio.amedida)) && (
-                        <div>
-                            <label>Subir archivo</label>
-                            <div className="radio-group">
-                                <label className="radio-label">
-                                    <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
-                                    <span>🖼️</span>
-                                    <span className="text">Imagen</span>
-                                </label>
-     
-                                <label className="radio-label">
-                                    <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
-                                    <span>🎥</span>
-                                    <span className="text">Video</span>
-                                </label>
-                            </div>
-                        </div>
-                    )}
-     
-                    {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
-                        <label htmlFor="textfield" className="search-label-admin mt-3">
-                            Cargar imagen
-                        </label>
-                    )}
-                    {(tipoSubir === 1 || (editar && (anuncio.amedida && !anuncio.esVideo))) && (
-                        <input type="file" accept="image/*" className="w-100" onChange={handleImage} />
-                    )}
-                    <div id="containerViewImg" className={anuncio.amedida && !anuncio.esVideo ? "" : "d-none"}>
-                        <h3>Vista previa Imagen:</h3>
-                        <img
-                            id="visualizadorImg"
-                            src={!crear ? anuncio.amedida : ""}
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null;
-                                target.src = imgError;
-                            }}
-                            alt="Vista previa"
-                            style={{ maxWidth: '300px', marginTop: '10px' }}
-                        />
-                    </div>
-     
-     
-                    {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
-                        <label htmlFor="textfield" className="search-label-admin mt-3">
-                            Cargar video
-                        </label>
-                    )}
-                    {(tipoSubir === 2 || (editar && (anuncio.amedida && anuncio.esVideo))) && (
-                        <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
-                    )}
-                    <div id="containerViewVideo" className={anuncio.amedida && anuncio.esVideo ? "" : "d-none"}>
-                        <h3>Vista previa Video:</h3>
-                        <video id="visualizadorVideo" src={!crear ? anuncio.amedida : ""} controls width="300" />
-                    </div>
-                    <label htmlFor="textfield" className="search-label mt-3">
-                        Tipo
-                    </label>
-                    <select id="miCombo" value={anuncio.idTipo} className="typeDate" name="idTipo" onChange={handleChangeAnuncio}>
-                        <option value="1">Anuncio</option>
-                        <option value="0">Ventas</option>
-                        <option value="2">Recordatorio</option>
-                    </select>
-                    <button
-                        type="button"
-                        className="search-button mt-2"
-                        onClick={CrearAnuncio}
-                    >
-                        {crear ? "Crear" : "Editar"}
-                    </button>
-                </div>
-            </div>
-        } */
     const iconNotificaciones = (activa: boolean) => {
         return <label className="switch">
             <input
@@ -2406,210 +2292,6 @@ const Condominio = () => {
                     loading ?
                         <Loading />
                         : ""}
-                {/*<div className={enComunidad ? "w-100 pb-3 mb-3 containerMenu" : "d-none"}>
-                    <div className="containerImgMenu">
-                        {
-                            usuario.nombre.length > 0 && <button id="iconoMenuSup" className="iconNotificacion" onClick={() => { setMenuOpciones(!menuOpciones); }}>
-                                <img id="iconoMenuSup" width={25} src={menuicon} alt="icono abrir menu" />
-                            </button>
-                        }
-                        {dataFull.logo ?
-                            <img src={`data:image/jpeg;base64,${dataFull.logo}`} alt="Logo" style={{ width: '65px', margin: '0 auto' }} />
-                            : ""}
-                        <button className="iconRefresh" onClick={() => { setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); }}>
-                            <img width={25} src={actualizar} alt="icono actualizar" />
-                        </button>
-                    </div>
-                    {menuOpciones && (
-                        <div ref={menuRef} className="custom-menu">
-                            <button type="button" onClick={() => {
-                                cerrarMenu()
-                                setVerPerfil(true)
-                                Perfil()
-                            }}>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                                </svg>
-                                Perfil
-                            </button>
-                            <button type="button" onClick={() => {
-                                cerrarMenu();
-                                setVerMisAnuncios(true)
-                                setTipo(8);
-                                setLoading(true);
-                                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
-                            }}>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M3 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5zm13.586 4L13 5.414V9h3.586zM7 13h10v1.5H7V13zm0 3h7v1.5H7V16z" />
-                                </svg>
-                                Mis Publicaciones
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => { setOpenCrear(!openCrear); setOpenNotificaciones(false); }}
-                                className="crear-btn"
-                            >
-                                <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 27.963 27.963">
-                                    <g>
-                                        <g id="c140__x2B_">
-                                            <path d="M13.98,0C6.259,0,0,6.26,0,13.982s6.259,13.981,13.98,13.981c7.725,0,13.983-6.26,13.983-13.981
-			C27.963,6.26,21.705,0,13.98,0z M21.102,16.059h-4.939v5.042h-4.299v-5.042H6.862V11.76h5.001v-4.9h4.299v4.9h4.939v4.299H21.102z
-			"/>
-                                        </g>
-                                        <g id="Capa_1_9_">
-                                        </g>
-                                    </g>
-                                </svg>
-                                Crear
-                                <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
-                                </svg>
-                            </button>
-                            {openCrear && (
-                                <div className="submenu">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setTipo(1);
-                                            cerrarMenu()
-                                            setCrear(true)
-                                        }}
-                                        className="submenu-item ml-3"
-                                    >
-                                        Publicación
-                                    </button>
-                                    {usuario.rol === "ADMINISTRADOR" &&
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                cerrarMenu();
-                                                changeMenu(3);
-                                                setEncuesta(true);
-                                            }}
-                                            className="submenu-item ml-3"
-                                        >
-                                            Votación
-                                        </button>
-                                    }
-                                </div>
-                            )}
-                            {
-                                usuario.rol === "Administrador" || usuario.rol === "ADMINISTRADOR" && (
-                                    <button type="button" onClick={() => {
-                                        cerrarMenu()
-                                        changeMenu(999);
-                                        setVerUsuarios(true)
-                                        setLoading(true);
-                                        ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
-                                    }}>
-                                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.05 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z" />
-                                        </svg>
-                                        Comunidad
-                                    </button>
-                                )
-                            }
-
-                            <button
-                                type="button"
-                                onClick={() => { setOpenNotificaciones(!openNotificaciones); setOpenCrear(false); UsuarioObtener(); }}
-                                className="crear-btn"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z" />
-                                </svg>
-                                Notificaciones
-                                <svg style={{ position: 'absolute', right: '0' }} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="#0F0F0F" />
-                                </svg>
-                            </button>
-
-                            {openNotificaciones && (
-                                <div className="submenu">
-                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
-                                        createSuscripcion(usuario.tieneSuscripcionAnuncios, 1, ev)
-                                    }}>
-                                        Notif. Anuncios
-                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionAnuncios)}
-                                    </button>
-                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
-                                        createSuscripcion(usuario.tieneSuscripcionMensajes, 2, ev)
-                                    }}>
-                                        Notif. Mensajes
-                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionMensajes)}
-                                    </button>
-                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
-                                        createSuscripcion(usuario.tieneSuscripcionVotaciones, 3, ev)
-                                    }}>
-                                        Notif. Votaciones
-                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionVotaciones)}
-                                    </button>
-                                    <button type="button" className="submenu-item ml-3" onClick={(ev) => {
-                                        createSuscripcion(usuario.tieneSuscripcionAvisos, 4, ev)
-                                    }}>
-                                        Notif. Calendario
-                                        {iconNotificaciones(usuarioDetalle.tieneSuscripcionAvisos)}
-                                    </button>
-                                </div>
-                            )}
-
-                            <button type="button" onClick={() => {
-                                cerrarMenu();
-                                changeMenu(999);
-                                setVerReglasNormas(true);
-                                setNewTextRich(dataFull.normas);
-                            }}>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 10-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 9a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4A.75.75 0 0010 9z" clipRule="evenodd" />
-                                </svg>
-                                Reglas y Normas
-                            </button>
-                            <button type="button" onClick={() => {
-                                cerrarMenu()
-                                changeMenu(999)
-                                setVerAvisos(true)
-                                setLoading(true)
-                                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
-                            }}>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    height="20px"
-                                    viewBox="0 -960 960 960"
-                                    width="20px"
-                                    fill="currentColor"
-                                >
-                                    <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
-                                </svg>
-                                Calendario
-                            </button>
-                            <button type="button" onClick={() => {
-                                cerrarMenu()
-                                changeMenu(999);
-                                setVerEmergencia(true)
-                                setLoading(true)
-                                ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
-                            }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                        d="M10.29 3.86L1.82 18a1 1 0 00.86 1.5h18.64a1 1 0 00.86-1.5L13.71 3.86a1 1 0 00-1.72 0zM12 9v4m0 4h.01" />
-                                </svg>
-                                Núm. Emergencias
-                            </button>
-                            <button type="button" onClick={() => {
-                                cerrarMenu()
-                                changeMenu(999);
-                                cerrarSesion()
-                            }}>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
-                                    <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
-                                </svg>
-                                Cerrar Sesión
-                            </button>
-                        </div>
-                    )}
-                </div>*/}
                 <HuinchaSuperior
                     enComunidad={enComunidad}
                     onChangeAtras={handleVolverAtras}
@@ -2617,10 +2299,31 @@ const Condominio = () => {
                     onChangeMenu={handleChangeMenu}
                 />
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
+                {
+                    (tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) && (
+                        <div
+                            role="group"
+                            aria-label="Platform"
+                            className="btn-group-toggle-custom d-flex justify-content-center"
+                        >
+                            {["Anuncios", "Ventas", "Reclamos"].map((platform) => (
+                                <button
+                                    key={platform}
+                                    type="button"
+                                    className={`btn btn-toggle ${alignment === platform ? "active" : ""
+                                        }`}
+                                    aria-pressed={alignment === platform}
+                                    onClick={() => handleChange(platform)}
+                                >
+                                    {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 <div className="container pb-5 mb-5">
-                    <div className="row px-3 justify-content-around">
+                    <div className="row px-2 justify-content-around">
                         {
-                            dataCondominios.length > 1 && !enComunidad &&
+                            (dataCondominios.length > 1 && !enComunidad) &&
                             <>
                                 {panelPrincipal()}
                             </>
@@ -2765,7 +2468,7 @@ const Condominio = () => {
                                 />
                             </>
                         }
-                        {verDetalle && tipo !== 2 &&
+                        {(verDetalle && tipo !== 2) &&
                             <>
                                 <DetalleAnuncioPanel
                                     anuncio={dataDetalle}
@@ -2817,8 +2520,26 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle &&
-                            <>
+                            (tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) &&
+                            <div className="mt-4">
+                                {/*<div
+                                    role="group"
+                                    aria-label="Platform"
+                                    className="btn-group-toggle-custom d-flex justify-content-center"
+                                >
+                                    {["Anuncios", "Ventas", "Reclamos"].map((platform) => (
+                                        <button
+                                            key={platform}
+                                            type="button"
+                                            className={`btn btn-toggle ${alignment === platform ? "active" : ""
+                                                }`}
+                                            aria-pressed={alignment === platform}
+                                            onClick={() => handleChange(platform)}
+                                        >
+                                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>*/}
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
                                     if (Number(tipo) === Number(a.idTipo))
                                         return <AnunciosPanel
@@ -2840,7 +2561,7 @@ const Condominio = () => {
                                         />
                                 }
                                 )}
-                            </>
+                            </div>
                         }
                     </div>
                 </div>

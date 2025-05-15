@@ -231,14 +231,14 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                         <div className={`${menuOpen ? 'visual' : ''} container-submenu`}>
                             <div className={`create-dropdown ${menuOpen ? 'show' : ''} fullContainerOpciones shadow`}>
                                 <div className='filaOpciones'>
-                                    <button
+                                    {/*<button
                                         className={`nav-button container-Opcion`}
                                         onClick={() => onChangeMenu('perfil')}
                                         aria-label="Mi Perfil"
                                     >
                                         {icons.perfilSelect}
                                         <span className='txtOpcion'>Mi<br></br>Perfil</span>
-                                    </button>
+                                    </button>*/}
                                     <button
                                         className={`nav-button container-Opcion`}
                                         onClick={() => onChangeMenu('mispublicaciones')}

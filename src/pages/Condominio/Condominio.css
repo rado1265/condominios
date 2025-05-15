@@ -607,7 +607,6 @@ body {
 .containerMenu {
   justify-content: center;
   display: grid;
-  box-shadow: var(--colorNeutro) 0px 0px 24px 0px;
   height: 55px;
   background: var(--colorFondo);
   position: fixed;
@@ -1341,7 +1340,7 @@ a:hover {
   font-weight: 500;
   margin: 0;
   padding: 0;
-  border:none;
+  border: none;
   background: none;
 }
 
@@ -1355,6 +1354,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  border: 1px solid var(--colorSecundarioVarianteDos)
 }
 
 .v2-anuncio:hover {
@@ -1853,4 +1853,40 @@ a:hover {
 
 .titulocalendarioAviso {
   color: var(--colorSecundario);
+}
+
+/* Contenedor del grupo */
+.btn-group-toggle-custom {
+  background-color: var(--colorFondo);
+  box-shadow: 0 1px 3px #bdbcbc40;
+  position: fixed;
+  top: 59px;
+  z-index: 98;
+  width: 100%;
+  border-bottom: 1px solid var(--colorSecundario);
+  border-radius: 5px;
+}
+
+/* Botones base */
+.btn-toggle {
+  color: var(--colorSecundario);
+  background-color: transparent;
+  transition: background-color 0.3s, color 0.3s;
+  user-select: none;
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+/* Estado activo */
+.btn-toggle.active,
+.btn-toggle:active {
+  background-color: #cad3d2;
+  color: #139387;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+/* Hover para no activo */
+.btn-toggle:not(.active):hover {
+  color: #139387;
 }
