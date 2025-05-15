@@ -632,6 +632,7 @@ const Condominio = () => {
     const selLogin = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
+            debugger
             if (data.nombre && data.nombre != null && data.nombre != "") {
                 if (localStorage.getItem("idCondominio")) {
                     const cargarDatos = async () => {
@@ -676,7 +677,7 @@ const Condominio = () => {
                     if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
                         setLoading(true);
-                        alert("tiene 1 Condominio " + data.condominios[0].id + localStorage.getItem("idCondominio")!.toString())
+                        alert("tiene 1 Condominio " + data.condominios[0].id)
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
