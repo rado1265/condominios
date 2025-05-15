@@ -1105,6 +1105,7 @@ const Condominio = () => {
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
+                 alert("nice" + JSON.stringify(data))
             } else {
                 alert("catch" + JSON.stringify(data))
             }
