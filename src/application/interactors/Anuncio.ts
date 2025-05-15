@@ -269,23 +269,3 @@ export const ObtenerMisAnuncio = (selListado: any, idUsuario: string) => {
         }
     });
 };
-export const CerrarSesion = (selListado: any) => {
-    SVCAnuncio.CerrarSesion().then((res: IServiceResult<any>) => {
-        if (res.result !== undefined) {
-            let data: any = res.result;
-            selListado(false, '', data);
-        } else {
-            selListado(true, 'error', []);
-        }
-    });
-};
-export const ValidarPersona = (selListado: any) => {
-    SVCAnuncio.ValidarPersona().then((res: IServiceResult<any>) => {
-        if (res.result !== undefined) {
-            let data: any = res.result;
-            selListado(false, '', data);
-        } else {
-            selListado(true, 'error', []);
-        }
-    });
-};

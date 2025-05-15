@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CerrarSesionLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, ValidarPersonaLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage } from "../../components/utils/messages";
 import actualizar from './../../components/utils/img/actualizar-flecha.png';
 import menuicon from './../../components/utils/img/menuicon.png';
@@ -26,6 +26,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import iconborrar from './../../components/utils/img/iconborrar.png';
 import iconeditar from './../../components/utils/img/editar.png';
 import HuinchaSuperior from "../HuinchaSuperior/HuinchaSuperior";
+import CryptoJS from "crypto-js";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -67,6 +68,7 @@ const Condominio = () => {
         appId: "1:1047153246562:web:233d121eafee71fb95ec3b",
         measurementId: "G-54LZY2M3BN"
     };
+    const secret = "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79";
 
     const app = initializeApp(firebaseConfig);
     const storage = getStorage(app);
@@ -414,22 +416,18 @@ const Condominio = () => {
 
     useEffect(() => {
         if (navigator.onLine) {
-            if (!iniciarSesion)
-                ValidarPersonaLogic(selLogin)
-            /* if ((localStorage.getItem("usuario") && localStorage.getItem("usuario") != 'undefined') &&
-                (localStorage.getItem("rolUsuario") && localStorage.getItem("rolUsuario") != 'undefined') &&
-                (localStorage.getItem("clave") && localStorage.getItem("clave") != 'undefined') &&
-                (localStorage.getItem("idUsuario") && localStorage.getItem("idUsuario") != 'undefined')) {
-
-                LoginLogic(selLogin, {
-                    usuario: localStorage.getItem("usuario"),
-                    clave: localStorage.getItem("clave"),
-                    idCondominio: 0
-                })
+            if ((localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") && localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") != 'undefined')) {
+                const jsonData = JSON.stringify(deserializeFromAscii(localStorage.getItem("ZXN0byBlcyBzZWNyZXRv")!));
+                const hash = CryptoJS.HmacSHA256(jsonData, secret).toString();
+                const paquete = {
+                    datos: jsonData,
+                    firma: hash
+                };
+                LoginLogic(selLogin, paquete)
             }
             else {
                 cerrarSesion()
-            } */
+            }
         } else {
             obtenerUltimoRegistro()
             setUsuario({
@@ -529,10 +527,6 @@ const Condominio = () => {
     }
 
     const cerrarSesion = () => {
-        CerrarSesionLogic(selCerrarSesion);
-
-    }
-    const selCerrarSesion = (error: Boolean, err: string, data: any) => {
         localStorage.clear();
 
         setDataCondominios([]);
@@ -623,16 +617,32 @@ const Condominio = () => {
 
     const login = () => {
         try {
+            const jsonData = JSON.stringify(normalizarLogin(loguear));
+            const hash = CryptoJS.HmacSHA256(jsonData, secret).toString();
+            const paquete = {
+                datos: jsonData,
+                firma: hash
+            };
             setLoading(true);
-            LoginLogic(selLogin, normalizarLogin(loguear))
+            localStorage.setItem("ZXN0byBlcyBzZWNyZXRv", serializeToAscii(loguear));
+            LoginLogic(selLogin, paquete)
         } catch (er) {
         }
+    }
+    function serializeToAscii(data: any): string {
+        const json = JSON.stringify(data);
+        const asciiCodes = Array.from(json).map(char => char.charCodeAt(0));
+        return asciiCodes.join(',');
+    }
+    function deserializeFromAscii<T>(asciiStr: string): T {
+        const bytes = asciiStr.split(',').map(Number);
+        const json = String.fromCharCode(...bytes);
+        return JSON.parse(json);
     }
 
     const selLogin = (error: Boolean, err: string, data: any) => {
         try {
             setLoading(false);
-            debugger
             if (data.nombre && data.nombre != null && data.nombre != "") {
                 if (localStorage.getItem("idCondominio")) {
                     const cargarDatos = async () => {
@@ -670,18 +680,15 @@ const Condominio = () => {
                         cerrarSesion();
                     } else {
                         setLoading(true);
-                        alert("tiene idCondominio " + localStorage.getItem("idCondominio")!.toString())
                         setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
                     }
                 } else {
                     if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
                         setLoading(true);
-                        alert("tiene 1 Condominio " + data.condominios[0].id)
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
-                        alert("no tiene Condominio ")
                         //ErrorMessage("Su usuario no tiene comunidades activas", "")
                         toast.info('Su usuario no tiene comunidades activas', {
                             position: posicionAlertas,
@@ -1110,13 +1117,10 @@ const Condominio = () => {
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
-                alert("nice" + JSON.stringify(data))
             } else {
-                alert("catch" + JSON.stringify(data))
             }
             setLoading(false);
         } catch (er) {
-            alert("catch" + er)
         }
     }
     const guardarUltimoRegistro = async (ultimoRegistro: any, nombre: string) => {

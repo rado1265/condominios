@@ -23,8 +23,8 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
+                    'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
                 }
             })
@@ -48,7 +48,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -59,14 +58,9 @@ export class SVCAnuncio {
                     sr.result = res.data;
                 }
             })
-            .catch((error: any) => {
-                if (axios.isAxiosError(error) && error.response?.status === 401) {
-                    sr.errorMessage = "No autorizado. Redirigiendo al login...";
-                    // Redirige al login, muestra un mensaje, etc.
-                } else {
-                    sr.errorMessage = "Error al leer";
-                    sr.errorDetails = error;
-                }
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
             });
 
         return sr;
@@ -79,7 +73,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -105,7 +98,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, anuncio, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -136,13 +128,11 @@ export class SVCAnuncio {
             userVisibleOnly: true,
             applicationServerKey: convertedVapidKey,
         });*/
-
-        const url: string = _ruta + "Condominios/getUsuario";
+        const url: string = _ruta + "Condominios/getUsuario?usuario";
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios
-            .post(url, { "usuario": usuario.usuario, "clave": usuario.clave, "idCondominio": usuario.idCondominio }, {
-                withCredentials: true,
+            .post(url, usuario, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -153,14 +143,9 @@ export class SVCAnuncio {
                     sr.result = res.data;
                 }
             })
-            .catch((error: any) => {
-                if (axios.isAxiosError(error) && error.response?.status === 401) {
-                    sr.errorMessage = "No autorizado. Redirigiendo al login...";
-                    // Redirige al login, muestra un mensaje, etc.
-                } else {
-                    sr.errorMessage = "Error al leer";
-                    sr.errorDetails = error;
-                }
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
             });
 
         return sr;
@@ -189,7 +174,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, subscription, {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -214,7 +198,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -240,7 +223,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -266,7 +248,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.get(url, {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -292,7 +273,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -317,7 +297,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -342,7 +321,6 @@ export class SVCAnuncio {
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, votacion, {
-            withCredentials: true,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -368,7 +346,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, comentario, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -394,7 +371,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -422,7 +398,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, usuario, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -457,7 +432,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, subscription, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -483,7 +457,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -511,7 +484,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, aviso, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -537,7 +509,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -564,7 +535,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, emergencia, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -592,7 +562,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, usuario, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -618,7 +587,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -646,7 +614,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, JSON.stringify({ html: normas }), {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
@@ -674,7 +641,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, aviso, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -701,56 +667,6 @@ export class SVCAnuncio {
         sr.errorMessage = "Inicializando invocación";
         await axios
             .get(url, {
-                withCredentials: true,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
-                }
-            })
-            .then((res: AxiosResponse) => {
-                if (res.data !== undefined) {
-                    sr.result = res.data;
-                }
-            })
-            .catch((err: any) => {
-                sr.errorMessage = "Error al leer";
-                sr.errorDetails = err;
-            });
-
-        return sr;
-    }
-    public static async CerrarSesion(): Promise<IServiceResult<any>> {
-        let _ruta: string = con.RetornaRuta();
-
-        const url: string = _ruta + "Condominios/logout";
-        let sr: ServiceResult<any> = new ServiceResult<any>();
-        sr.errorMessage = "Inicializando invocación";
-        await axios
-            .post(url, [], {
-                withCredentials: true
-            })
-            .then((res: AxiosResponse) => {
-                if (res.data !== undefined) {
-                    sr.result = res.data;
-                }
-            })
-            .catch((err: any) => {
-                sr.errorMessage = "Error al leer";
-                sr.errorDetails = err;
-            });
-
-        return sr;
-    }
-
-    public static async ValidarPersona(): Promise<IServiceResult<any>> {
-        let _ruta: string = con.RetornaRuta();
-
-        const url: string = _ruta + "Condominios/validarPersona";
-        let sr: ServiceResult<any> = new ServiceResult<any>();
-        sr.errorMessage = "Inicializando invocación";
-        await axios
-            .get(url, {
-                withCredentials: true,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
