@@ -25,9 +25,10 @@ interface Props {
     usuario: any;
     crear: boolean;
     editar: boolean;
+    imgError: string;
 }
 
-const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancelar, crear, editar }) => {
+const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancelar, crear, editar, imgError }) => {
     const [form, setForm] = useState<Anuncio>({
         id: 0,
         cabecera: '',
@@ -44,7 +45,6 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         idUsuario: usuario.id,
         activo: true,
     });
-    console.log(form, usuario, anuncio)
     /* const [archivo, setArchivo] = useState<File | null>(null); */
     const [preview, setPreview] = useState<string | null>(null);
     const [tipoSubir, setTipoSubir] = useState(1);
@@ -169,7 +169,6 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onGuardar(form, archivoTemp);
-        /* console.log(form, archivoTemp) */
     };
 
     return (
@@ -275,7 +274,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.onerror = null;
-                            target.src = 'imgError';
+                            target.src = imgError;
                         }}
                         alt="Vista previa"
                         style={{ maxWidth: '300px', marginTop: '10px' }}

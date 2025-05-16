@@ -153,8 +153,7 @@ export class SVCAnuncio {
 
     public static async SuscribirNotificaciones(registration: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
-        const response = await axios.get(_ruta + 'Condominios/obtenerKey',);
-        console.log(response.data)
+        const response = await axios.get(_ruta + 'Condominios/obtenerKey');
         const vapidPublicKey = response.data;
         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 

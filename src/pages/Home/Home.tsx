@@ -36,7 +36,6 @@ const Home = () => {
     };
 
     const normalizarLogin = (data: any) => {
-        console.log(data);
         return {
             usuario: data.usuario ?? "",
             clave: data.clave ?? "",
@@ -48,9 +47,11 @@ const Home = () => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js')
                 .then(reg => {
-                    console.log('Service Worker registrado:', reg);
+                    //console.log('Service Worker registrado:', reg);
                 })
-                .catch(err => console.error('Error al registrar SW:', err));
+                .catch(err => {
+                    //console.error('Error al registrar SW:', err)
+                });
         }
     }, []);
 
@@ -73,7 +74,6 @@ const Home = () => {
     };
 
     const selLogin = (error: Boolean, err: string, data: any) => {
-        console.log(data);
         try {
             setLoading(false);
             if (data.nombre !== null) {

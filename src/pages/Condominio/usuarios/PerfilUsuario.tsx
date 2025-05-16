@@ -19,10 +19,9 @@ interface UsuarioDetalle {
 interface Props {
     usuario: UsuarioDetalle;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onGuardar: () => void;
+    onGuardar: (archivoAdjunto: File | null) => void;
     onCancelar: () => void;
     onChangeCreateSub: (tiene: any, id: any, ev: any) => void;
-    onImagenSeleccionada: (file: File) => void;
     loading?: boolean;
 }
 
@@ -32,19 +31,11 @@ const PerfilUsuario: React.FC<Props> = ({
     onGuardar,
     onCancelar,
     onChangeCreateSub,
-    onImagenSeleccionada,
     loading = false,
 }) => {
     const [preview, setPreview] = useState<string>("");
     const [editarPerfil, setEditarPerfil] = useState(false)
-
-    const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setPreview(URL.createObjectURL(file));
-            onImagenSeleccionada(file);
-        }
-    };
+    const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
 
     useEffect(() => {
         if (usuario.imagen) {
@@ -54,9 +45,10 @@ const PerfilUsuario: React.FC<Props> = ({
 
     const handleImagePerfilChange = (e: any) => {
         const file = e.target.files[0];
-        onImagenSeleccionada(file);
 
         if (!file) return;
+
+        setArchivoTemp(file);
 
         document.getElementById('userDetallePerfil')?.classList.remove("d-none");
         document.getElementById('userDetallePerfilSVG')?.classList.add("d-none");
@@ -64,11 +56,6 @@ const PerfilUsuario: React.FC<Props> = ({
         const img = document.getElementById('userDetallePerfil') as HTMLImageElement | null;
         if (img) {
             img.src = URL.createObjectURL(file);
-            /*setUsuarioDetalle(prev => ({
-                ...prev,
-                // eslint-disable-next-line
-                ["imagen"]: 'img-' + file.name
-            }));*/
         }
     };
 
@@ -85,7 +72,7 @@ const PerfilUsuario: React.FC<Props> = ({
     }
 
     return (
-        <form onSubmit={(e) => { e.preventDefault(); onGuardar(); setEditarPerfil(false); }} className="perfil-form">
+        <form onSubmit={(e) => { e.preventDefault(); onGuardar(archivoTemp); setEditarPerfil(false); }} className="perfil-form">
             {
                 editarPerfil ?
                     <>

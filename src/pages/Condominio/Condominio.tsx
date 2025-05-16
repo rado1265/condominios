@@ -74,7 +74,6 @@ const Condominio = () => {
     const storage = getStorage(app);
     const [buscarDataFull, setBuscarDataFull] = useState("");
     const [imagenPerfil, setImagenPerfil] = useState("");
-    const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
     const [editImgPerfil, setEditImgPerfil] = useState(false);
     const [agregarUsuario, setAgregarUsuario] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -314,8 +313,6 @@ const Condominio = () => {
         if (files.target.files.length === 0) return;
         const file = files.target.files[0];
 
-        setArchivoTemp(files.target.files[0]);
-
         document.getElementById('containerViewImg')?.classList.remove("d-none");
 
         const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
@@ -347,7 +344,6 @@ const Condominio = () => {
                     body
                 );
                 const safeSearch = response.data.responses[0].safeSearchAnnotation;
-                console.log(response.data.responses[0]);
                 if (safeSearch.adult === "VERY_LIKELY" || safeSearch.adult === 'LIKELY') {
                     toast.error('La imagen contiene posiblemente contenido para adultos. Se enviará a su revisión', {
                         position: posicionAlertas,
@@ -610,7 +606,6 @@ const Condominio = () => {
 
     const uploadVideo = (files: any) => {
         const file = files[0];
-        setArchivoTemp(file);
 
         if (!file) return;
 
@@ -797,10 +792,10 @@ const Condominio = () => {
     const CrearAnuncio = (form: any, archivoTemp: File | null) => {
         let anuncioParse = form;
         if (archivoTemp) {
+            guardarArchivo(4, archivoTemp);
             anuncioParse.amedida = archivoTemp.name
         }
         try {
-
             if (anuncioParse.cabecera.length > 0) {
                 setLoading(true);
                 CrearAnuncioLogic(selCrearAnuncio, normalizarAnuncio(anuncioParse))
@@ -904,13 +899,11 @@ const Condominio = () => {
     }
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
         try {
-            guardarArchivo();
             if (data) {
                 setTipo(4);
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
-                setArchivoTemp(null);
                 toast.success('Anuncio creado correctamente', {
                     position: posicionAlertas,
                 });
@@ -1083,10 +1076,10 @@ const Condominio = () => {
     }
 
 
-    const EditarPerfil = () => {
-        guardarArchivo(2);
+    const EditarPerfil = (archivoTemp: File | null) => {
         let usuarioParse = usuarioDetalle;
         if (archivoTemp) {
+            guardarArchivo(1, archivoTemp);
             usuarioParse.imagen = archivoTemp.name
         }
         try {
@@ -1187,8 +1180,6 @@ const Condominio = () => {
                     esVideo: matchArchivo ? matchArchivo.esVideo : esVideodesdeURL
                 };
             });
-
-            console.log(newDataFull);
 
             setMisAnuncios(newDataFull);
             setActualizarMisAnuncios(false);
@@ -1374,24 +1365,22 @@ const Condominio = () => {
         setAnuncio(a);
     }
 
-    const guardarArchivo = (tipo: number = 1) => {
-        if (archivoTemp && !(archivoTemp.size > 100000000)) {
-            if (tipo === 4) {
-                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoTemp.name}`);
-                const uploadTask = uploadBytes(storageRef, archivoTemp);
+    const guardarArchivo = (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+        if (archivoAsubir && !(archivoAsubir.size > 100000000)) {
+            if (tipoArchivo === 4) {
+                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name}`);
+                const uploadTask = uploadBytes(storageRef, archivoAsubir);
             } else {
-                const storageRef = ref(storage, `perfiles/${archivoTemp.name}`);
-                const uploadTask = uploadBytes(storageRef, archivoTemp);
+                const storageRef = ref(storage, `perfiles/${archivoAsubir.name}`);
+                const uploadTask = uploadBytes(storageRef, archivoAsubir);
             }
-            setArchivoTemp(null);
-        } else if (archivoTemp && (archivoTemp.size > 100000000)) {
+        } else if (archivoAsubir && (archivoAsubir.size > 100000000)) {
             alert("El archivo pesa mas de 100 MB")
         }
     }
 
     const handleImageChange = (e: any) => {
         const file = e.target.files[0];
-        setArchivoTemp(file);
 
         if (!file) return;
 
@@ -1410,7 +1399,6 @@ const Condominio = () => {
 
     const handleImagePerfilChange = (e: any) => {
         const file = e.target.files[0];
-        setArchivoTemp(file);
 
         if (!file) return;
 
@@ -2279,7 +2267,6 @@ const Condominio = () => {
                                 <AnunciosCrear
                                     anuncio={anuncio}
                                     onGuardar={(form: any, archivo: any) => {
-                                        setArchivoTemp(archivo);
                                         setAnuncio(form);
                                         CrearAnuncio(form, archivo);
                                     }}
@@ -2288,6 +2275,7 @@ const Condominio = () => {
                                         setCrear(false);
                                         setEditar(false);
                                     }}
+                                    imgError={imgError}
                                     usuario={usuario}
                                     crear={crear}
                                     editar={editar}
@@ -2367,10 +2355,11 @@ const Condominio = () => {
                                 <PerfilUsuario
                                     usuario={usuarioDetalle}
                                     onChange={handleChangePerfil}
-                                    onGuardar={EditarPerfil}
                                     onCancelar={() => setEditarPerfil(false)}
-                                    onImagenSeleccionada={(file) => setArchivoTemp(file)}
                                     loading={loading}
+                                    onGuardar={(archivo: any) => {
+                                        EditarPerfil(archivo);
+                                    }}
                                     onChangeCreateSub={createSuscripcion}
                                 />
                             </>

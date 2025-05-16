@@ -74,7 +74,6 @@ const AvisoPanel: React.FC<Props> = ({
     useEffect(() => {
         generarCalendario();
         const fechaChile = dayjs().tz("America/Santiago");
-        console.log(fechaChile,diaMesSelect)
         const avisosDeHoy = avisos.filter((a, b) => new Date(a.fecha).getTime() === new Date().getTime());
         const avisosOrdenados = avisosDeHoy.slice().sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         setAvisosParse(avisosOrdenados);
