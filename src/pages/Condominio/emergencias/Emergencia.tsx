@@ -66,11 +66,11 @@ const Emergencia: React.FC<Props> = ({
                             value={emergencia.telefono}
                             onChange={onChange}
                         />
-                        <div className="form-actions">
-                            <button type="submit" className="search-button mt-2" disabled={loading}>
+                        <div className="modal-actions">
+                            <button type="submit" className="modal-btn modal-btn-green" disabled={loading}>
                                 {loading ? 'Guardando...' : 'Guardar'}
                             </button>
-                            <button type="button" className="search-button mt-2" onClick={onCancelar}>Cancelar</button>
+                            <button type="button" className="modal-btn modal-btn-close" onClick={onCancelar}>Cancelar</button>
                         </div>
                     </div>
                 </div>
@@ -90,7 +90,7 @@ const Emergencia: React.FC<Props> = ({
                                             <>
                                                 {/*<span className="d-block">{e.telefono}</span>*/}
 
-                                                <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={onGuardar}>
+                                                <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => onSelect(e)}>
                                                     <img src={iconeditar} />
                                                 </button>
                                                 <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={onEliminar}>

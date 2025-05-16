@@ -1,4 +1,6 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 interface Anuncio {
     id: number;
@@ -21,9 +23,11 @@ interface Props {
     onGuardar: (anuncio: Anuncio, archivoAdjunto: File | null) => void;
     onCancelar: () => void;
     usuario: any;
+    crear: boolean;
+    editar: boolean;
 }
 
-const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancelar }) => {
+const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancelar, crear, editar }) => {
     const [form, setForm] = useState<Anuncio>({
         id: 0,
         cabecera: '',
@@ -32,7 +36,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         organizador: usuario.nombre,
         amedida: '',
         fechaDesde: new Date(),
-        fechaHasta: new Date(),
+        fechaHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
         idTipo: 1,
         esVideo: false,
         ...(anuncio || {}),
@@ -41,23 +45,30 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         activo: true,
     });
     console.log(form, usuario, anuncio)
-    const [archivo, setArchivo] = useState<File | null>(null);
+    /* const [archivo, setArchivo] = useState<File | null>(null); */
     const [preview, setPreview] = useState<string | null>(null);
-
+    const [tipoSubir, setTipoSubir] = useState(1);
+    const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
     useEffect(() => {
         if (anuncio != null && anuncio?.id > 0) {
             setForm(anuncio)
         }
     }, [anuncio])
+    /* useEffect(() => {
+        setForm(prev => ({
+            ...prev,
+            ["organizador"]: usuario.nombre
+        }));
+    }, [form]) */
     useEffect(() => {
-        if (archivo) {
-            const url = URL.createObjectURL(archivo);
+        if (archivoTemp) {
+            const url = URL.createObjectURL(archivoTemp);
             setPreview(url);
             return () => URL.revokeObjectURL(url);
         } else {
             setPreview(null);
         }
-    }, [archivo]);
+    }, [archivoTemp]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -67,7 +78,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         }));
     };
 
-    const handleArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    /* const handleArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setArchivo(file);
@@ -78,13 +89,89 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                 esVideo
             }));
         }
+    }; */
+
+    const uploadVideo = (files: any) => {
+        const file = files[0];
+        setArchivoTemp(file);
+
+        if (!file) return;
+
+        /*setAnuncio(prev => ({
+            ...prev,
+            // eslint-disable-next-line
+            ["amedida"]: 'video-' + file.name
+        }));*/
+
+        document.getElementById('containerViewVideo')?.classList.remove("d-none");
+
+        const videoPreview = document.getElementById('visualizadorVideo') as HTMLVideoElement;
+        if (videoPreview) {
+            const videoURL = URL.createObjectURL(file);
+            videoPreview.src = videoURL;
+            videoPreview.load();
+        }
+    };
+
+    const handleImage = (files: any) => {
+        if (files.target.files.length === 0) return;
+        const file = files.target.files[0];
+
+        setArchivoTemp(files.target.files[0]);
+
+        document.getElementById('containerViewImg')?.classList.remove("d-none");
+
+        const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
+        if (img) {
+            img.src = URL.createObjectURL(files.target.files[0]);
+        }
+
+        const reader = new FileReader();
+
+        reader.onloadend = async () => {
+            if (!reader.result || typeof reader.result !== 'string') {
+                return;
+            }
+
+            const base64 = reader.result.split(',')[1];
+
+            const body = {
+                requests: [
+                    {
+                        image: { content: base64 },
+                        features: [{ type: 'SAFE_SEARCH_DETECTION' }],
+                    },
+                ],
+            };
+
+            /* try {
+                const response = await axios.post(
+                    `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`,
+                    body
+                );
+                const safeSearch = response.data.responses[0].safeSearchAnnotation;
+                console.log(response.data.responses[0]);
+                if (safeSearch.adult === "VERY_LIKELY" || safeSearch.adult === 'LIKELY') {
+                    toast.error('La imagen contiene posiblemente contenido para adultos. Se enviará a su revisión', {
+                        position: posicionAlertas,
+                    });
+                }
+            } catch (err) {
+
+            } finally {
+
+            } */
+        };
+
+        reader.readAsDataURL(file);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onGuardar(form, archivo);
+        onGuardar(form, archivoTemp);
+        /* console.log(form, archivoTemp) */
     };
-    
+
     return (
         <form onSubmit={handleSubmit} className="anuncio-form">
             <h2 className="mb-4 text-center">{anuncio != null && anuncio.id > 0 ? 'Editar Anuncio' : 'Nuevo Anuncio'}</h2>
@@ -117,9 +204,8 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     type="text"
                     name="organizador"
                     className="search-input"
-                    value={form.organizador}
+                    value={usuario.nombre/* form.organizador */}
                     disabled
-                    onChange={handleChange}
                 />
                 <label htmlFor="textfield" className="search-label-admin">
                     Teléfono
@@ -143,7 +229,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
 
-                <label>Imagen o Video</label>
+                {/* <label>Imagen o Video</label>
                 <input type="file" accept="image/*,video/*" onChange={handleArchivo} />
 
                 {preview && (
@@ -152,25 +238,73 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     ) : (
                         <img src={preview} alt="Preview" width={300} />
                     )
+                )} */}
+                {/* //////////////////////////////////////////////////////////////////////////// */}
+
+                {(crear || (!crear && !form.amedida)) && (
+                    <div>
+                        <label>Subir archivo</label>
+                        <div className="radio-group">
+                            <label className="radio-label">
+                                <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
+                                <span>🖼️</span>
+                                <span className="text">Imagen</span>
+                            </label>
+
+                            <label className="radio-label">
+                                <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
+                                <span>🎥</span>
+                                <span className="text">Video</span>
+                            </label>
+                        </div>
+                    </div>
                 )}
+                {(tipoSubir === 1 || (editar && (form.amedida && !form.esVideo))) && (
+                    <label htmlFor="textfield" className="search-label-admin mt-3">
+                        Cargar imagen
+                    </label>)}
+
+                {(tipoSubir === 1 || (editar && (form.amedida && !form.esVideo))) && (
+                    <input type="file" accept="image/*" className="w-100" onChange={handleImage} />
+                )}
+                <div id="containerViewImg" className={form.amedida && !form.esVideo ? "" : "d-none"}>
+                    <h3>Vista previa Imagen:</h3>
+                    <img
+                        id="visualizadorImg"
+                        src={!crear ? form.amedida : ""}
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = 'imgError';
+                        }}
+                        alt="Vista previa"
+                        style={{ maxWidth: '300px', marginTop: '10px' }}
+                    />
+                </div>
+                {(tipoSubir === 2 || (editar && (form.amedida && form.esVideo))) && (
+                    <label htmlFor="textfield" className="search-label-admin mt-3">
+                        Cargar video
+                    </label>
+                )}
+                {(tipoSubir === 2 || (editar && (form.amedida && form.esVideo))) && (
+                    <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
+                )}
+                <div id="containerViewVideo" className={form.amedida && form.esVideo ? "" : "d-none"}>
+                    <h3>Vista previa Video:</h3>
+                    <video id="visualizadorVideo" src={!crear ? form.amedida : ""} controls width="300" />
+                </div>
+
+
+
+                {/* //////////////////////////////////////////////////////////////////////////// */}
                 <label htmlFor="textfield" className="search-label mt-3">
                     Tipo
                 </label>
                 <select id="miCombo" value={form.idTipo} className="typeDate" name="idTipo" onChange={handleChange}>
                     <option value="1">Anuncio</option>
                     <option value="0">Ventas</option>
-                    <option value="2">Recordatorio</option>
+                    <option value="2">Reclamos</option>
                 </select>
-
-                {/*<div className="form-actions">
-                    <button
-                        type="submit"
-                        className="search-button mt-2"
-                    >
-                        {anuncio != null && anuncio.id > 0 ? "Editar" : "Crear"}
-                    </button>
-                    <button type="button" className="search-button mt-2" onClick={onCancelar}>Cancelar</button>
-                </div>*/}
 
                 <div className="modal-actions">
                     <button type="submit" className="modal-btn modal-btn-green">{anuncio != null && anuncio.id > 0 ? "Editar" : "Crear"}</button>

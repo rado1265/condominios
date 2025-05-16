@@ -1,5 +1,5 @@
 import React, { ChangeEventHandler } from 'react';
-
+import iconborrar from './../../../components/utils/img/iconborrar.png'
 interface Comentario {
     id: number;
     descripcion: string;
@@ -30,6 +30,7 @@ interface Props {
     onCerrar: () => void;
     loading?: boolean;
     imgError: string;
+    onEliminar: (id: number) => void
 }
 
 const DetalleAnuncioPanel: React.FC<Props> = ({
@@ -40,7 +41,8 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     onLike,
     onCerrar,
     loading = false,
-    imgError
+    imgError,
+    onEliminar
 }) => {
     return <>{!loading &&
         <div className="mx-3">
@@ -87,6 +89,9 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                 <h2 className="comments-title">Comentarios</h2>
                 {anuncio.comentarios ? anuncio.comentarios.map((j: any) => {
                     return <div key={j.id} className="comment-box">
+                        <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={() => onEliminar(j.id)}>
+                            <img src={iconborrar} />
+                        </button>
                         <div className="comment-header">
                             <span className="comment-author">{j.nombreUsuario}</span>
                             <div>

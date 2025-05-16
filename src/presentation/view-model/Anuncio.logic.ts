@@ -39,8 +39,8 @@ export const VotarLogic = (selListado: any, idOpcionVotacion: any, idUsuario: an
 export const CrearVotacionLogic = (selListado: any, votacion: any) => {
     return CrearVotacion(selListado, votacion);
 }
-export const CrearComentarioAnuncioLogic = (selListado: any, comentario: any, idCondominio: any) => {
-    return CrearComentarioAnuncio(selListado, comentario, idCondominio);
+export const CrearComentarioAnuncioLogic = (selListado: any, comentario: any, idCondominio: any, eliminar: boolean) => {
+    return CrearComentarioAnuncio(selListado, comentario, idCondominio, eliminar);
 }
 
 export const ObtenerAnuncioPorIdLogic = (selListado: any, idAnuncio: string) => {

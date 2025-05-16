@@ -57,7 +57,7 @@ const ReglasNormasPanel: React.FC<Props> = ({
                                     aria-label="Editor de texto enriquecido"
                                 />
                                 {textRichEditado ?
-                                    <button type="button" className="search-button mt-2 w-100" onClick={onGuardar}>
+                                    <button type="button" className="modal-btn modal-btn-green mt-2 w-100" onClick={onGuardar}>
                                         {loading ? "Guardando..." : "Guardar"}
                                     </button>
                                     : ""}

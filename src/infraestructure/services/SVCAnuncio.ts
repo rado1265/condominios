@@ -338,10 +338,10 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async CrearComentarioAnuncio(comentario: any, idCondominio: any): Promise<IServiceResult<any>> {
+    public static async CrearComentarioAnuncio(comentario: any, idCondominio: any, eliminar: boolean): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/createComentarioAnuncio?idCondominio=" + idCondominio;
+        const url: string = _ruta + "Condominios/createComentarioAnuncio?idCondominio=" + idCondominio + "&eliminar=" + eliminar;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios

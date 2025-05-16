@@ -107,7 +107,7 @@ const Condominio = () => {
     });
     const [misAnuncios, setMisAnuncios] = useState<any[]>([]);
     const [actualizarMisAnuncios, setActualizarMisAnuncios] = useState(false);
-    const [tipo, setTipo] = useState(1)
+    const [tipo, setTipo] = useState(4)
     const [cupoUsuarios, setCupoUsuarios] = useState({ usados: 0, cupo: 0 })
     const [usuario, setUsuario] = useState({
         usuario: '',
@@ -176,7 +176,7 @@ const Condominio = () => {
         telefono: "",
         amedida: "",
         fechaDesde: new Date(),
-        fechaHasta: new Date(),
+        fechaHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
         idTipo: 1,
         idUsuario: 0,
         activo: true,
@@ -241,21 +241,25 @@ const Condominio = () => {
     };
 
 
-    const [alignment, setAlignment] = useState("Anuncios");
+    const [alignment, setAlignment] = useState("Todo");
 
     const handleChange = (value: any) => {
         switch (value) {
+            case "Todo":
+                cerrarMenu(); changeMenu(4); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                break;
             case "Anuncios":
-                cerrarMenu(); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
+                cerrarMenu(); changeMenu(1);
                 break;
             case "Ventas":
                 cerrarMenu(); changeMenu(0)
                 break;
-
             case "Reclamos":
                 cerrarMenu(); changeMenu(2)
                 break;
-
+            case "Servicios":
+                cerrarMenu(); changeMenu(3)
+                break;
             default:
                 break;
         }
@@ -295,7 +299,7 @@ const Condominio = () => {
             telefono: "",
             amedida: "",
             fechaDesde: new Date(),
-            fechaHasta: new Date(),
+            fechaHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
             idTipo: 1,
             idUsuario: usuario.id,
             activo: true,
@@ -467,7 +471,7 @@ const Condominio = () => {
             setEnComunidad(true)
             setLoading(false)
         }
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    }, [])
 
     ///////////////////////////////////////////////////////////////////
     function urlBase64ToUint8Array(base64String: string) {
@@ -498,7 +502,6 @@ const Condominio = () => {
         const hasServiceWorker = 'serviceWorker' in navigator;
         const hasPushManager = 'PushManager' in window;
 
-        // En iOS, solo las PWAs instaladas permiten notificaciones
         if (isIos() && isAndroid()) {
             return false;
         }
@@ -521,7 +524,6 @@ const Condominio = () => {
         try {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                /* alert('Debes permitir notificaciones para activarlas.'); */
                 return;
             }
 
@@ -600,7 +602,6 @@ const Condominio = () => {
                 setLoading(false);
             }
         } catch (er) {
-            //ErrorMessage("Credenciales incorrectas", "")
             toast.error('Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos', {
                 position: posicionAlertas,
             });
@@ -628,6 +629,17 @@ const Condominio = () => {
             videoPreview.load();
         }
     };
+
+    const eliminarComentario = (id: number) => {
+        CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, {
+            Id: id,
+            IdUsuario: usuario.id,
+            NombreUsuario: usuario.nombre,
+            IdAnuncio: dataDetalle.id,
+            Mensaje: "",
+            Fecha: new Date()
+        }, localStorage.getItem("idCondominio")!.toString(), true);
+    }
 
     const normalizarLogin = (data: any) => {
         return {
@@ -675,7 +687,7 @@ const Condominio = () => {
                 }
                 registerPush();
                 setUsuario(data);
-                setTipo(1)
+                setTipo(4)
                 setIniciarSesion(false)
                 if (data.imagen && !data.imagen.includes("http")) {
                     const imageRef = ref(storage, `perfiles/${data.imagen}`);
@@ -711,7 +723,6 @@ const Condominio = () => {
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
-                        //ErrorMessage("Su usuario no tiene comunidades activas", "")
                         toast.info('Su usuario no tiene comunidades activas', {
                             position: posicionAlertas,
                         });
@@ -733,7 +744,6 @@ const Condominio = () => {
             }
 
         } catch (er) {
-            //ErrorMessage("Credenciales incorrectas", "")
             toast.info('Credenciales incorrectas', {
                 position: posicionAlertas,
             });
@@ -784,8 +794,7 @@ const Condominio = () => {
         };
     };
 
-    const CrearAnuncio = (form: any) => {
-        guardarArchivo();
+    const CrearAnuncio = (form: any, archivoTemp: File | null) => {
         let anuncioParse = form;
         if (archivoTemp) {
             anuncioParse.amedida = archivoTemp.name
@@ -851,19 +860,16 @@ const Condominio = () => {
     const selEnviarNotifAviso = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                //SuccessMessage("Aviso enviado correctamente.")
                 toast.success('Aviso enviado correctamente.', {
                     position: posicionAlertas,
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -886,13 +892,11 @@ const Condominio = () => {
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al intentar Crear Aviso. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al intentar Crear Aviso. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -900,9 +904,9 @@ const Condominio = () => {
     }
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
         try {
+            guardarArchivo();
             if (data) {
-                /* ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
-                setTipo(1);
+                setTipo(4);
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
@@ -912,7 +916,6 @@ const Condominio = () => {
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
@@ -920,8 +923,22 @@ const Condominio = () => {
             setDataFull(data);
             setActualizarData(true);
             setLoading(false);
+            setAnuncio({
+                id: 0,
+                idCondominio: localStorage.getItem("idCondominio"),
+                cabecera: "",
+                descripcion: "",
+                organizador: "",
+                telefono: "",
+                amedida: "",
+                fechaDesde: new Date(),
+                fechaHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+                idTipo: 1,
+                idUsuario: 0,
+                activo: true,
+                esVideo: false
+            })
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -930,12 +947,6 @@ const Condominio = () => {
     const selDeshabilitarAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                /* setLoading(true); */
-                /* if (tipo === 8) {
-                    ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
-                } else {
-                    ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                } */
                 setCrear(false);
                 setEditar(false);
                 limpiarAnuncio();
@@ -944,7 +955,6 @@ const Condominio = () => {
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al deshabilitar anuncio. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
@@ -959,7 +969,6 @@ const Condominio = () => {
             }
 
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al deshabilitar anuncio. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1000,7 +1009,7 @@ const Condominio = () => {
         }
     }
     const SeleccionarEmergencia = (e: any) => {
-        setEmergenciaDetalle(e);
+        setEmergencia(e);
         setEditarEmergencia(true);
     }
     const handleConfirmMessageEliminarEmergencia = async () => {
@@ -1030,14 +1039,12 @@ const Condominio = () => {
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al crear número de emergencia. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
             setLoading(false)
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al crear número de emergencia. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1063,14 +1070,12 @@ const Condominio = () => {
             }
             else {
                 setLoading(false);
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Usuario. Comuníquese con el Administrador.")
                 toast.info(err ? 'Error al eliminar usuario. Comuníquese con el Administrador.' : 'Error al crear usuario. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
             setLoading(false);
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Usuario. Comuníquese con el Administrador.")
             toast.info('Error al crear usuario. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1094,7 +1099,6 @@ const Condominio = () => {
 
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
-            /* alert((serviceWorker as any).endpoint) */
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
             setEditarPerfil(false);
         }
@@ -1108,13 +1112,11 @@ const Condominio = () => {
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al editar perfil. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al editar perfil. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1133,9 +1135,6 @@ const Condominio = () => {
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                /* if (data.avisosHoy) {
-                    setAlerta({ tipo: 1, mensaje: "Tu calendario muestra eventos programados para hoy" })
-                } */
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
@@ -1149,8 +1148,6 @@ const Condominio = () => {
         try {
 
             await AsyncStorage.setItem(nombre, JSON.stringify(ultimoRegistro));
-
-            /* console.log('Último registro guardado', JSON.stringify(ultimoRegistro)); */
         } catch (error) {
             console.error('Error al guardar el registro:', error);
         }
@@ -1263,7 +1260,7 @@ const Condominio = () => {
                 ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
                 break;
             case "crearAnuncio":
-                setTipo(1);
+                setTipo(4);
                 cerrarMenu()
                 setCrear(true)
                 break;
@@ -1280,7 +1277,8 @@ const Condominio = () => {
                 break;
             case "anuncios":
                 cerrarMenu();
-                changeMenu(1);
+                changeMenu(4);
+                setAlignment("Todo")
                 setLoading(true);
                 ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
                 break;
@@ -1378,7 +1376,7 @@ const Condominio = () => {
 
     const guardarArchivo = (tipo: number = 1) => {
         if (archivoTemp && !(archivoTemp.size > 100000000)) {
-            if (tipo === 1) {
+            if (tipo === 4) {
                 const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoTemp.name}`);
                 const uploadTask = uploadBytes(storageRef, archivoTemp);
             } else {
@@ -1491,7 +1489,6 @@ const Condominio = () => {
         try {
             setLoading(false);
             if (data) {
-                //SuccessMessage("Votación creada correctamente.")
                 toast.success('Votación creada correctamente.', {
                     position: posicionAlertas,
                 });
@@ -1500,13 +1497,11 @@ const Condominio = () => {
                 changeMenu(5);
             }
             else {
-                //ErrorMessage("Ocurrió un error al crear la Votación", "")
                 toast.info('Error al crear votación. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Ocurrió un error al crear la Votación", "")
             toast.info('Error al crear votación. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1524,7 +1519,6 @@ const Condominio = () => {
             }
             setLoading(false);
         } catch (er) {
-            //ErrorMessage("Ocurrió un error al crear la Votación", "")
             toast.info('Error al cambiar estado. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -1548,65 +1542,6 @@ const Condominio = () => {
 
     const navegador = () => {
         return <div className="fixed bottom-0 left-0 z-50 w-full bg-white">
-            {/*usuario.nombre.length > 0 ?
-                <div className="circular-menu">
-                    <button
-                        className={`menu-button ${open ? "open" : ""}`}
-                        onClick={() => setOpen(!open)}
-                        aria-label="Abrir menú"
-                    >
-                        <img width={50} src={iconmas} alt="icono de menu" />
-                    </button>
-                    <div className={`menu-items ${open ? "open" : ""}`}>
-                        <button disabled={!open} className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, true); setOpen(false); }}>Anuncio</button>
-                        {
-                            usuario.rol === "ADMINISTRADOR" &&
-                            <button disabled={!open} className="menu-item encuesta" onClick={() => { cerrarMenu(false); changeMenu(3, false, false, false, true); setOpen(false); }}>Votación</button>
-                        }
-                    </div>
-                </div>
-                : ""*/}
-
-
-            {/*
-        return <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t">
-            <div className="grid max-w-lg grid-cols-4 mx-auto font-medium" style={{ background: 'white' }}>
-                <button aria-label="Anuncios" type="button" className={tipo === 1 ? "button btnactive" : "button"} onClick={() => {
-                    cerrarMenu(); changeMenu(1); setLoading(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString());
-                }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
-                        <path d="M10 2a1 1 0 0 1 1 1v4.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4.293 4.293a1 1 0 0 1-1.414 0l-4.293-4.293a1 1 0 0 1 1.414-1.414L9 7.586V3a1 1 0 0 1 1-1zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                    </svg>
-                    <span className="text">Anuncios</span>
-                </button>
-                <button aria-label="Ventas" type="button" className={tipo === 0 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(0) }}>
-                    <svg className="icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6 2a1 1 0 0 0-1 1v2H3a1 1 0 0 0-1 1v2h20V6a1 1 0 0 0-1-1h-2V3a1 1 0 0 0-1-1H6Zm1 3V4h10v1H7Zm-4 5v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10H3Zm7 3a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Zm4 0a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0v-1Z" />
-                    </svg>
-                    <span className="text">Ventas</span>
-                </button>
-                <button aria-label="Recordatorios" type="button" className={tipo === 2 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(2) }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
-                        <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm-.5-9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5V7z" />
-                    </svg>
-                    <span className="text">Recordatorios</span>
-                </button>
-                {
-                    usuario.nombre.length > 0 ? <button type="button" className={tipo === 5 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(5); setVotaciones(true) }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
-                            <path d="M4 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4zm1 3h10v2H5V6zm0 4h10v2H5v-2zm0 4h6v2H5v-2z" />
-                        </svg>
-                        <span className="text">Votaciones</span>
-                    </button> :
-                        <button type="button" className={tipo === 4 ? "button btnactive" : "button"} onClick={() => { cerrarMenu(); changeMenu(4); setVerPerfil(true) }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="icon">
-                                <path d="M10 0a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
-                            </svg>
-                            <span className="text">Perfil</span>
-                        </button>
-                }
-            </div >*/}
-
             <BottomNav
                 onChangeMenu={handleChangeMenu}
                 active={active}
@@ -1649,7 +1584,6 @@ const Condominio = () => {
 
     const selVotar = (error: Boolean, err: string, data: any) => {
         try {
-            /* ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id); */
             setDataVotaciones(data);
             setLoading(false);
         } catch (er) {
@@ -1659,8 +1593,37 @@ const Condominio = () => {
     const selcrearComentarioAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                setLoading(true);
-                ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, dataDetalle.id);
+                if (data) {
+                    let newData = data;
+
+                    if (newData.amedida && !newData.amedida.includes("http")) {
+                        const imageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${newData.amedida.replace("video-", "").replace("img-", "")}`);
+
+                        const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(imageRef.fullPath)
+
+                        getDownloadURL(imageRef)
+                            .then((url) => {
+                                newData.amedida = url;
+                                newData.esVideo = esVideo;
+                                setDataDetalle(newData);
+                                setLoading(false);
+                            })
+                            .catch((_err) => {
+                                console.error(_err);
+                            });
+
+                    } else {
+                        const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(newData.amedida.fullPath)
+                        newData.esVideo = esVideo;
+                        setDataDetalle(newData);
+                        setLoading(false);
+                    }
+                }
+            }
+            if (err) {
+                toast.success("Comentario eliminado correctamente.", {
+                    position: posicionAlertas,
+                });
             }
         } catch (er) {
         }
@@ -2005,8 +1968,6 @@ const Condominio = () => {
     const selCambiarNormas = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
-                /* setLoading(true);
-                ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString()); */
                 setDataFull(data);
                 setActualizarData(true);
                 setLoading(false);
@@ -2015,13 +1976,11 @@ const Condominio = () => {
                 });
             }
             else {
-                //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
                 toast.info('Error al cambiar las normas. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Ha ocurrido un error", "Ha ocurrido un error al intentar Crear Anuncio. Comuníquese con el Administrador.")
             toast.info('Error al cambiar las normas. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -2116,23 +2075,6 @@ const Condominio = () => {
             return false
         }
     }
-
-
-    /* const cerrarMenu = (a: any, b: any = false, c: any = false, d: any = false, e: any = false, f: any = false, g: any = false, h: any = false, i: any = false) => {
-        setAlerta({ tipo: 1, mensaje: "" })
-        setAlertaCerrada(false);
-        setMenuOpciones(a)
-        setVerPerfil(b)
-        setVerReglasNormas(c);
-        setVerAvisos(d)
-        setEditarAvisos(e)
-        setVerPuntosInteres(f)
-        setVerEmergencia(g)
-        setVotaciones(h);
-        setVerUsuarios(i);
-        setVerMisAnuncios(false);
-        setAgregarUsuario(false);
-    } */
     const cerrarMenu = () => {
         setAlerta({ tipo: 1, mensaje: "" })
         setAlertaCerrada(false);
@@ -2157,7 +2099,6 @@ const Condominio = () => {
         setLoading(false);
         try {
             if (data) {
-                //SuccessMessage("Su suscripción a las notificaciones fue realizada correctamente.")
                 toast.success('Su suscripción a las notificaciones fue realizada correctamente.', {
                     position: posicionAlertas,
                 });
@@ -2182,13 +2123,11 @@ const Condominio = () => {
                 }
             }
             else {
-                //ErrorMessage("Error crear suscripción", "Favor intentarlo nuevamente en unos minutos")
                 toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Error crear suscripción", "Favor comuniquese con el administrador.")
             toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -2198,12 +2137,10 @@ const Condominio = () => {
         setNewComentario(ev)
     }
 
-    // eslint-disable-next-line
     const selDesSuscribir = (error: Boolean, err: string, data: any) => {
         setLoading(false);
         try {
             if (data) {
-                //SuccessMessage("Su desuscribipción a las notificaciones fue realizada correctamente.")
                 toast.info('Su desuscribipción a las notificaciones fue realizada correctamente.', {
                     position: posicionAlertas,
                 });
@@ -2221,13 +2158,11 @@ const Condominio = () => {
                 localStorage.setItem(campo, "false");
             }
             else {
-                //ErrorMessage("Error quitar suscripción", "Favor intentarlo nuevamente en unos minutos")
                 toast.info('Error al quitar suscripción. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            //ErrorMessage("Error quitar suscripción", "Favor comuniquese con el administrador.")
             toast.info('Error al quitar suscripción. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
@@ -2267,7 +2202,6 @@ const Condominio = () => {
 
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
-            /* alert((serviceWorker as any).endpoint) */
             SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result)
         }
     }
@@ -2280,7 +2214,6 @@ const Condominio = () => {
 
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
-            /* alert((serviceWorker as any).endpoint) */
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
         }
     }
@@ -2300,13 +2233,13 @@ const Condominio = () => {
                 />
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 {
-                    (tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) && (
+                    (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) && (
                         <div
                             role="group"
                             aria-label="Platform"
                             className="btn-group-toggle-custom d-flex justify-content-center"
                         >
-                            {["Anuncios", "Ventas", "Reclamos"].map((platform) => (
+                            {["Todo", "Anuncios", "Ventas", /* "Servicios", */ "Reclamos"].map((platform) => (
                                 <button
                                     key={platform}
                                     type="button"
@@ -2348,7 +2281,7 @@ const Condominio = () => {
                                     onGuardar={(form: any, archivo: any) => {
                                         setArchivoTemp(archivo);
                                         setAnuncio(form);
-                                        CrearAnuncio(form);
+                                        CrearAnuncio(form, archivo);
                                     }}
                                     onCancelar={() => {
                                         limpiarAnuncio();
@@ -2356,6 +2289,8 @@ const Condominio = () => {
                                         setEditar(false);
                                     }}
                                     usuario={usuario}
+                                    crear={crear}
+                                    editar={editar}
                                 />
                             </>
                         }
@@ -2483,10 +2418,11 @@ const Condominio = () => {
                                                 IdAnuncio: dataDetalle.id,
                                                 Mensaje: newComentario,
                                                 Fecha: new Date()
-                                            }, localStorage.getItem("idCondominio")!.toString());
+                                            }, localStorage.getItem("idCondominio")!.toString(), false);
                                             setNewComentario('');
                                         }
                                     }}
+                                    onEliminar={eliminarComentario}
                                     onLike={() => handleLike(dataDetalle.id, true, true)}
                                     onCerrar={() => setVerDetalle(false)}
                                     loading={loading}
@@ -2520,28 +2456,10 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            (tipo < 3 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) &&
+                            (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) &&
                             <div className="mt-4">
-                                {/*<div
-                                    role="group"
-                                    aria-label="Platform"
-                                    className="btn-group-toggle-custom d-flex justify-content-center"
-                                >
-                                    {["Anuncios", "Ventas", "Reclamos"].map((platform) => (
-                                        <button
-                                            key={platform}
-                                            type="button"
-                                            className={`btn btn-toggle ${alignment === platform ? "active" : ""
-                                                }`}
-                                            aria-pressed={alignment === platform}
-                                            onClick={() => handleChange(platform)}
-                                        >
-                                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                                        </button>
-                                    ))}
-                                </div>*/}
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
-                                    if (Number(tipo) === Number(a.idTipo))
+                                    if (Number(tipo) === Number(a.idTipo) || Number(tipo) === 4)
                                         return <AnunciosPanel
                                             key={i}
                                             anuncio={a}

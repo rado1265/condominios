@@ -135,13 +135,13 @@ export const CrearVotacion = (selListado: any, votacion: any) => {
     });
 }
 
-export const CrearComentarioAnuncio = (selListado: any, comentario: any, idCondominio: any) => {
-    SVCAnuncio.CrearComentarioAnuncio(comentario, idCondominio).then((res: IServiceResult<any>) => {
+export const CrearComentarioAnuncio = (selListado: any, comentario: any, idCondominio: any, eliminar: boolean) => {
+    SVCAnuncio.CrearComentarioAnuncio(comentario, idCondominio, eliminar).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
-            selListado(false, '', data);
+            selListado(false, eliminar, data);
         } else {
-            selListado(true, 'error', []);
+            selListado(true, eliminar, []);
         }
     });
 }
