@@ -149,8 +149,8 @@ const AvisoPanel: React.FC<Props> = ({
     };
 
     return (
-        <div className="aviso-panel w-100">
-            <div className='container-calendario shadow'>
+        <div className="aviso-panel w-100 row mt-md-5">
+            <div className='container-calendario col-12 col-md-7 d-md-block'>
                 <div style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
                     <button
                         onClick={() => {
@@ -186,11 +186,11 @@ const AvisoPanel: React.FC<Props> = ({
                         </svg>
                     </button>
                 </div>
-                <div className="calendario">
+                <div className="calendario h-md-50">
                     {days}
                 </div>
             </div>
-            <div>
+            <div className='col-12 col-md-5'>
                 <div className='container-title-eventosdelDia'>
                     <h5 className='title-eventosdeldia'>Eventos {diaMesSelect.dia} de {monthTitle}</h5>
                     <button className="avisos-add" title="Agregar Evento" onClick={() => { setCrearEvento(true) }}>

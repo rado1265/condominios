@@ -166,6 +166,7 @@ const Condominio = () => {
     const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false })
     const [verDetalle, setVerDetalle] = useState(false)
     const menuRef = useRef(null);
+    const [nombreComunidad, setNombreComunidad] = useState("")
     const [anuncio, setAnuncio] = useState({
         id: 0,
         idCondominio: localStorage.getItem("idCondominio"),
@@ -680,6 +681,7 @@ const Condominio = () => {
                     }
                     cargarDatos();
                 }
+                console.log(data);
                 registerPush();
                 setUsuario(data);
                 setTipo(4)
@@ -723,6 +725,14 @@ const Condominio = () => {
                         });
                     }
                 }
+
+                /*INICIO SE ABRE CALENDARIO COMO PRINCIPAL*/
+                cerrarMenu()
+                changeMenu(999)
+                setVerAvisos(true)
+                setLoading(true)
+                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
+                /*FIN SE ABRE CALENDARIO COMO PRINCIPAL*/
             }
             else {
                 toast.info('Credenciales incorrectas', {
@@ -1128,6 +1138,7 @@ const Condominio = () => {
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
+                setNombreComunidad(data.nombre);
                 setDataFull(data);
                 setActualizarData(true);
                 guardarUltimoRegistro(data, 'anuncios')
@@ -2214,6 +2225,7 @@ const Condominio = () => {
                         <Loading />
                         : ""}
                 <HuinchaSuperior
+                    nombre={nombreComunidad}
                     enComunidad={enComunidad}
                     onChangeAtras={handleVolverAtras}
                     imagenPerfil={imagenPerfil}
@@ -2398,6 +2410,7 @@ const Condominio = () => {
                                     anuncio={dataDetalle}
                                     comentario={newComentario}
                                     onChangeComentario={changeComentario}
+                                    user={usuario}
                                     onComentar={() => {
                                         if (newComentario.trim()) {
                                             CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, {
@@ -2472,7 +2485,7 @@ const Condominio = () => {
                         }
                     </div>
                 </div>
-                {modalOpenImg && (
+                {/*modalOpenImg && (
                     <div className="modal-overlay" onClick={closeModalImg}>
                         <div className="modal-content" onClick={e => e.stopPropagation()}>
                             <button className="close-btn" onClick={closeModalImg}>&times;</button>
@@ -2485,7 +2498,7 @@ const Condominio = () => {
                                 alt="Imagen Ampliada" />
                         </div>
                     </div>
-                )}
+                )*/}
                 <ToastContainer />
                 {enComunidad && navegador()}
             </div>

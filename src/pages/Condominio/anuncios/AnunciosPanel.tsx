@@ -42,9 +42,22 @@ const AnunciosPanel: React.FC<Props> = ({
     loading
 }) => {
     const esPropietario = usuarioId === anuncio.idUsuario || usuarioRol === "ADMINISTRADOR";
+    const [modalOpenImg, setModalOpenImg] = useState(false);
+    const [imgSelect, setImgSelect] = useState("");
 
+    
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = imgErrorUrl;
+    };
+
+    const openModalImg = (img: any) => {
+        setImgSelect(img);
+        setModalOpenImg(true);
+    }
+
+    const closeModalImg = () => {
+        setModalOpenImg(false);
+        setImgSelect("");
     };
 
     return <>
@@ -96,9 +109,9 @@ const AnunciosPanel: React.FC<Props> = ({
                 anuncio.amedida && (
                     <div className="v2-anuncio-media-wrapper">
                         {anuncio.esVideo ? (
-                            <video src={anuncio.amedida} controls />
+                            <video src={anuncio.amedida} controls/>
                         ) : (
-                            <img src={anuncio.amedida} onError={handleImageError} alt="Anuncio" />
+                            <img src={anuncio.amedida} onError={handleImageError} alt="Anuncio" onClick={()=>{openModalImg(anuncio.amedida)}} />
                         )}
                     </div>
                 )
@@ -152,6 +165,15 @@ const AnunciosPanel: React.FC<Props> = ({
             </div>
         </div >
         }
+        {modalOpenImg && (
+            <div className="vi-modal-overlay" onClick={closeModalImg}>
+                <div className="vi-modal-content shadow" onClick={e => e.stopPropagation()}>
+                    <button className="vi-close-btn" onClick={closeModalImg}>&times;</button>
+                    <img src={imgSelect ?? ""}
+                        alt="Imagen Ampliada" />
+                </div>
+            </div>
+        )}
     </>
 };
 

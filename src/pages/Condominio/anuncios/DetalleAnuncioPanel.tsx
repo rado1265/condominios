@@ -30,6 +30,7 @@ interface Props {
     onCerrar: () => void;
     loading?: boolean;
     imgError: string;
+    user: any;
     onEliminar: (id: number) => void
 }
 
@@ -42,6 +43,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     onCerrar,
     loading = false,
     imgError,
+    user,
     onEliminar
 }) => {
     return <>{!loading &&
@@ -88,10 +90,12 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
             <div className="comments-container">
                 <h2 className="comments-title">Comentarios</h2>
                 {anuncio.comentarios ? anuncio.comentarios.map((j: any) => {
-                    return <div key={j.id} className="comment-box">
-                        <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={() => onEliminar(j.id)}>
-                            <img src={iconborrar} />
-                        </button>
+                    return <div key={j.id} className={`comment-box shadow ${j.idUsuario == user.id || user.rol == "ADMINISTRADOR" ? "pt-4" : ""}`}>
+                        {(j.idUsuario == user.id || user.rol == "ADMINISTRADOR") && (
+                            <button type="button" className="iconoVolver" style={{ right: '40px', marginTop: '-20px', position: 'absolute' }} onClick={() => onEliminar(j.id)}>
+                                <img width={20} height={20} src={iconborrar} />
+                            </button>
+                        )}
                         <div className="comment-header">
                             <span className="comment-author">{j.nombreUsuario}</span>
                             <div>
@@ -103,7 +107,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                     </div>
                 }) : ""}
                 <textarea
-                    className="comment-textarea"
+                    className="comment-textarea shadow"
                     placeholder="Escribe tu comentario..."
                     value={comentario}
                     onChange={(e: any) => onChangeComentario(e.target.value)}
@@ -112,7 +116,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                 />
                 <button
                     type="button"
-                    className="search-button w-100 mt-1"
+                    className="modal-btn modal-btn-green w-100 mt-1"
                     onClick={onComentar}
                 >
                     Publicar comentario

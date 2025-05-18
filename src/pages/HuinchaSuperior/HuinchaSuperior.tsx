@@ -8,11 +8,12 @@ import personFull from './../../components/utils/img/menuInferior/personFull.png
 interface Props {
     enComunidad: boolean;
     imagenPerfil: string;
+    nombre: string;
     onChangeAtras: () => void;
     onChangeMenu: (e: string) => void;
 }
 
-const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPerfil, onChangeMenu }) => {
+const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPerfil, onChangeMenu, nombre }) => {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -31,7 +32,7 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPe
         <>
             <div className={enComunidad ? "w-100 p-3 mb-3 containerMenu" : "d-none"}>
                 <img src={back} onClick={onChangeAtras} />
-                <span className='tituloMenu'>Mi Comunidad</span>
+                <span className='tituloMenu'>{nombre}</span>
                 <div className="huincha-profile-dropdown" ref={dropdownRef}>
                     <button
                         className="huincha-icon-button"
