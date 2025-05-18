@@ -23,7 +23,7 @@ import rulesSelect from '../../components/utils/img/menuInferior/rules-select.pn
 import emergency from '../../components/utils/img/menuInferior/emergency.png';
 import emergencySelect from '../../components/utils/img/menuInferior/emergency-select.png';
 import close from '../../components/utils/img/menuInferior/close.png';
-
+import EspacioComun from '../../components/utils/img/menuInferior/calendar_3348195.png';
 interface Props {
     active: string;
     orden: string;
@@ -108,6 +108,9 @@ const icons = {
     ),
     votacionOption: (
         <img width={25} src={votaciones} />
+    ),
+    EspacioComun: (
+        <img width={25} src={EspacioComun} />
     ),
 };
 
@@ -270,6 +273,14 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                                     >
                                         {icons.votacionesSelect}
                                         <span className='txtOpcion'>Crear <br></br>Votación</span>
+                                    </button>
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => onChangeMenu('espacioComun')}
+                                        aria-label="Espacio Comun"
+                                    >
+                                        {icons.EspacioComun}
+                                        <span className='txtOpcion'>Espacio <br></br>Común</span>
                                     </button>
                                     <button
                                         className={`nav-button container-Opcion`}
