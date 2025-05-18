@@ -27,6 +27,7 @@ import iconborrar from './../../components/utils/img/iconborrar.png';
 import iconeditar from './../../components/utils/img/editar.png';
 import HuinchaSuperior from "../HuinchaSuperior/HuinchaSuperior";
 import CryptoJS from "crypto-js";
+import EspacioComun from "./espacioComun/EspacioComun";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -198,12 +199,9 @@ const Condominio = () => {
     const [verPuntosInteres, setVerPuntosInteres] = useState(false)
     const [days, setDays] = useState([]);
     const [monthTitle, setMonthTitle] = useState('');
-
     const [avisos, setAvisos] = useState([]);
-
     const [año, setAño] = useState(new Date().getFullYear());
     const [mes, setMes] = useState(new Date().getMonth());
-
     const [mensajeAviso, setMensajeAviso] = useState('');
     const [fechaAviso, setFechaAviso] = useState('');
     const [horaAviso, setHoraAviso] = useState(new Date().toLocaleTimeString());
@@ -225,7 +223,7 @@ const Condominio = () => {
         rol: '',
         idCondominio: 0
     })
-
+    const [verEspacioComun, setVerEspacioComun] = useState(false)
     const [modalOpenImg, setModalOpenImg] = useState(false);
     const [imgSelect, setImgSelect] = useState("");
     const [serviceWorker, setServiceWorker] = useState({})
@@ -1307,6 +1305,11 @@ const Condominio = () => {
                 cerrarMenu();
                 changeMenu(999);
                 cerrarSesion();
+                break;
+            case "espacioComun":
+                cerrarMenu();
+                changeMenu(999);
+                setVerEspacioComun(true);
                 break;
             default:
 
@@ -2484,6 +2487,10 @@ const Condominio = () => {
                             </div>
                         }
                     </div>
+                    {
+                        verEspacioComun &&
+                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} />
+                    }
                 </div>
                 {/*modalOpenImg && (
                     <div className="modal-overlay" onClick={closeModalImg}>
