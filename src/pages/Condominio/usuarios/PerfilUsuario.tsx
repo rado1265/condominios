@@ -13,6 +13,7 @@ interface UsuarioDetalle {
     tieneSuscripcionVotaciones: boolean;
     tieneSuscripcionAnuncios: boolean;
     tieneSuscripcionAvisos: boolean;
+    tieneSuscripcionEspacioComun: boolean;
     rol: string;
 }
 
@@ -227,6 +228,14 @@ const PerfilUsuario: React.FC<Props> = ({
                                     }}>
                                         Notif. Calendario
                                         {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                    </button>
+                                </div>
+                                <div className="container-dataPerfil">
+                                    <button type="button" className="submenu-item" onClick={(ev) => {
+                                        onChangeCreateSub(usuario.tieneSuscripcionEspacioComun, 5, ev)
+                                    }}>
+                                        Notif. Espacio Común
+                                        {iconNotificaciones(usuario.tieneSuscripcionEspacioComun)}
                                     </button>
                                 </div>
                                 <div className="container-dataPerfil">

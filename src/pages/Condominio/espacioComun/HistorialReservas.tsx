@@ -29,7 +29,7 @@ export default function HistorialReservas(props: any) {
   };
 
   const cancelarReserva = async (id: number) => {
-    await axios.delete(_ruta + `EspacioComun/cancelar/${id}`, {
+    await axios.delete(_ruta + `EspacioComun/cancelar?id=${id}&idCondominio=${localStorage.getItem("idCondominio")!.toString()}`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
