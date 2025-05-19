@@ -72,7 +72,7 @@ const PerfilUsuario: React.FC<Props> = ({
     }
 
     return (
-        <form onSubmit={(e) => { e.preventDefault(); onGuardar(archivoTemp); setEditarPerfil(false); }} className="perfil-form">
+        <form onSubmit={(e) => { e.preventDefault(); onGuardar(archivoTemp); setEditarPerfil(false); }} className="perfil-form mt-md-5">
             {
                 editarPerfil ?
                     <>

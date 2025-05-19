@@ -12,6 +12,7 @@ export default function ReservaConHorario(props: any) {
   const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
   const [fechaFin, setFechaFin] = useState<Date | null>(null);
   const [unidadesDisponibles, setUnidadesDisponibles] = useState<{ id: number; numero: number }[]>([]);
+  const [verDisp, setVerDisp] = useState(false);
 
   useEffect(() => {
     axios.get(_ruta + "EspacioComun?idCondominio=" + localStorage.getItem("idCondominio")!.toString(), {
@@ -41,6 +42,7 @@ export default function ReservaConHorario(props: any) {
     });
 
     setUnidadesDisponibles(res.data);
+    setVerDisp(true);
   };
 
   const reservar = async (unidadId: number) => {
@@ -62,29 +64,40 @@ export default function ReservaConHorario(props: any) {
     }
     );
     alert("Reserva realizada");
+    setVerDisp(false);
     props.onCancelar()
   };
+
   useEffect(() => {
     if (espacioId) {
       setEspacioSelect(espacios.find((e: any) => e.id === espacioId));
+      setVerDisp(false);
     }
   }, [espacioId]);
 
   return (
-    <div className="p-4 border rounded mt-4">
-      <h3 className="font-bold">Reservar con horario</h3>
-
-      <select onChange={(e) => setEspacioId(Number(e.target.value))} value={espacioId ?? ""}>
-        <option value="">Seleccione un espacio</option>
-        {espacios.map((e: any) => (
-          <option key={e.id} value={e.id}>
-            {e.nombre}
-          </option>
-        ))}
-      </select>
-      <div className="flex gap-2 my-2">
-        <div>
-          <label>Desde:</label>
+    <div className="reserva-container shadow-lg p-4 rounded-4 bg-white mx-auto mt-3 mt-md-5" style={{ maxWidth: 420 }}>
+      <h3 className="fw-bold mb-4 text-center">
+        Reservar con horario
+      </h3>
+      <div className="mb-3">
+        <label className="form-label fw-semibold">Espacio</label>
+        <select
+          className="form-control"
+          value={espacioId ?? ""}
+          onChange={(e) => setEspacioId(Number(e.target.value))}
+        >
+          <option value="">Seleccione un espacio</option>
+          {espacios.map((e: any) => (
+            <option key={e.id} value={e.id} title={e.nombre}>
+              {e.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="row g-3 align-items-center mb-4">
+        <div className="col-12">
+          <label className="form-label">Desde</label>
           <DatePicker
             selected={fechaInicio}
             onChange={(date) => setFechaInicio(date)}
@@ -92,10 +105,11 @@ export default function ReservaConHorario(props: any) {
             timeIntervals={30}
             dateFormat="Pp"
             placeholderText="Inicio"
+            className="form-control"
           />
         </div>
-        <div>
-          <label>Hasta:</label>
+        <div className="col-12">
+          <label className="form-label">Hasta</label>
           <DatePicker
             selected={fechaFin}
             onChange={(date) => setFechaFin(date)}
@@ -103,25 +117,35 @@ export default function ReservaConHorario(props: any) {
             timeIntervals={30}
             dateFormat="Pp"
             placeholderText="Fin"
+            className="form-control"
           />
         </div>
       </div>
+      <div className="modal-actions mt-4">
+        <button className="modal-btn modal-btn-green" onClick={buscarDisponibles} >
+          Ver Disponibilidad
+        </button>
+        <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>
+          Cancelar
+        </button>
+      </div>
+      {(espacioId && fechaInicio && fechaFin && verDisp) && (
+        <ul className="list-group mt-4">
+          <h5 className="titulo-secundario">Disponibles:</h5>
+          {unidadesDisponibles.length > 0 && unidadesDisponibles.map((h: any) => {
+            return <li key={h.id}>
+              {espacioSelect.nombre} #{h.numero}{" "}
+              <button onClick={() => reservar(h.id)} className="ml-3 modal-btn modal-btn-green btn-reservar">
+                Reservar
+              </button>
+            </li>
+          })}
 
-      <button onClick={buscarDisponibles} className="mb-2">
-        Consultar disponibilidad
-      </button>
-      <ul>
-        {unidadesDisponibles.length > 0 && unidadesDisponibles.map((h: any) => {
-          return <li key={h.id}>
-            Unidad #{h.numero}{" "}
-            <button onClick={() => reservar(h.id)} className="ml-2">
-              Reservar
-            </button>
-          </li>
-        })
-        }
-      </ul>
-      <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Cancelar</button>
+          {(unidadesDisponibles.length == 0 && verDisp) && (
+            <span>No hay disponibilidad para el rango seleccionado</span>
+          )}
+        </ul>
+      )}
     </div>
   );
 }

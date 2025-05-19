@@ -81,7 +81,7 @@ const Emergencia: React.FC<Props> = ({
                         {
                             emergencias.map((e: any) => {
                                 return (
-                                    <div className="container-emergencia">
+                                    <div className="container-emergencia shadow">
                                         <span><strong>{e.descripcion}</strong></span><br />
                                         <span>{e.direccion}</span>
                                         <a href={`tel:${e.telefono}`} className="d-block">{e.telefono}</a>
@@ -90,10 +90,10 @@ const Emergencia: React.FC<Props> = ({
                                             <>
                                                 {/*<span className="d-block">{e.telefono}</span>*/}
 
-                                                <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-75px', position: 'absolute' }} onClick={() => onSelect(e)}>
+                                                <button type="button" className="iconoVolver" style={{ marginTop: '-75px', float: 'right' }} onClick={() => onSelect(e)}>
                                                     <img src={iconeditar} />
                                                 </button>
-                                                <button type="button" className="iconoVolver" style={{ right: '25px', marginTop: '-30px', position: 'absolute' }} onClick={onEliminar}>
+                                                <button type="button" className="iconoVolver" style={{ marginTop: '-30px', float: 'right' }} onClick={onEliminar}>
                                                     <img src={iconborrar} />
                                                 </button>
                                             </>

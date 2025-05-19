@@ -60,7 +60,7 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
     };
 
     return (
-        <div key={1} className="w-100" style={{ maxWidth: '700px', margin: '0 auto' }}>
+        <div key={1} className="w-100 mt-4" style={{ maxWidth: '700px', margin: '0 auto' }}>
             <div className="survey-creator-container">
                 <h2 className="creator-title">Creador de Votaciones</h2>
 

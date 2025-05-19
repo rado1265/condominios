@@ -239,6 +239,12 @@ const Condominio = () => {
     };
 
 
+    function formatToLocalISOString(date: Date) {
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+    }
+
+
     const [alignment, setAlignment] = useState("Todo");
 
     const handleChange = (value: any) => {
@@ -838,7 +844,7 @@ const Condominio = () => {
 
             var aviso: any = {
                 id: idAviso,
-                fecha: newFecha,//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
+                fecha: formatToLocalISOString(new Date(newFecha)),//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
                 mensaje: mensajeAviso,
                 idUsuario: usuario.id,
                 color: colorAviso,
@@ -1796,22 +1802,17 @@ const Condominio = () => {
                                             <option value="VECINO" selected>Vecino</option>
                                             <option value="ADMINISTRADOR">Administrador</option>
                                         </select>
-                                        <button
-                                            type="button"
-                                            disabled={newUser.nombre === "" || newUser.clave === ""}
-                                            className="search-button mt-2"
+                                        <div className="modal-actions mt-3">
+                                            <button type="button" 
                                             onClick={() => CrearUsuario(false)}
-                                        >
-                                            Aceptar
-                                        </button>
-                                        <button
-                                            type="button"
-                                            disabled={newUser.nombre === "" || newUser.clave === ""}
-                                            className="modal-btn modal-btn-close mt-2"
-                                            onClick={() => setAgregarUsuario(false)}
-                                        >
-                                            Cancelar
-                                        </button>
+                                            className="modal-btn modal-btn-green">
+                                                Aceptar
+                                            </button>
+                                            
+                                            <button className="modal-btn modal-btn-close" onClick={() => setAgregarUsuario(false)}>
+                                                Cancelar
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </> :
@@ -2438,7 +2439,7 @@ const Condominio = () => {
                         {
                             verMisAnuncios &&
                             <>
-                                <h2>Mis Publicaciones</h2>
+                                <h2 className="col-12 text-center mt-4">MIS PUBLICACIONES</h2>
                                 {misAnuncios !== null && ordenarListado(misAnuncios).map((a: any, i: any) => (
                                     <AnunciosPanel
                                         key={i}
@@ -2462,7 +2463,7 @@ const Condominio = () => {
                         }
                         {
                             (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) &&
-                            <div className="mt-4">
+                            <div className="mt-4 row justify-content-around">
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
                                     if (Number(tipo) === Number(a.idTipo) || Number(tipo) === 4)
                                         return <AnunciosPanel

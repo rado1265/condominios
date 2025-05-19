@@ -23,7 +23,7 @@ import rulesSelect from '../../components/utils/img/menuInferior/rules-select.pn
 import emergency from '../../components/utils/img/menuInferior/emergency.png';
 import emergencySelect from '../../components/utils/img/menuInferior/emergency-select.png';
 import close from '../../components/utils/img/menuInferior/close.png';
-import EspacioComun from '../../components/utils/img/menuInferior/calendar_3348195.png';
+import EspacioComun from '../../components/utils/img/menuInferior/comunes.png';
 interface Props {
     active: string;
     orden: string;
@@ -148,6 +148,10 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
     const handleCreateClick = () => {
         setMenuOpen((open) => !open);
     };
+
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [onChangeMenu])
 
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
 

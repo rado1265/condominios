@@ -92,7 +92,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                 {anuncio.comentarios ? anuncio.comentarios.map((j: any) => {
                     return <div key={j.id} className={`comment-box shadow ${j.idUsuario == user.id || user.rol == "ADMINISTRADOR" ? "pt-4" : ""}`}>
                         {(j.idUsuario == user.id || user.rol == "ADMINISTRADOR") && (
-                            <button type="button" className="iconoVolver" style={{ right: '40px', marginTop: '-20px', position: 'absolute' }} onClick={() => onEliminar(j.id)}>
+                            <button type="button" className="iconoVolver icon-deleteComentario" onClick={() => onEliminar(j.id)}>
                                 <img width={20} height={20} src={iconborrar} />
                             </button>
                         )}
