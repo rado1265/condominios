@@ -241,7 +241,6 @@ const AvisoPanel: React.FC<Props> = ({
                         <option value="#f1c40f" style={{ color: "#f1c40f", fontWeight: 700 }}>Amarillo</option>
                         <option value="#27ae60" style={{ color: "#27ae60", fontWeight: 700 }}>Verde</option>
                         <option value="#e67e22" style={{ color: "#e67e22", fontWeight: 700 }}>Naranja</option>
-                        <option value="#9b59b6" style={{ color: "#9b59b6", fontWeight: 700 }}>Morado</option>
                     </select>
                     <div className="modal-actions">
                         <button className="modal-btn modal-btn-green" onClick={onCrear}>
