@@ -31,7 +31,7 @@ const Home = () => {
 
     const handleKeyDown = (e: any) => {
         if (e.key === 'Enter') {
-            LoginLogic(selLogin, normalizarLogin(loguear))
+            /* LoginLogic(selLogin, normalizarLogin(loguear)) */
         }
     };
 
@@ -59,7 +59,7 @@ const Home = () => {
     const login = () => {
         try {
             setLoading(true);
-            LoginLogic(selLogin, normalizarLogin(loguear))
+            /* LoginLogic(selLogin, normalizarLogin(loguear)) */
         } catch (er) {
             console.log(er);
         }

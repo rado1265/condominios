@@ -451,7 +451,7 @@ const Condominio = () => {
                     datos: jsonData,
                     firma: hash
                 };
-                LoginLogic(selLogin, paquete)
+                LoginLogic(selLogin, paquete, false)
             }
             else {
                 cerrarSesion()
@@ -660,7 +660,7 @@ const Condominio = () => {
             };
             setLoading(true);
             localStorage.setItem("ZXN0byBlcyBzZWNyZXRv", serializeToAscii(loguear));
-            LoginLogic(selLogin, paquete)
+            LoginLogic(selLogin, paquete, true)
         } catch (er) {
         }
     }
@@ -752,7 +752,9 @@ const Condominio = () => {
                 })
                 cerrarSesion()
             }
-
+            if (err) {
+                SuscripcionTotal(0, data)
+            }
         } catch (er) {
             toast.info('Credenciales incorrectas', {
                 position: posicionAlertas,
@@ -825,7 +827,7 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const EliminarAviso = (a: any, b: any, c: any) => {
+    const EliminarAviso = (a: any, b: any, c: any, d: any, e: any) => {
         try {
             let fecha: Date = new Date(b)
             var aviso: any = {
@@ -834,27 +836,30 @@ const Condominio = () => {
                 mensaje: c,
                 idUsuario: usuario.id,
                 idCondominio: localStorage.getItem("idCondominio")!.toString(),
-                idReserva: 0
+                idReserva: 0,
+                cabecera: d,
+                color: e
             }
             CrearAvisosLogic(selCrearAvisos, aviso, true)
         } catch (er) {
         }
     }
-    const CrearAviso = () => {
+    const CrearAviso = (_aviso: any) => {
         try {
-            let newFecha = fechaAviso;
-
-            var aviso: any = {
-                id: idAviso,
-                fecha: newFecha,/* formatToLocalISOString(new Date(newFecha)), *///fecha: newFecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
-                mensaje: mensajeAviso,
-                idUsuario: usuario.id,
-                color: colorAviso,
-                idCondominio: localStorage.getItem("idCondominio")!.toString(),
-                idReserva: 0
-            }
-
-            CrearAvisosLogic(selCrearAvisos, aviso, false)
+            /*  let newFecha = fechaAviso;
+ 
+             var aviso: any = {
+                 id: idAviso,
+                 fecha: newFecha,
+                 mensaje: mensajeAviso,
+                 idUsuario: usuario.id,
+                 color: colorAviso,
+                 idCondominio: localStorage.getItem("idCondominio")!.toString(),
+                 idReserva: 0,
+                 cabecera: ""
+             } */
+            /* console.log(_aviso) */
+            CrearAvisosLogic(selCrearAvisos, _aviso, false)
         } catch (er) {
         }
     }
@@ -899,7 +904,7 @@ const Condominio = () => {
                 setColorAviso("");
                 setHoraAviso(new Date().toLocaleTimeString());
                 setIdAviso(0);
-                toast.success('Aviso creado correctamente', {
+                toast.success('Aviso ' + (err ? 'eliminado' : 'creado') + ' correctamente', {
                     position: posicionAlertas,
                 });
             }
@@ -2206,10 +2211,15 @@ const Condominio = () => {
         }
     }
     async function Suscripcion(tipoSuscripcion: any) {
-
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
             SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result)
+        }
+    }
+    async function SuscripcionTotal(tipoSuscripcion: any, _usuario: any) {
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), _usuario.id, tipoSuscripcion, result)
         }
     }
 
@@ -2352,21 +2362,17 @@ const Condominio = () => {
                             <>
                                 <AvisoPanel
                                     avisos={avisos}
-                                    mensaje={mensajeAviso}
-                                    fecha={fechaAviso}
-                                    hora={horaAviso}
                                     mes={mes}
                                     año={año}
-                                    colorEvento={colorAviso}
                                     onCambiarMes={cambiarMes}
-                                    onChangeColor={(e) => setColorAviso(e)}
-                                    onChangeMensaje={(e) => setMensajeAviso(e.target.value)}
-                                    onChangeFecha={(e) => setFechaAviso(e)}
-                                    onChangeHora={(e) => setHoraAviso(e.target.value)}
                                     onCrear={CrearAviso}
-                                    onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje)}
+                                    onEditar={(_aviso: any) => {
+                                        CrearAvisosLogic(selCrearAvisos, _aviso, false)
+                                    }}
+                                    onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje, a.cabecera, a.color)}
                                     onEnviarNotificacion={EnviarNotifAviso}
                                     loading={loading}
+                                    usuario={usuario}
                                 />
                             </>
                         }

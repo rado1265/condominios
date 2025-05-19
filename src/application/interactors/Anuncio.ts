@@ -42,13 +42,13 @@ export const CrearAnuncio = (selListado: any, anuncio: any) => {
         }
     });
 }
-export const Login = (selListado: any, usuario: any) => {
+export const Login = (selListado: any, usuario: any, suscribir: boolean) => {
     SVCAnuncio.Login(usuario).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
-            selListado(false, '', data);
+            selListado(false, suscribir, data);
         } else {
-            selListado(true, 'error', []);
+            selListado(true, suscribir, []);
         }
     });
 }

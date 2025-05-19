@@ -12,8 +12,8 @@ export const EliminarAnuncioLogic = (selListado: any, idAnuncio: string) => {
 export const CrearAnuncioLogic = (selListado: any, anuncio: any) => {
     return CrearAnuncio(selListado, anuncio);
 }
-export const LoginLogic = (selListado: any, usuario: any) => {
-    return Login(selListado, usuario);
+export const LoginLogic = (selListado: any, usuario: any, suscribir: boolean) => {
+    return Login(selListado, usuario, suscribir);
 }
 export const SuscribirNotificacionesLogic = (selListado: any, tipoSuscripcion: any, registration: any) => {
     return SuscribirNotificaciones(selListado, tipoSuscripcion, registration);
