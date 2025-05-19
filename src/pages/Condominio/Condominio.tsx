@@ -119,9 +119,9 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
-    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
-    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" }]);
-    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, imagen: "" });
+    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "" }]);
+    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "" }]);
+    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "" });
     const [verUsuarioInd, setVerUserInd] = useState(false);
     const [usuarioDetalle, setUsuarioDetalle] = useState({
         nombre: "",
@@ -129,6 +129,7 @@ const Condominio = () => {
         tieneSuscripcionVotaciones: false,
         tieneSuscripcionAnuncios: false,
         tieneSuscripcionAvisos: false,
+        tieneSuscripcionEspacioComun: false,
         rol: "",
         id: 0,
         activo: false,
@@ -2462,7 +2463,7 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) &&
+                            (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle && !verEspacioComun) &&
                             <div className="mt-4 row justify-content-around">
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
                                     if (Number(tipo) === Number(a.idTipo) || Number(tipo) === 4)
