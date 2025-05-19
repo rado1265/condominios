@@ -30,13 +30,13 @@ export default function ListaEspacios(props: any) {
   }, []);
 
   return (!crearNuevo && !editar) ?
-    <div className="p-4">
+    <div className="p-md-4 p-2">
       <h2 className="font-bold text-xl mb-2">Espacios creados</h2>
       <ul className="space-y-2">
         <button type="submit" className="modal-btn modal-btn-green" onClick={() => setCrearNuevo(true)}>+ Crear Nuevo</button>
         {espacios.map((e) => (
-          <li key={e.id} className="border p-2 rounded">
-            <button type="button" className="iconoVolver mr-4" style={{ right: '25px',position: 'absolute' }} onClick={() => { setEspacio(e); setEditar(true); }}>
+          <li key={e.id} className="border py-3 pl-4 rounded justify-content-space-beetween w-100">
+            <button type="button" className="iconoVolver mr-4" style={{ float: 'right'}} onClick={() => { setEspacio(e); setEditar(true); }}>
               <img src={iconeditar} />
             </button>
             <strong>{e.nombre}</strong> — {e.unidades != null ? e.unidades.length : 0} unidad(es)

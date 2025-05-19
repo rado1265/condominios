@@ -18,6 +18,7 @@ export default function HistorialReservas(props: any) {
   const [reservas, setReservas] = useState<ReservaUsuario[]>([]);
   let _ruta: string = con.RetornaRuta();
   const [crearNuevo, setCrearNuevo] = useState(false)
+  const [reservasCargadas, setReservasCargadas] = useState(false)
   const cargarReservas = async () => {
     const res = await axios.get(_ruta + "EspacioComun/mis-reservas?idUsuario=" + props.usuario.id + "&idCondominio=" + localStorage.getItem("idCondominio")!.toString(), {
       headers: {
@@ -26,6 +27,7 @@ export default function HistorialReservas(props: any) {
       }
     });
     setReservas(res.data);
+    setReservasCargadas(true);
   };
 
   const cancelarReserva = async (id: number) => {
@@ -44,27 +46,48 @@ export default function HistorialReservas(props: any) {
   }, []);
 
   return (!crearNuevo) ?
-    <div className="p-4 border rounded mt-4">
-      <h3 className="font-bold">Mis Reservas</h3>
-      <button type="submit" className="modal-btn modal-btn-green" onClick={() => setCrearNuevo(true)}>+ Reservar</button>
-      {reservas.length === 0 ? (
-        <p>No tienes reservas aún.</p>
-      ) : (
-        <ul>
-          {reservas.map((r) => (
-            <li key={r.id}>
-              {r.espacioComun} {r.espacio} #{r.unidad} - {new Date(r.fechaInicio).toLocaleString()}{" "}{new Date(r.fechaFin).toLocaleString()}{" "}
-              {
-                ((props.usuario.id === r.idUsuario && r.estado) || (props.usuario.rol === "ADMINISTRADOR")) && (
-                  <button onClick={() => cancelarReserva(r.id)} className="ml-2 text-red-500">
-                    {r.estado ? "Rechazar" : "Aprobar"}
-                  </button>)
-              }
+    <div className="p-4 p-md-5 rounded mt-5 shadow mx-auto col-md-8">
+      <div className="d-flex">
+        <h3 className="font-bold">Mis Reservas</h3>
+        <button type="submit" className="modal-btn modal-btn-green ml-3 btn-newReserva" onClick={() => setCrearNuevo(true)}>+ Reservar</button>
+      </div>
+      {!reservasCargadas ? (
+        <p>Cargando reservas...</p>
+      ) :
+        (reservas.length === 0 && reservasCargadas) ? (
+          <p>No tienes reservas aún.</p>
+        ) : (
+          <ul>
+            {reservas.map((r) => (
+              <li key={r.id} className="shadow px-4 py-3 rounded container-reserva">
+                <strong>{r.espacioComun} {r.espacio} #{r.unidad} </strong><br></br>
+                {r.usuario} <br></br>
+                {new Date(r.fechaInicio).toLocaleString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+                {" - "}
+                {new Date(r.fechaFin).toLocaleString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}{" "}
+                {
+                  ((props.usuario.id === r.idUsuario && r.estado) || (props.usuario.rol === "ADMINISTRADOR")) && (
+                    <button onClick={() => cancelarReserva(r.id)} className="ml-2 ml-2 modal-btn modal-btn-green btn-reservar">
+                      {r.estado ? "Rechazar" : "Aprobar"}
+                    </button>)
+                }
 
-            </li>
-          ))}
-        </ul>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
       <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Volver</button>
     </div>
     :

@@ -49,29 +49,38 @@ export default function CrearEspacio(props: any) {
   }, [props.espacio]);
 
   return (
-    <div className="p-4 border rounded mb-4">
-      <h3 className="font-bold">Crear Espacio Común</h3>
+    <div className="p-4 rounded shadow mb-4 mt-3 mt-md-5 row col-12 col-md-8 mx-auto">
+      <h3 className="font-bold col-12">Crear Espacio Común</h3>
 
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Nombre"
-        value={form.nombre}
-        onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-        required
-      />
-      <input
-        type="number"
-        className="search-input"
-        placeholder="Cantidad"
-        value={form.cantidadUnidades}
-        onChange={(e) =>
-          setForm({ ...form, cantidadUnidades: parseInt(e.target.value) })
-        }
-        required
-        min={1}
-      />
-      <div className="modal-actions mt-4">
+      <div className="col-12 col-md-6">
+        <label htmlFor="nombreEspacio" className="search-label-admin">Nombre</label>
+        <input
+          type="text"
+          id="nombreEspacio"
+          className="search-input w-100"
+          placeholder="Nombre"
+          value={form.nombre}
+          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className="col-12 col-md-6">
+        <label htmlFor="cantEspacio" className="search-label-admin">Cantidad</label>
+        <input
+          type="number"
+          id="cantEspacio"
+          className="search-input w-100"
+          placeholder="Cantidad"
+          value={form.cantidadUnidades}
+          onChange={(e) =>
+            setForm({ ...form, cantidadUnidades: parseInt(e.target.value) })
+          }
+          required
+          min={1}
+        />
+      </div>
+      <div className="modal-actions mt-4 col-12">
         <button type="submit" className="modal-btn modal-btn-green" onClick={handleSubmit}>Crear</button>
         <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Cancelar</button>
       </div>

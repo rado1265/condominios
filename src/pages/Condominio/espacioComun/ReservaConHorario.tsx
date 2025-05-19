@@ -3,6 +3,11 @@ import axios from "axios";
 import { con } from "../../../application/entity/Rutas";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { registerLocale, setDefaultLocale } from  "react-datepicker";
+import { es } from 'date-fns/locale/es';
+registerLocale('es', es)
+setDefaultLocale('es')
+
 
 export default function ReservaConHorario(props: any) {
   let _ruta: string = con.RetornaRuta();
@@ -102,6 +107,7 @@ export default function ReservaConHorario(props: any) {
             selected={fechaInicio}
             onChange={(date) => setFechaInicio(date)}
             showTimeSelect
+            locale="es"
             timeIntervals={30}
             dateFormat="Pp"
             placeholderText="Inicio"
@@ -114,6 +120,7 @@ export default function ReservaConHorario(props: any) {
             selected={fechaFin}
             onChange={(date) => setFechaFin(date)}
             showTimeSelect
+            locale="es"
             timeIntervals={30}
             dateFormat="Pp"
             placeholderText="Fin"

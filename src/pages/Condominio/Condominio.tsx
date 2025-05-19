@@ -2241,13 +2241,13 @@ const Condominio = () => {
                 />
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 {
-                    (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle) && (
+                    (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle && !encuesta) && (
                         <div
                             role="group"
                             aria-label="Platform"
                             className="btn-group-toggle-custom d-flex justify-content-center"
                         >
-                            {["Todo", "Anuncios", "Ventas", /* "Servicios", */ "Reclamos"].map((platform) => (
+                            {["Todo", "Anuncios", "Ventas", "Reclamos"].map((platform) => (
                                 <button
                                     key={platform}
                                     type="button"

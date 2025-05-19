@@ -1979,3 +1979,40 @@ a:hover {
 .titulo-secundario {
   color: var(--colorPrincipal);
 }
+
+.react-datepicker-time__header {
+  position: relative;
+  background: #f0f0f0;
+  color: #f0f0f0 !important;
+}
+
+.react-datepicker-time__header::after {
+  content: "Hora";
+  color: #000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.btn-newReserva {
+  height: 35px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: medium;
+}
+
+.container-reserva {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.container-reserva>strong {
+  display: contents;
+}
+
+.container-reserva>button {
+  float: right;
+}
