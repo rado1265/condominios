@@ -1,65 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { ObtenerAvisosLogic } from '../../../presentation/view-model/Anuncio.logic';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-
+import axios from 'axios';
+import { con } from '../../../application/entity/Rutas';
+import iconeditar from './../../../components/utils/img/editar.png'
+import iconborrar from './../../../components/utils/img/iconborrar.png'
+import iconNotificacion from './../../../components/utils/img/notificacion.png'
 interface Aviso {
     id: number;
     mensaje: string;
     fecha: string;
     color: string;
+    cabecera: string;
+    idCondominio: number;
+    idReserva: number;
+    idUsuario: number;
 }
 
 interface Props {
     avisos: Aviso[];
-    mensaje: string;
-    fecha: string;
-    hora: string;
     año: number;
     mes: number;
-    colorEvento: string;
-    onChangeMensaje: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onChangeFecha: (e: string) => void;
-    onChangeHora: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onChangeColor: (e: string) => void;
-    onCrear: () => void;
+    onCrear: (_aviso: Aviso) => void;
     onEliminar: (aviso: Aviso) => void;
     onCambiarMes: (mes: any, anio: any) => void;
     onEnviarNotificacion: (mensaje: string) => void;
     loading?: boolean;
+    onEditar: (aviso: Aviso) => void;
+    usuario: any;
 }
 
 const AvisoPanel: React.FC<Props> = ({
     avisos,
-    mensaje,
-    fecha,
-    hora,
     año,
     mes,
-    colorEvento,
-    onChangeMensaje,
-    onChangeFecha,
-    onChangeHora,
     onCrear,
     onEliminar,
     onCambiarMes,
     onEnviarNotificacion,
-    onChangeColor,
-    loading = false
+    loading = false,
+    usuario
 }) => {
     dayjs.extend(utc);
     dayjs.extend(timezone);
     const [idEdit, setIdEdit] = useState<number | null>(null);
     const [crearEvento, setCrearEvento] = useState(false);
+    const [editarEvento, setEditarEvento] = useState(false);
     const [monthTitle, setMonthTitle] = useState('');
     const [days, setDays] = useState([]);
     const [avisosParse, setAvisosParse] = useState<Aviso[]>();
     const [diaMesSelect, setDiaMesSelect] = useState({ dia: 0, mes: 0, anio: 0 })
+    let _ruta: string = con.RetornaRuta();
+    const [tiposAviso, setTiposAviso] = useState([]);
+    const [aviso, setAviso] = useState<Aviso>({
+        id: 0,
+        fecha: '',
+        mensaje: "",
+        idUsuario: usuario.id,
+        color: "",
+        idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()),
+        idReserva: 0,
+        cabecera: ""
+    });
 
     const handleNotificar = (msg: string) => {
         if (window.confirm("¿Deseas enviar una notificación a todos los vecinos?")) {
             onEnviarNotificacion(msg);
+        }
+    };
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+        setAviso(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        if (name === "cabecera") {
+            const eventoSeleccionado: any = tiposAviso.find(
+                (_aviso: any) => _aviso.descripcion === value
+            );
+
+            if (eventoSeleccionado) {
+                setAviso(prev => ({
+                    ...prev,
+                    ["color"]: eventoSeleccionado.color
+                }));
+            } else {
+                setAviso(prev => ({
+                    ...prev,
+                    ["color"]: ""
+                }));
+            }
         }
     };
 
@@ -68,10 +99,14 @@ const AvisoPanel: React.FC<Props> = ({
         const avisosDeHoy = avisos.filter((a) => (new Date(a.fecha)).getTime() === (new Date(año + '/' + mes + '/' + dia)).getTime());
         const avisosOrdenados = avisosDeHoy.slice().sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         setAvisosParse(avisosOrdenados);
-        onChangeFecha(`${año}-${mes.toString().padStart(2, '0')}-${dia}`);
+        setAviso(prev => ({
+            ...prev,
+            ["fecha"]: `${año}-${mes.toString().padStart(2, '0')}-${dia}`
+        }));
     }
 
     useEffect(() => {
+        cargar();
         generarCalendario();
         const fechaChile = dayjs().tz("America/Santiago");
         const avisosDeHoy = avisos.filter((a, b) => new Date(a.fecha).getTime() === new Date().getTime());
@@ -148,6 +183,16 @@ const AvisoPanel: React.FC<Props> = ({
         setCrearEvento(false);
     };
 
+    const cargar = async () => {
+        const res = await axios.get(_ruta + "Condominios/getTipoAvisos?idCondominio=" + localStorage.getItem("idCondominio")!.toString(), {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        });
+        setTiposAviso(res.data);
+    };
+
     return (
         <div className="aviso-panel w-100 row mt-md-5">
             <div className='container-calendario col-12 col-md-7 d-md-block'>
@@ -203,6 +248,23 @@ const AvisoPanel: React.FC<Props> = ({
                 {avisosParse?.map((a: any, i: number) => {
                     return (
                         <div className='avisos-dia' key={i} style={{ borderBottom: `4px solid ${a.color}`, background: `${a.color}12`, color: a.color }}>
+                            {a.idReserva === 0 && <div style={{ float: 'right', display: 'flex', alignItems: 'center', marginTop: '-5px' }}>
+                                <button type="button" className="iconoVolver " onClick={() => onEnviarNotificacion(a.cabecera + ": " + a.mensaje)}>
+                                    <img width={20} height={20} src={iconNotificacion} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="iconoVolver"
+                                    onClick={() => { setEditarEvento(true); setAviso(a); }}
+                                    aria-label="Editar perfil"
+                                >
+                                    <img src={iconeditar} />
+                                </button>
+                                <button type="button" className="iconoVolver " onClick={() => onEliminar(a)}>
+                                    <img width={20} height={20} src={iconborrar} />
+                                </button>
+                            </div>}
+                            <span><strong>{a.cabecera}:</strong></span><br />
                             <span>{a.mensaje}</span>
                             <div style={{ display: 'flex', alignItems: 'center', marginTop: '5px' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#9a9a9a">
@@ -218,22 +280,30 @@ const AvisoPanel: React.FC<Props> = ({
                     </div>
                 )}
             </div>
-            <div className={`modal-overlay ${crearEvento ? "" : "d-none"}`}>
+            <div className={`modal-overlay ${crearEvento || editarEvento ? "" : "d-none"}`}>
                 <div className="modal-content">
-                    <h5 className="modal-title">Crear evento <br></br>{diaMesSelect.dia} de {monthTitle}</h5>
+                    <h5 className="modal-title">{crearEvento ? "Crear evento" : "Editar evento"}<br></br>{diaMesSelect.dia} de {monthTitle}</h5>
                     <input
                         className="modal-input"
                         type="text"
                         placeholder="Escribe tu mensaje..."
-                        value={mensaje}
-                        onChange={onChangeMensaje}
+                        value={aviso.mensaje}
+                        name='mensaje'
+                        onChange={handleChange}
                     />
-                    <select
+                    <select id="miCombo" value={aviso.cabecera} className="typeDate" name="cabecera" onChange={handleChange}>
+                        <option key={0} value={""}>Seleccione tipo evento</option>
+                        {tiposAviso.map((a: any) => (
+                            <option key={a.id} value={a.descripcion}>{a.descripcion}</option>
+                        ))}
+                    </select>
+                    {/* <select
                         id="colorEvento"
                         style={{ color: colorEvento, fontWeight: 600 }}
                         className="modal-select"
+                        name="color"
                         value={colorEvento}
-                        onChange={(e) => onChangeColor(e.target.value)}
+                        onChange={(e) => handleChange(e.target.value)}
                     >
                         <option value="" disabled>Selecciona un color</option>
                         <option value="#e74c3c" style={{ color: "#e74c3c", fontWeight: 700 }}>Rojo</option>
@@ -242,18 +312,30 @@ const AvisoPanel: React.FC<Props> = ({
                         <option value="#27ae60" style={{ color: "#27ae60", fontWeight: 700 }}>Verde</option>
                         <option value="#e67e22" style={{ color: "#e67e22", fontWeight: 700 }}>Naranja</option>
                         <option value="#9b59b6" style={{ color: "#9b59b6", fontWeight: 700 }}>Morado</option>
-                    </select>
+                    </select> */}
                     <div className="modal-actions">
-                        <button className="modal-btn modal-btn-green" onClick={onCrear}>
+                        <button className="modal-btn modal-btn-green" onClick={() => {
+                            onCrear(aviso); setAviso({
+                                id: 0,
+                                fecha: '',
+                                mensaje: "",
+                                idUsuario: usuario.id,
+                                color: "",
+                                idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()),
+                                idReserva: 0,
+                                cabecera: ""
+                            })
+                            setCrearEvento(false); setEditarEvento(false)
+                        }}>
                             Guardar
                         </button>
-                        <button className="modal-btn modal-btn-close" onClick={() => { setCrearEvento(false) }}>
+                        <button className="modal-btn modal-btn-close" onClick={() => { setCrearEvento(false); setEditarEvento(false) }}>
                             Cancelar
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
