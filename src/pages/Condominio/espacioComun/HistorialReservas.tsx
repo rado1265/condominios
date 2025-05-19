@@ -65,7 +65,7 @@ export default function HistorialReservas(props: any) {
           ))}
         </ul>
       )}
-      <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Cancelar</button>
+      <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Volver</button>
     </div>
     :
     <ReservaConHorario onCancelar={() => { setCrearNuevo(false); cargarReservas() }} usuario={props.usuario} />

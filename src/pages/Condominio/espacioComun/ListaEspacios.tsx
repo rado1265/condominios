@@ -43,8 +43,8 @@ export default function ListaEspacios(props: any) {
           </li>
         ))}
       </ul>
-      <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Cancelar</button>
+      <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Volver</button>
     </div >
     :
-    <CrearEspacio onCancelar={() => { setCrearNuevo(false); setEditar(false) }} espacio={espacio} editar={editar} />
+    <CrearEspacio onCancelar={() => { setCrearNuevo(false); setEditar(false);cargar() }} espacio={espacio} editar={editar} />
 }

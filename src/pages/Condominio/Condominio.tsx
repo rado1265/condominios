@@ -242,7 +242,7 @@ const Condominio = () => {
 
     function formatToLocalISOString(date: Date) {
         const pad = (n: number) => n.toString().padStart(2, '0');
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T00:00:00`;
     }
 
 
@@ -833,7 +833,8 @@ const Condominio = () => {
                 fecha: b,
                 mensaje: c,
                 idUsuario: usuario.id,
-                idCondominio: localStorage.getItem("idCondominio")!.toString()
+                idCondominio: localStorage.getItem("idCondominio")!.toString(),
+                idReserva: 0
             }
             CrearAvisosLogic(selCrearAvisos, aviso, true)
         } catch (er) {
@@ -845,11 +846,12 @@ const Condominio = () => {
 
             var aviso: any = {
                 id: idAviso,
-                fecha: formatToLocalISOString(new Date(newFecha)),//fecha: fecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
+                fecha: newFecha,/* formatToLocalISOString(new Date(newFecha)), *///fecha: newFecha.getFullYear() + "-" + ((fecha.getMonth() + 1).toString().length === 1 ? "0" + (fecha.getMonth() + 1) : fecha.getMonth() + 1) + "-" + ((fecha.getDate()).toString().length === 1 ? "0" + (fecha.getDate()) : fecha.getDate()) + "T" + horaAviso,
                 mensaje: mensajeAviso,
                 idUsuario: usuario.id,
                 color: colorAviso,
-                idCondominio: localStorage.getItem("idCondominio")!.toString()
+                idCondominio: localStorage.getItem("idCondominio")!.toString(),
+                idReserva: 0
             }
 
             CrearAvisosLogic(selCrearAvisos, aviso, false)
@@ -1804,12 +1806,12 @@ const Condominio = () => {
                                             <option value="ADMINISTRADOR">Administrador</option>
                                         </select>
                                         <div className="modal-actions mt-3">
-                                            <button type="button" 
-                                            onClick={() => CrearUsuario(false)}
-                                            className="modal-btn modal-btn-green">
+                                            <button type="button"
+                                                onClick={() => CrearUsuario(false)}
+                                                className="modal-btn modal-btn-green">
                                                 Aceptar
                                             </button>
-                                            
+
                                             <button className="modal-btn modal-btn-close" onClick={() => setAgregarUsuario(false)}>
                                                 Cancelar
                                             </button>
@@ -2097,6 +2099,7 @@ const Condominio = () => {
         setAgregarUsuario(false);
         setOpenCrear(false);
         setEncuesta(false);
+        setVerEspacioComun(false);
     }
 
     const selSuscribir2 = (error: Boolean, err: string, data: any) => {
