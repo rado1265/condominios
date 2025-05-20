@@ -136,7 +136,8 @@ const Condominio = () => {
         telefono: '',
         fechaCaducidad: new Date(),
         imagen: '',
-        clave: ''
+        clave: '',
+        mostrarDireccion: false
     });
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
@@ -1357,6 +1358,14 @@ const Condominio = () => {
             [name]: value
         }));
     };
+    const handleChangePerfilDireccion = (e: boolean) => {
+        console.log(e)
+        setUsuarioDetalle(prev => ({
+            ...prev,
+            ["mostrarDireccion"]: e
+        }));
+    };
+    
     const changeMenu = (a: number) => {
         window.scrollTo(0, 0);
         setAlerta({ tipo: 1, mensaje: "" })
@@ -2281,7 +2290,7 @@ const Condominio = () => {
                                     onClick={() => setBuscarEnMenu(true)}
                                     aria-label="Buscar"
                                 >
-                                   <img src={iconBuscar}/>
+                                    <img src={iconBuscar} />
                                 </button>
                                 :
                                 <nav className="bottom-nav" style={{ height: '155px' }}>
@@ -2437,6 +2446,7 @@ const Condominio = () => {
                                 <PerfilUsuario
                                     usuario={usuarioDetalle}
                                     onChange={handleChangePerfil}
+                                    onChangedireccion={handleChangePerfilDireccion}
                                     onCancelar={() => setEditarPerfil(false)}
                                     loading={loading}
                                     onGuardar={(archivo: any) => {

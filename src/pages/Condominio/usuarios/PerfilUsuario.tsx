@@ -15,6 +15,7 @@ interface UsuarioDetalle {
     tieneSuscripcionAvisos: boolean;
     tieneSuscripcionEspacioComun: boolean;
     rol: string;
+    mostrarDireccion: boolean;
 }
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
     onCancelar: () => void;
     onChangeCreateSub: (tiene: any, id: any, ev: any) => void;
     loading?: boolean;
+    onChangedireccion: (e: boolean) => void
 }
 
 const PerfilUsuario: React.FC<Props> = ({
@@ -33,6 +35,7 @@ const PerfilUsuario: React.FC<Props> = ({
     onCancelar,
     onChangeCreateSub,
     loading = false,
+    onChangedireccion
 }) => {
     const [preview, setPreview] = useState<string>("");
     const [editarPerfil, setEditarPerfil] = useState(false)
@@ -119,7 +122,7 @@ const PerfilUsuario: React.FC<Props> = ({
                                 disabled
                             />
                             <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
-                                Dirección
+                                Depto./Casa
                             </label>
                             <input
                                 type="text"
@@ -128,6 +131,18 @@ const PerfilUsuario: React.FC<Props> = ({
                                 value={usuario.direccion}
                                 onChange={onChange}
                             />
+                            {/* <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
+                                Visible Depto./Casa
+                            </label> */}
+                            <div className="container-dataPerfil">
+                                <button type="button" name='mostrarDireccion' className="submenu-item" onClick={(e: any) => {
+                                    e.preventDefault(); onChangedireccion(!usuario.mostrarDireccion)
+                                }}>
+                                    Mostrar Depto./casa
+                                    {iconNotificaciones(usuario.mostrarDireccion)}
+                                </button>
+                            </div>
+
                             <label htmlFor="textfield" className="search-label-admin">
                                 Teléfono
                             </label>
@@ -191,7 +206,7 @@ const PerfilUsuario: React.FC<Props> = ({
                                     {usuario.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.rol}</span>}
                                 </div>
                                 <div className="container-dataPerfil">
-                                    <span>Dirección</span>
+                                    <span>Depto./casa{usuario.mostrarDireccion ? "(visible)" : "(Oculto)"}</span>
                                     {usuario.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                 </div>
                                 <div className="container-dataPerfil">
