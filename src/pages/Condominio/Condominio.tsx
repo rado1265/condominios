@@ -2285,7 +2285,7 @@ const Condominio = () => {
                                 </button>
                                 :
                                 <nav className="bottom-nav" style={{ height: '155px' }}>
-                                    <img src={iconClose} style={{ position: 'absolute', top: '7px', right: '7px' }} onClick={noFiltrar} />
+                                    <img src={iconClose} style={{ position: 'absolute', top: '7px', right: '7px', cursor: 'pointer' }} onClick={noFiltrar} />
                                     <div className="search-menu-container">
                                         <div className="filters">
                                             <span
