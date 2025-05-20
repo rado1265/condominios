@@ -14,6 +14,8 @@ interface Anuncio {
     cantComentarios: number;
     fechaDesde: string;
     likes: number;
+    imgOrganizador: string;
+    direccionOrganizador: string;
 }
 
 interface Props {
@@ -27,6 +29,7 @@ interface Props {
     onLike: (id: number) => void;
     imgErrorUrl: string;
     loading: boolean;
+    arrayImgUsers: any[];
 }
 
 const AnunciosPanel: React.FC<Props> = ({
@@ -39,13 +42,15 @@ const AnunciosPanel: React.FC<Props> = ({
     onVerDetalle,
     onLike,
     imgErrorUrl,
-    loading
+    loading,
+    arrayImgUsers
 }) => {
     const esPropietario = usuarioId === anuncio.idUsuario || usuarioRol === "ADMINISTRADOR";
     const [modalOpenImg, setModalOpenImg] = useState(false);
     const [imgSelect, setImgSelect] = useState("");
+    const [imgAnuncio, setImgAnuncio] = useState("");
 
-    
+
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = imgErrorUrl;
     };
@@ -59,6 +64,16 @@ const AnunciosPanel: React.FC<Props> = ({
         setModalOpenImg(false);
         setImgSelect("");
     };
+
+    useEffect(() => {
+        const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === anuncio.imgOrganizador);
+        if (matchArchivo) {
+            setImgAnuncio(matchArchivo);
+        }else if(anuncio.imgOrganizador.includes("https")){
+            setImgAnuncio(anuncio.imgOrganizador);
+        }
+    }, [])
+
 
     return <>
         {!loading && <div className="v2-anuncio card-shadow col-10 col-md-3 my-3 mx-md-1 pb-5 pt-5">
@@ -109,16 +124,16 @@ const AnunciosPanel: React.FC<Props> = ({
                 anuncio.amedida && (
                     <div className="v2-anuncio-media-wrapper">
                         {anuncio.esVideo ? (
-                            <video src={anuncio.amedida} controls/>
+                            <video src={anuncio.amedida} controls />
                         ) : (
-                            <img src={anuncio.amedida} onError={handleImageError} alt="Anuncio" onClick={()=>{openModalImg(anuncio.amedida)}} />
+                            <img src={anuncio.amedida} onError={handleImageError} alt="Anuncio" onClick={() => { openModalImg(anuncio.amedida) }} />
                         )}
                     </div>
                 )
             }
 
             <div className="v2-anuncio-footer">
-                <span>Creado por: {anuncio.organizador}</span>
+                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador} <span className={`dirUserAnuncio ml-1 ${anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "" : "d-none" }`}>{anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "(" + anuncio.direccionOrganizador + ")" : "" }</span></span>
                 <span className="v2-anuncio-telefono">{anuncio.telefono}</span>
             </div>
 

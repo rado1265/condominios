@@ -74,7 +74,6 @@ const Condominio = () => {
     const storage = getStorage(app);
     const [buscarDataFull, setBuscarDataFull] = useState("");
     const [imagenPerfil, setImagenPerfil] = useState("");
-    const [editImgPerfil, setEditImgPerfil] = useState(false);
     const [agregarUsuario, setAgregarUsuario] = useState(false);
     const [loading, setLoading] = useState(false);
     const [editarTextRich, setEditarTextRich] = useState(false);
@@ -82,7 +81,6 @@ const Condominio = () => {
     const [newTextRich, setNewTextRich] = useState("");
     const [textRichEditado, setTextRichEditado] = useState(false);
     const [verDetalleAvisos, setVerDetalleAvisos] = useState(false);
-    const [colorAviso, setColorAviso] = useState("");
     const [tipoSubir, setTipoSubir] = useState(0);
     const [dataCondominios, setDataCondominios] = useState([]);
     const [dataArchivosComunidad, setDataArchivosComunidad] = useState([{ nombre: "test", url: "test" }]);
@@ -141,6 +139,7 @@ const Condominio = () => {
     });
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
+    const [arrayImgUsers, setArrayImgUsers] = useState([{nombre: "", url: ""}]);
     const [loguear, setLoguear] = useState({
         usuario: "",
         clave: "",
@@ -167,7 +166,7 @@ const Condominio = () => {
     const [encuesta, setEncuesta] = useState(false)
     const [menuOpciones, setMenuOpciones] = useState(false)
     const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
-    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false })
+    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false, imgOrganizador: "" })
     const [verDetalle, setVerDetalle] = useState(false)
     const menuRef = useRef(null);
     const [nombreComunidad, setNombreComunidad] = useState("")
@@ -312,56 +311,6 @@ const Condominio = () => {
 
     const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
 
-    const handleImage = (files: any) => {
-        if (files.target.files.length === 0) return;
-        const file = files.target.files[0];
-
-        document.getElementById('containerViewImg')?.classList.remove("d-none");
-
-        const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
-        if (img) {
-            img.src = URL.createObjectURL(files.target.files[0]);
-        }
-
-        const reader = new FileReader();
-
-        reader.onloadend = async () => {
-            if (!reader.result || typeof reader.result !== 'string') {
-                return;
-            }
-
-            const base64 = reader.result.split(',')[1];
-
-            const body = {
-                requests: [
-                    {
-                        image: { content: base64 },
-                        features: [{ type: 'SAFE_SEARCH_DETECTION' }],
-                    },
-                ],
-            };
-
-            try {
-                const response = await axios.post(
-                    `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`,
-                    body
-                );
-                const safeSearch = response.data.responses[0].safeSearchAnnotation;
-                if (safeSearch.adult === "VERY_LIKELY" || safeSearch.adult === 'LIKELY') {
-                    toast.error('La imagen contiene posiblemente contenido para adultos. Se enviará a su revisión', {
-                        position: posicionAlertas,
-                    });
-                }
-            } catch (err) {
-
-            } finally {
-
-            }
-        };
-
-        reader.readAsDataURL(file);
-    };
-
     const obtenerArchivosComunidad = async (idCondominio: string) => {
         const folderRef = ref(storage, `comunidad-${idCondominio}/`);
         try {
@@ -392,6 +341,26 @@ const Condominio = () => {
                     return { nombre: nombreArchivo, url: url };
                 })
             );
+            return arrayArchivos;
+        } catch (error) {
+            console.error("Error al listar archivos:", error);
+            return [];
+        }
+    };
+
+    const obtenerImgenesPerfil = async () => {
+        console.log("Entra");
+        const folderRef = ref(storage, `perfiles/`);
+        try {
+            const res = await listAll(folderRef);
+            const arrayArchivos = await Promise.all(
+                res.items.map(async (itemRef) => {
+                    const nombreArchivo = itemRef.name;
+                    const url = await getDownloadURL(itemRef);
+                    return { nombre: nombreArchivo, url: url };
+                })
+            );
+            setArrayImgUsers(arrayArchivos);
             return arrayArchivos;
         } catch (error) {
             console.error("Error al listar archivos:", error);
@@ -734,7 +703,8 @@ const Condominio = () => {
                 setLoading(true)
                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                 /*FIN SE ABRE CALENDARIO COMO PRINCIPAL*/
-            }
+                obtenerImgenesPerfil();
+            } 
             else {
                 toast.info('Credenciales incorrectas', {
                     position: posicionAlertas,
@@ -897,7 +867,6 @@ const Condominio = () => {
                 setEditarAvisos(false);
                 setMensajeAviso('');
                 setFechaAviso('');
-                setColorAviso("");
                 setHoraAviso(new Date().toLocaleTimeString());
                 setIdAviso(0);
                 toast.success('Aviso ' + (err ? 'eliminado' : 'creado') + ' correctamente', {
@@ -1414,43 +1383,6 @@ const Condominio = () => {
         }
     }
 
-    const handleImageChange = (e: any) => {
-        const file = e.target.files[0];
-
-        if (!file) return;
-
-        document.getElementById('containerViewImg')?.classList.remove("d-none");
-
-        const img = document.getElementById('visualizadorImg') as HTMLImageElement | null;
-        if (img) {
-            img.src = URL.createObjectURL(file);
-            /*setAnuncio(prev => ({
-                ...prev,
-                // eslint-disable-next-line
-                ["amedida"]: 'img-' + file.name
-            }));*/
-        }
-    };
-
-    const handleImagePerfilChange = (e: any) => {
-        const file = e.target.files[0];
-
-        if (!file) return;
-
-        document.getElementById('userDetallePerfil')?.classList.remove("d-none");
-        document.getElementById('userDetallePerfilSVG')?.classList.add("d-none");
-
-        const img = document.getElementById('userDetallePerfil') as HTMLImageElement | null;
-        if (img) {
-            img.src = URL.createObjectURL(file);
-            /*setUsuarioDetalle(prev => ({
-                ...prev,
-                // eslint-disable-next-line
-                ["imagen"]: 'img-' + file.name
-            }));*/
-        }
-    };
-
     /*  document.addEventListener('visibilitychange', () => {
          if (document.visibilityState === 'visible' && tipo < 3) {
              setLoading(true);
@@ -1673,7 +1605,7 @@ const Condominio = () => {
                         });
 
                 } else {
-                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(newData.amedida.fullPath)
+                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(newData.amedida)
                     newData.esVideo = esVideo;
                     setDataDetalle(newData);
                     setLoading(false);
@@ -2491,6 +2423,7 @@ const Condominio = () => {
                                     comentario={newComentario}
                                     onChangeComentario={changeComentario}
                                     user={usuario}
+                                    arrayImgUsers={arrayImgUsers}
                                     onComentar={() => {
                                         if (newComentario.trim()) {
                                             CrearComentarioAnuncioLogic(selcrearComentarioAnuncio, {
@@ -2513,7 +2446,7 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            verMisAnuncios &&
+                            (verMisAnuncios && !verDetalle) &&
                             <>
                                 <h2 className="col-12 text-center mt-4">MIS PUBLICACIONES</h2>
                                 {misAnuncios !== null && ordenarListado(misAnuncios).map((a: any, i: any) => (
@@ -2522,6 +2455,7 @@ const Condominio = () => {
                                         anuncio={a}
                                         usuarioId={usuario.id}
                                         usuarioRol={usuario.rol}
+                                        arrayImgUsers={arrayImgUsers}
                                         onEditar={cargarAnuncioParaEdit}
                                         onEliminar={EliminarAnuncio}
                                         onDeshabilitar={DeshabilitarAnuncio}
@@ -2547,6 +2481,7 @@ const Condominio = () => {
                                             anuncio={a}
                                             usuarioId={usuario.id}
                                             usuarioRol={usuario.rol}
+                                            arrayImgUsers={arrayImgUsers}
                                             onEditar={cargarAnuncioParaEdit}
                                             onEliminar={EliminarAnuncio}
                                             onDeshabilitar={DeshabilitarAnuncio}

@@ -76,11 +76,11 @@ const PerfilUsuario: React.FC<Props> = ({
     }
 
     return (
-        <form onSubmit={(e) => { e.preventDefault(); onGuardar(archivoTemp); setEditarPerfil(false); }} className="perfil-form mt-md-5">
+        <form onSubmit={(e) => { e.preventDefault(); onGuardar(archivoTemp); setEditarPerfil(false); }} className="perfil-form mt-md-5 col-12">
             {
                 editarPerfil ?
                     <>
-                        <div className="login-box py-3 w-100">
+                        <div className="login-box py-3 px-md-5 col-12 col-md-8 mx-auto shadow rounded">
 
                             <div style={{ justifySelf: 'center' }}>
                                 <img

@@ -1978,6 +1978,12 @@ a:hover {
   display: contents;
 }
 
+.dirUserAnuncio {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 600px) {
   .icon-deleteComentario {
     right: 40px;
@@ -1993,9 +1999,17 @@ a:hover {
   .container-reserva>button {
     margin-top: 5px;
   }
+
+  .dirUserAnuncio {
+    max-width: 150px;
+  }
 }
 
 @media (min-width: 600px) {
+  .dirUserAnuncio {
+    max-width: 100px;
+  }
+
   .calendario {
     height: 50vh;
   }
@@ -2051,4 +2065,11 @@ a:hover {
   overflow-y: scroll;
   scrollbar-width: thin;
   overflow-x: hidden;*/
+}
+
+.imgUserAnuncio {
+  width: 20px;
+  height: 20px;
+  border-radius: 15px;
+  border: 1px solid var(--colorSecundario);
 }

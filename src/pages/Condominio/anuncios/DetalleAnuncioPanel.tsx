@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler } from 'react';
+import React, { ChangeEventHandler, useEffect, useState } from 'react';
 import iconborrar from './../../../components/utils/img/iconborrar.png'
 interface Comentario {
     id: number;
@@ -19,6 +19,7 @@ interface AnuncioDetalle {
     comentarios: Comentario[];
     fechaDesde: Date;
     fechaHasta: Date;
+    imgOrganizador: string;
 }
 
 interface Props {
@@ -31,7 +32,8 @@ interface Props {
     loading?: boolean;
     imgError: string;
     user: any;
-    onEliminar: (id: number) => void
+    onEliminar: (id: number) => void;
+    arrayImgUsers: any[];
 }
 
 const DetalleAnuncioPanel: React.FC<Props> = ({
@@ -44,15 +46,39 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     loading = false,
     imgError,
     user,
-    onEliminar
+    onEliminar,
+    arrayImgUsers
 }) => {
+    const [imgAnuncio, setImgAnuncio] = useState("");
+
+    useEffect(() => {
+        console.log(anuncio);
+        const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === anuncio.imgOrganizador);
+        if (matchArchivo) {
+            setImgAnuncio(matchArchivo);
+        } else if (anuncio.imgOrganizador.includes("https")) {
+            setImgAnuncio(anuncio.imgOrganizador);
+        }
+
+        if (anuncio.comentarios) {
+            anuncio.comentarios.map((a: any) => {
+                const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === a.imgUsuario);
+                if (matchArchivo) {
+                    a.imgUsuario = matchArchivo;
+                }
+            })
+        }
+    }, [])
+
+
+
     return <>{!loading &&
         <div className="mx-3">
             <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{anuncio.cabecera}</h4>
             <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: anuncio.descripcion }} />
             <div className="anuncio-footer">
                 <div className="anuncio-organizador">
-                    <span>Creado por: </span>
+                    <img className="imgUserAnuncio shadow" src={imgAnuncio} />
                     <span className="ml-1">{anuncio.organizador}</span>
                 </div>
                 <span className="anuncio-telefono">{anuncio.telefono}</span>
@@ -97,7 +123,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                             </button>
                         )}
                         <div className="comment-header">
-                            <span className="comment-author">{j.nombreUsuario}</span>
+                            <span className="comment-author"><img className="imgUserAnuncio shadow mr-1" src={j.imgUsuario} />{j.nombreUsuario}</span>
                             <div>
                                 <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
                                 <span className="comment-date ml-2">{new Date(j.fecha).toLocaleTimeString().split(":").slice(0, 2).join(":")}</span>
