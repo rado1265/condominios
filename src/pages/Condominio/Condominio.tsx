@@ -3,14 +3,11 @@ import Loading from "../../components/utils/loading";
 import './Condominio.css';
 import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage } from "../../components/utils/messages";
-import actualizar from './../../components/utils/img/actualizar-flecha.png';
-import menuicon from './../../components/utils/img/menuicon.png';
 import volver from './../../components/utils/img/volver.png';
 import axios from 'axios';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
-import filtro from './../../components/utils/img/flechas-arriba-y-abajo.png';
 import AnunciosPanel from "./anuncios/AnunciosPanel";
 import AnunciosCrear from "./anuncios/AnunciosCrear";
 import Login from "./login/Login";
@@ -28,6 +25,8 @@ import iconeditar from './../../components/utils/img/editar.png';
 import HuinchaSuperior from "../HuinchaSuperior/HuinchaSuperior";
 import CryptoJS from "crypto-js";
 import EspacioComun from "./espacioComun/EspacioComun";
+import iconClose from '../../components/utils/img/menuInferior/close.png';
+import iconBuscar from '../../components/utils/img/menuInferior/buscar-select.png';
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -139,6 +138,8 @@ const Condominio = () => {
         imagen: '',
         clave: ''
     });
+    const [activeFilter, setActiveFilter] = useState("fechaDesde");
+    const [buscarenmenu, setBuscarEnMenu] = useState(false);
     const [loguear, setLoguear] = useState({
         usuario: "",
         clave: "",
@@ -225,25 +226,20 @@ const Condominio = () => {
         idCondominio: 0
     })
     const [verEspacioComun, setVerEspacioComun] = useState(false)
-    const [modalOpenImg, setModalOpenImg] = useState(false);
-    const [imgSelect, setImgSelect] = useState("");
     const [serviceWorker, setServiceWorker] = useState({})
     const [estadoServiceWorker, setEstadoServiceWorker] = useState('aun nada')
-    const openModalImg = (img: any) => {
-        setImgSelect(img);
-        setModalOpenImg(true);
-    }
-
-    const closeModalImg = () => {
-        setModalOpenImg(false);
-        setImgSelect("");
-    };
 
 
     function formatToLocalISOString(date: Date) {
         const pad = (n: number) => n.toString().padStart(2, '0');
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T00:00:00`;
     }
+
+    const filters = [
+        { label: "Fecha", key: "fechaDesde" },
+        { label: "Likes", key: "likes" },
+        { label: "Comentarios", key: "cantComentarios" }
+    ];
 
 
     const [alignment, setAlignment] = useState("Todo");
@@ -686,7 +682,6 @@ const Condominio = () => {
                     }
                     cargarDatos();
                 }
-                console.log(data);
                 registerPush();
                 setUsuario(data);
                 setTipo(4)
@@ -1324,13 +1319,13 @@ const Condominio = () => {
                 cerrarMenu();
                 changeMenu(999);
                 setVerEspacioComun(true);
-                if(usuario.rol === "ADMINISTRADOR"){
+                if (usuario.rol === "ADMINISTRADOR") {
                     ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
                 }
                 break;
             default:
 
-            break;
+                break;
         }
     }
 
@@ -1763,6 +1758,11 @@ const Condominio = () => {
         setBuscarDataFull(ev.target.value);
     }
 
+    const noFiltrar = () => {
+        setDataFullParse(dataFull);
+        setBuscarEnMenu(false);
+    }
+
 
     const panelUsuarios = () => {
         return <>
@@ -2108,6 +2108,7 @@ const Condominio = () => {
         setOpenCrear(false);
         setEncuesta(false);
         setVerEspacioComun(false);
+        noFiltrar();
     }
 
     const selSuscribir2 = (error: Boolean, err: string, data: any) => {
@@ -2255,27 +2256,79 @@ const Condominio = () => {
                 {(alerta.mensaje !== "" && !alertaCerrada) && mensajeSuperior()}
                 {
                     (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle && !encuesta) && (
-                        <div
-                            role="group"
-                            aria-label="Platform"
-                            className="btn-group-toggle-custom d-flex justify-content-center"
-                        >
-                            {["Todo", "Anuncios", "Ventas", "Reclamos"].map((platform) => (
+                        <>
+                            <div
+                                role="group"
+                                aria-label="Platform"
+                                className="btn-group-toggle-custom d-flex justify-content-center"
+                            >
+                                {["Todo", "Anuncios", "Ventas", "Reclamos"].map((platform) => (
+                                    <button
+                                        key={platform}
+                                        type="button"
+                                        className={`btn btn-toggle ${alignment === platform ? "active" : ""
+                                            }`}
+                                        aria-pressed={alignment === platform}
+                                        onClick={() => handleChange(platform)}
+                                    >
+                                        {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                    </button>
+                                ))}
+                            </div>
+                            {!buscarenmenu ?
                                 <button
-                                    key={platform}
-                                    type="button"
-                                    className={`btn btn-toggle ${alignment === platform ? "active" : ""
-                                        }`}
-                                    aria-pressed={alignment === platform}
-                                    onClick={() => handleChange(platform)}
+                                    className={`nav-button shadow iconbuscarAnuncios`}
+                                    onClick={() => setBuscarEnMenu(true)}
+                                    aria-label="Buscar"
                                 >
-                                    {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                   <img src={iconBuscar}/>
                                 </button>
-                            ))}
-                        </div>
+                                :
+                                <nav className="bottom-nav" style={{ height: '155px' }}>
+                                    <img src={iconClose} style={{ position: 'absolute', top: '7px', right: '7px' }} onClick={noFiltrar} />
+                                    <div className="search-menu-container">
+                                        <div className="filters">
+                                            <span
+                                                key={1}
+                                                className={`filter`}
+                                            >
+                                                Ordenar por:
+                                            </span>
+                                            {filters.map((f) => (
+                                                <span
+                                                    key={f.key}
+                                                    className={`filter${activeFilter === f.key ? " active" : ""}`}
+                                                    onClick={() => { handleChangeCriterio(f.key); setActiveFilter(f.key) }}
+                                                >
+                                                    {f.label}
+                                                </span>
+                                            ))}
+                                            <button
+                                                onClick={() => { handleChangeOrden(orden === 'asc' ? 'desc' : 'asc') }}
+                                                className="iconoFiltro" title="Cambiar orden">
+                                                <img width={20} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAACxAAAAsQHGLUmNAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAJNJREFUSIntlEEKwyAQRR+9Qwd6/zO0WYZ2W7tJCzlOssgIQ8DWxnGlHz4K6n8i+KF1CRDU4h1+BiZgUc/ApVa4K0SAtwbG0c4/ZD7XXb3XywSKAVhwyAHEg3tdgae5pd0nuvYoAfy175RDKlEHdIAvYCDdisL2g28lsMCxChjVP+VWYt9UtYZTENfwqNiKtjUb1QonJEYB7NA3+gAAAABJRU5ErkJggg==" />
+                                            </button>
+                                        </div>
+                                        <div className="search-bar">
+                                            <span className="search-icon">
+                                                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                                    <circle cx="11" cy="11" r="7" stroke="#222" strokeWidth="2" />
+                                                    <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="#222" strokeWidth="2" strokeLinecap="round" />
+                                                </svg>
+                                            </span>
+                                            <input
+                                                type="text"
+                                                placeholder="Buscar por título o creador"
+                                                onChange={filtrarDataFull}
+                                            />
+                                        </div>
+                                    </div>
+                                </nav>
+                            }
+                        </>
                     )}
-                <div className="container pb-5 mb-5">
-                    <div className="row px-2 justify-content-around">
+                <div className={`container pb-5 mb-5`}>
+                    <div className={`row px-2 justify-content-around ${buscarenmenu ? "mb-5" : ""}`}>
                         {
                             (dataCondominios.length > 1 && !enComunidad) &&
                             <>
@@ -2503,23 +2556,9 @@ const Condominio = () => {
                     </div>
                     {
                         verEspacioComun &&
-                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} listadoUsuarios={listadousuarios}/>
+                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} listadoUsuarios={listadousuarios} />
                     }
                 </div>
-                {/*modalOpenImg && (
-                    <div className="modal-overlay" onClick={closeModalImg}>
-                        <div className="modal-content" onClick={e => e.stopPropagation()}>
-                            <button className="close-btn" onClick={closeModalImg}>&times;</button>
-                            <img src={imgSelect ?? ""}
-                                onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.onerror = null;
-                                    target.src = imgError;
-                                }}
-                                alt="Imagen Ampliada" />
-                        </div>
-                    </div>
-                )*/}
                 <ToastContainer />
                 {enComunidad && navegador()}
             </div>

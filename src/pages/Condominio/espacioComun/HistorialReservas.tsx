@@ -62,7 +62,7 @@ export default function HistorialReservas(props: any) {
             {reservas.map((r) => (
               <li key={r.id} className="shadow px-4 py-3 pb-5 pb-md-3 rounded container-reserva">
                 <strong>{r.espacioComun} {r.espacio} #{r.unidad} </strong><br></br>
-                {r.usuario} ({r.direccion})<br></br>
+                {r.usuario} {r.direccion ? "(" + r.direccion + ")" : ""}<br></br>
                 {new Date(r.fechaInicio).toLocaleString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',

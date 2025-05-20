@@ -39,7 +39,6 @@ export default function CrearEspacio(props: any) {
   };
 
   useEffect(() => {
-    console.log(props)
     if (props.espacio != null && Object.keys(props.espacio).length > 0)
       setForm({
         nombre: props.espacio.nombre,

@@ -11,7 +11,6 @@ export interface UnidadDisponible {
   numero: number;
 }
 export default function ListaEspaciosDisponibles(props: any) {
-  console.log(props)
   const [espacios, setEspacios] = useState<EspacioComun[]>([]);
   const [seleccionado, setSeleccionado] = useState<number | null>(null);
   const [fecha, setFecha] = useState("");

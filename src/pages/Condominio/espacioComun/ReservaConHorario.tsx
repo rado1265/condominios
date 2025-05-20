@@ -166,7 +166,7 @@ export default function ReservaConHorario(props: any) {
             </li>
           })}
 
-          {(unidadesDisponibles.length == 0 && verDisp) && (
+          {(unidadesDisponibles.length === 0 && verDisp) && (
             <span>No hay disponibilidad para el rango seleccionado</span>
           )}
         </ul>

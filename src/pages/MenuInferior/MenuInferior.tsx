@@ -24,6 +24,7 @@ import emergency from '../../components/utils/img/menuInferior/emergency.png';
 import emergencySelect from '../../components/utils/img/menuInferior/emergency-select.png';
 import close from '../../components/utils/img/menuInferior/close.png';
 import EspacioComun from '../../components/utils/img/menuInferior/comunes.png';
+import EspacioComunSelect from '../../components/utils/img/menuInferior/comunesSelect.png';
 interface Props {
     active: string;
     orden: string;
@@ -35,94 +36,90 @@ interface Props {
 
 const icons = {
     close: (
-        <img width={25} src={close} />
+        <img width={25} src={close} alt='Icono Cerrar' />
     ),
     emergency: (
-        <img width={25} src={emergency} />
+        <img width={25} src={emergency}  alt='Icono Números de emergencia'/>
     ),
     emergencySelect: (
-        <img width={25} src={emergencySelect} />
+        <img width={25} src={emergencySelect}  alt='Icono Números de emergencia Seleccionado'/>
     ),
     rules: (
-        <img width={25} src={rules} />
+        <img width={25} src={rules} alt='Icono Reglas y Normas'/>
     ),
     rulesSelect: (
-        <img width={25} src={rulesSelect} />
+        <img width={25} src={rulesSelect} alt='Icono Reglas y Normas Seleccionado'/>
     ),
     notificaciones: (
-        <img width={25} src={notificaciones} />
+        <img width={25} src={notificaciones} alt='Icono Notificaciones'/>
     ),
     comunidad: (
-        <img width={25} src={comunidad} />
+        <img width={25} src={comunidad} alt='Icono Comunidad'/>
     ),
     comunidadSelect: (
-        <img width={25} src={comunidadSelect} />
+        <img width={25} src={comunidadSelect} alt='Icono Comunidad Seleccionado'/>
     ),
     mispublicaciones: (
-        <img width={25} src={mispublicaciones} />
+        <img width={25} src={mispublicaciones} alt='Icono Mis Publicaciones'/>
     ),
     mispublicacionesSelect: (
-        <img width={25} src={mispublicacionesSelect} />
+        <img width={25} src={mispublicacionesSelect} alt='Icono Mis Publicaciones Seleccionado'/>
     ),
     perfil: (
-        <img width={25} src={perfil} />
+        <img width={25} src={perfil} alt='Icono Mis Perfil'/>
     ),
     perfilSelect: (
-        <img width={25} src={perfilSelect} />
+        <img width={25} src={perfilSelect} alt='Icono Mis Perfil Seleccionado'/>
     ),
     buscar: (
-        <img width={25} src={buscar} />
+        <img width={25} src={buscar} alt='Icono Buscar'/>
     ),
     buscarSelect: (
-        <img width={25} src={buscarSelect} />
+        <img width={25} src={buscarSelect} alt='Icono Buscar Seleccionado'/>
     ),
     calendario: (
-        <img width={25} src={calendario} />
+        <img width={25} src={calendario} alt='Icono Calendario'/>
     ),
     calendarioSelect: (
-        <img width={25} src={calendarioSelect} />
+        <img width={25} src={calendarioSelect} alt='Icono Calendario Seleccionado'/>
     ),
     anuncios: (
-        <img width={30} src={anuncio} />
+        <img width={30} src={anuncio} alt='Icono Anuncios'/>
     ),
     anunciosSelect: (
-        <img width={30} src={anuncioSelect} />
+        <img width={30} src={anuncioSelect} alt='Icono Anuncios Seleccionado'/>
     ),
     crear: (
-        <img width={25} src={iconMore} />
+        <img width={25} src={iconMore} alt='Icono Crear'/>
     ),
     votaciones: (
-        <img width={25} src={votaciones} />
+        <img width={25} src={votaciones} alt='Icono Votaciones'/>
     ),
     votacionesSelect: (
-        <img width={25} src={votacionesSelect} />
+        <img width={25} src={votacionesSelect} alt='Icono Votaciones Seleccionado'/>
     ),
     more: (
-        <img width={25} src={more} />
+        <img width={25} src={more} alt='Icono Más'/>
     ),
     moreSelect: (
-        <img id="moreSelect" width={25} src={moreSelect} />
+        <img id="moreSelect" width={25} src={moreSelect} alt='Icono Más Seleccionado'/>
     ),
     anuncioOption: (
-        <img width={25} src={anuncio} />
+        <img width={25} src={anuncio} alt='Icono Opciones Anuncio'/>
     ),
     votacionOption: (
-        <img width={25} src={votaciones} />
+        <img width={25} src={votaciones} alt='Icono Opciones Votacion'/>
     ),
     EspacioComun: (
-        <img width={25} src={EspacioComun} />
+        <img width={27} src={EspacioComun} alt='Icono Espacios Comunes'/>
+    ),
+    EspacioComunSelect: (
+        <img width={27} src={EspacioComunSelect} alt='Icono Espacios Comunes Seleccionado'/>
     ),
 };
 
-const filters = [
-    { label: "Fecha", key: "fechaDesde" },
-    { label: "Likes", key: "likes" },
-    { label: "Comentarios", key: "cantComentarios" }
-];
-
 const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCriterio, onFiltrarDataFull, onChangeOrden }) => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [buscarenmenu, setBuscarEnMenu] = useState(false);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -153,70 +150,16 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
         setMenuOpen(false);
     }, [onChangeMenu])
 
-    const [activeFilter, setActiveFilter] = useState("fechaDesde");
-
     return (
         <>
-            {buscarenmenu ?
-                <nav className="bottom-nav" style={{ height: '155px' }}>
-                    <img src={close} style={{ position: 'absolute', top: '7px', right: '7px' }} onClick={() => setBuscarEnMenu(false)} />
-                    <div className="search-menu-container">
-                        <div className="filters">
-                            <span
-                                key={1}
-                                className={`filter`}
-                            >
-                                Ordenar por:
-                            </span>
-                            {filters.map((f) => (
-                                <span
-                                    key={f.key}
-                                    className={`filter${activeFilter === f.key ? " active" : ""}`}
-                                    onClick={() => { onChangeCriterio(f.key); setActiveFilter(f.key) }}
-                                >
-                                    {f.label}
-                                </span>
-                            ))}
-                            <button
-                                onClick={() => { onChangeOrden(orden === 'asc' ? 'desc' : 'asc') }}
-                                className="iconoFiltro" title="Cambiar orden">
-                                <img width={20} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAACxAAAAsQHGLUmNAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAJNJREFUSIntlEEKwyAQRR+9Qwd6/zO0WYZ2W7tJCzlOssgIQ8DWxnGlHz4K6n8i+KF1CRDU4h1+BiZgUc/ApVa4K0SAtwbG0c4/ZD7XXb3XywSKAVhwyAHEg3tdgae5pd0nuvYoAfy175RDKlEHdIAvYCDdisL2g28lsMCxChjVP+VWYt9UtYZTENfwqNiKtjUb1QonJEYB7NA3+gAAAABJRU5ErkJggg==" />
-                            </button>
-                        </div>
-                        <div className="search-bar">
-                            <span className="search-icon">
-                                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                                    <circle cx="11" cy="11" r="7" stroke="#222" strokeWidth="2" />
-                                    <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="#222" strokeWidth="2" strokeLinecap="round" />
-                                </svg>
-                            </span>
-                            <input
-                                type="text"
-                                placeholder="Buscar por título o creador"
-                                onChange={onFiltrarDataFull}
-                            />
-                        </div>
-                    </div>
-                </nav>
-                :
                 <nav className="bottom-nav">
-                    {active === "anuncios" || active === "mispublicaciones" ?
-                        <button
-                            className={`nav-button`}
-                            onClick={() => setBuscarEnMenu(true)}
-                            aria-label="Buscar"
-                        >
-                            {icons.buscar}
-                        </button>
-                        :
-                        <button
-                            className={`nav-button ${active === 'buscar' ? 'active' : ''}`}
-                            onClick={() => setBuscarEnMenu(true)}
-                            aria-label="Buscar"
-                        >
-                            {active === 'buscar' ? icons.buscarSelect : icons.buscar}
-                        </button>
-                    }
+                    <button
+                        className={`nav-button ${active === 'espacioComun' ? 'active' : ''}`}
+                        onClick={() => onChangeMenu('espacioComun')}
+                        aria-label="Espacio Comun"
+                    >
+                        {active === 'espacioComun' ? icons.EspacioComunSelect : icons.EspacioComun}
+                    </button>
                     <button
                         className={`nav-button ${active === 'calendario' ? 'active' : ''}`}
                         onClick={() => onChangeMenu('calendario')}
@@ -238,14 +181,6 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                         <div className={`${menuOpen ? 'visual' : ''} container-submenu`}>
                             <div className={`create-dropdown ${menuOpen ? 'show' : ''} fullContainerOpciones shadow`}>
                                 <div className='filaOpciones'>
-                                    {/*<button
-                                        className={`nav-button container-Opcion`}
-                                        onClick={() => onChangeMenu('perfil')}
-                                        aria-label="Mi Perfil"
-                                    >
-                                        {icons.perfilSelect}
-                                        <span className='txtOpcion'>Mi<br></br>Perfil</span>
-                                    </button>*/}
                                     <button
                                         className={`nav-button container-Opcion`}
                                         onClick={() => onChangeMenu('mispublicaciones')}
@@ -277,14 +212,6 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                                     >
                                         {icons.votacionesSelect}
                                         <span className='txtOpcion'>Crear <br></br>Votación</span>
-                                    </button>
-                                    <button
-                                        className={`nav-button container-Opcion`}
-                                        onClick={() => onChangeMenu('espacioComun')}
-                                        aria-label="Espacio Comun"
-                                    >
-                                        {icons.EspacioComun}
-                                        <span className='txtOpcion'>Espacio <br></br>Común</span>
                                     </button>
                                     <button
                                         className={`nav-button container-Opcion`}
@@ -322,7 +249,6 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                         {active === 'votaciones' ? icons.votacionesSelect : icons.votaciones}
                     </button>
                 </nav>
-            }
         </>
     );
 };

@@ -299,7 +299,7 @@ const AvisoPanel: React.FC<Props> = ({
                             </div>
                         </div>);
                 })}
-                {avisosParse?.length == 0 && (
+                {avisosParse?.length === 0 && (
                     <div className='sinEventos'>
                         <span>Sin eventos para este día</span>
                     </div>

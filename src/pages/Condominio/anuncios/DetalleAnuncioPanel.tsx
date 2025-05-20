@@ -90,8 +90,8 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
             <div className="comments-container">
                 <h2 className="comments-title">Comentarios</h2>
                 {anuncio.comentarios ? anuncio.comentarios.map((j: any) => {
-                    return <div key={j.id} className={`comment-box shadow ${j.idUsuario == user.id || user.rol == "ADMINISTRADOR" ? "pt-4" : ""}`}>
-                        {(j.idUsuario == user.id || user.rol == "ADMINISTRADOR") && (
+                    return <div key={j.id} className={`comment-box shadow ${j.idUsuario === user.id || user.rol === "ADMINISTRADOR" ? "pt-4" : ""}`}>
+                        {(j.idUsuario === user.id || user.rol === "ADMINISTRADOR") && (
                             <button type="button" className="iconoVolver icon-deleteComentario" onClick={() => onEliminar(j.id)}>
                                 <img width={20} height={20} src={iconborrar} />
                             </button>
