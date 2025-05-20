@@ -201,9 +201,9 @@ export const CrearAvisos = (selListado: any, aviso: string, eliminar: boolean) =
     SVCAnuncio.CrearAvisos(aviso, eliminar).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
-            selListado(false, '', data);
+            selListado(false, eliminar, data);
         } else {
-            selListado(true, 'error', []);
+            selListado(true, eliminar, []);
         }
     });
 };

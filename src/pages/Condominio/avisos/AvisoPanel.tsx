@@ -7,6 +7,7 @@ import { con } from '../../../application/entity/Rutas';
 import iconeditar from './../../../components/utils/img/editar.png'
 import iconborrar from './../../../components/utils/img/iconborrar.png'
 import iconNotificacion from './../../../components/utils/img/notificacion.png'
+import agregar from './../../../components/utils/img/plus.png'
 interface Aviso {
     id: number;
     mensaje: string;
@@ -47,12 +48,20 @@ const AvisoPanel: React.FC<Props> = ({
     const [idEdit, setIdEdit] = useState<number | null>(null);
     const [crearEvento, setCrearEvento] = useState(false);
     const [editarEvento, setEditarEvento] = useState(false);
+    const [crearTipoAviso, setCrearTipoAviso] = useState(false)
+    const [editarTipoAviso, setEditarTipoAviso] = useState(false)
     const [monthTitle, setMonthTitle] = useState('');
     const [days, setDays] = useState([]);
     const [avisosParse, setAvisosParse] = useState<Aviso[]>();
     const [diaMesSelect, setDiaMesSelect] = useState({ dia: 0, mes: 0, anio: 0 })
     let _ruta: string = con.RetornaRuta();
     const [tiposAviso, setTiposAviso] = useState([]);
+    const [tipoAviso, setTipoAviso] = useState({
+        id: 0,
+        descripcion: "",
+        color: "",
+        idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString())
+    });
     const [aviso, setAviso] = useState<Aviso>({
         id: 0,
         fecha: '',
@@ -92,6 +101,13 @@ const AvisoPanel: React.FC<Props> = ({
                 }));
             }
         }
+    };
+    const handleChangeTipoAviso = (e: any) => {
+        const { name, value } = e.target;
+        setTipoAviso(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const getObtenerAvisosDia = (dia: number, mes: number) => {
@@ -185,6 +201,15 @@ const AvisoPanel: React.FC<Props> = ({
 
     const cargar = async () => {
         const res = await axios.get(_ruta + "Condominios/getTipoAvisos?idCondominio=" + localStorage.getItem("idCondominio")!.toString(), {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+            }
+        });
+        setTiposAviso(res.data);
+    };
+    const CrearTipoAviso = async (eliminar: boolean) => {
+        const res = await axios.post(_ruta + "Condominios/createTipoAviso?eliminar" + eliminar, tipoAviso, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
@@ -291,28 +316,17 @@ const AvisoPanel: React.FC<Props> = ({
                         name='mensaje'
                         onChange={handleChange}
                     />
-                    <select id="miCombo" value={aviso.cabecera} className="typeDate" name="cabecera" onChange={handleChange}>
-                        <option key={0} value={""}>Seleccione tipo evento</option>
-                        {tiposAviso.map((a: any) => (
-                            <option key={a.id} value={a.descripcion}>{a.descripcion}</option>
-                        ))}
-                    </select>
-                    {/* <select
-                        id="colorEvento"
-                        style={{ color: colorEvento, fontWeight: 600 }}
-                        className="modal-select"
-                        name="color"
-                        value={colorEvento}
-                        onChange={(e) => handleChange(e.target.value)}
-                    >
-                        <option value="" disabled>Selecciona un color</option>
-                        <option value="#e74c3c" style={{ color: "#e74c3c", fontWeight: 700 }}>Rojo</option>
-                        <option value="#3498db" style={{ color: "#3498db", fontWeight: 700 }}>Azul</option>
-                        <option value="#f1c40f" style={{ color: "#f1c40f", fontWeight: 700 }}>Amarillo</option>
-                        <option value="#27ae60" style={{ color: "#27ae60", fontWeight: 700 }}>Verde</option>
-                        <option value="#e67e22" style={{ color: "#e67e22", fontWeight: 700 }}>Naranja</option>
-                        <option value="#9b59b6" style={{ color: "#9b59b6", fontWeight: 700 }}>Morado</option>
-                    </select> */}
+                    <div className='d-flex w-100'>
+                        <select id="miCombo" value={aviso.cabecera} className="typeDate" style={{ width: '90%' }} name="cabecera" onChange={handleChange}>
+                            <option key={0} value={""}>Seleccione tipo evento</option>
+                            {tiposAviso.map((a: any) => (
+                                <option key={a.id} value={a.descripcion}>{a.descripcion}</option>
+                            ))}
+                        </select>
+                        <button type="button" className="iconoVolver  mt-2" onClick={() => setCrearTipoAviso(true)}>
+                            <img width={20} height={20} src={agregar} />
+                        </button>
+                    </div>
                     <div className="modal-actions">
                         <button className="modal-btn modal-btn-green" onClick={() => {
                             onCrear(aviso); setAviso({
@@ -330,6 +344,52 @@ const AvisoPanel: React.FC<Props> = ({
                             Guardar
                         </button>
                         <button className="modal-btn modal-btn-close" onClick={() => { setCrearEvento(false); setEditarEvento(false) }}>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div className={`modal-overlay ${crearTipoAviso || editarTipoAviso ? "" : "d-none"}`}>
+                <div className="modal-content">
+                    <h5 className="modal-title">{crearTipoAviso ? "Crear Tipo Aviso" : "Editar Tipo Aviso"}<br /></h5>
+                    <input
+                        className="modal-input"
+                        type="text"
+                        placeholder="Escribe tu mensaje..."
+                        value={tipoAviso.descripcion}
+                        name='descripcion'
+                        onChange={handleChangeTipoAviso}
+                    />
+                    {<select
+                        id="colorEvento"
+                        style={{ color: tipoAviso.color, fontWeight: 600 }}
+                        className="modal-select"
+                        name="color"
+                        value={tipoAviso.color}
+                        onChange={handleChangeTipoAviso}
+                    >
+                        <option value="" disabled>Selecciona un color</option>
+                        <option value="#e74c3c" style={{ color: "#e74c3c", fontWeight: 700 }}>Rojo</option>
+                        <option value="#3498db" style={{ color: "#3498db", fontWeight: 700 }}>Azul</option>
+                        <option value="#f1c40f" style={{ color: "#f1c40f", fontWeight: 700 }}>Amarillo</option>
+                        <option value="#27ae60" style={{ color: "#27ae60", fontWeight: 700 }}>Verde</option>
+                        <option value="#e67e22" style={{ color: "#e67e22", fontWeight: 700 }}>Naranja</option>
+                    </select>}
+                    <div className="modal-actions">
+                        <button className="modal-btn modal-btn-green" onClick={() => {
+                            if (tipoAviso.color != "" && tipoAviso.descripcion != "") {
+                                CrearTipoAviso(false); setTipoAviso({
+                                    id: 0,
+                                    descripcion: "",
+                                    color: "",
+                                    idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString())
+                                })
+                                setCrearTipoAviso(false); setEditarTipoAviso(false)
+                            }
+                        }}>
+                            Guardar
+                        </button>
+                        <button className="modal-btn modal-btn-close" onClick={() => { setCrearTipoAviso(false); setEditarTipoAviso(false) }}>
                             Cancelar
                         </button>
                     </div>
