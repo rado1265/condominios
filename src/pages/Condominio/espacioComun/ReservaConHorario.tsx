@@ -3,7 +3,7 @@ import axios from "axios";
 import { con } from "../../../application/entity/Rutas";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale, setDefaultLocale } from  "react-datepicker";
+import { registerLocale, setDefaultLocale } from "react-datepicker";
 import { es } from 'date-fns/locale/es';
 registerLocale('es', es)
 setDefaultLocale('es')
@@ -18,6 +18,7 @@ export default function ReservaConHorario(props: any) {
   const [fechaFin, setFechaFin] = useState<Date | null>(null);
   const [unidadesDisponibles, setUnidadesDisponibles] = useState<{ id: number; numero: number }[]>([]);
   const [verDisp, setVerDisp] = useState(false);
+  const [userSelect, setUserSelect] = useState(0);
 
   useEffect(() => {
     axios.get(_ruta + "EspacioComun?idCondominio=" + localStorage.getItem("idCondominio")!.toString(), {
@@ -57,7 +58,7 @@ export default function ReservaConHorario(props: any) {
         idUnidadEspacio: unidadId,
         fechaInicio: formatToLocalISOString(new Date(fechaInicio ?? new Date())),
         fechaFin: formatToLocalISOString(new Date(fechaFin ?? new Date())),
-        idUsuario: props.usuario.id,
+        idUsuario: userSelect != 0 ? userSelect : props.usuario.id,
         idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()),
         fechaSolicitud: formatToLocalISOString(new Date()),
         estado: false
@@ -85,6 +86,23 @@ export default function ReservaConHorario(props: any) {
       <h3 className="fw-bold mb-4 text-center">
         Reservar con horario
       </h3>
+      {(props.usuario.rol === "ADMINISTRADOR") && (
+        <div className="mb-3">
+          <label className="form-label fw-semibold">Usuario</label>
+          <select
+            className="form-control"
+            value={userSelect ?? ""}
+            onChange={(e) => setUserSelect(Number(e.target.value))}
+          >
+            <option value="">Seleccione un usuario</option>
+            {props.listadoUsuarios.map((e: any) => (
+              <option key={e.id} value={e.id} title={e.nombre}>
+                {e.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="mb-3">
         <label className="form-label fw-semibold">Espacio</label>
         <select
@@ -114,7 +132,7 @@ export default function ReservaConHorario(props: any) {
             className="form-control"
           />
         </div>
-        <div className="col-12">
+        <div className="col-12 mt-3">
           <label className="form-label">Hasta</label>
           <DatePicker
             selected={fechaFin}

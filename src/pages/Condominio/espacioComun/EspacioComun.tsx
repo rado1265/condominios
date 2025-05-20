@@ -7,11 +7,13 @@ import HistorialReservas from './HistorialReservas';
 interface Props {
     onSelect: () => void;
     usuario: any;
+    listadoUsuarios: any;
 }
 
 const EspacioComun: React.FC<Props> = ({
     onSelect,
-    usuario
+    usuario,
+    listadoUsuarios
 }) => {
     const [eleccion, setEleccion] = useState("");
 
@@ -24,14 +26,14 @@ const EspacioComun: React.FC<Props> = ({
             case "verEspacio":
                 return <ListaEspacios onCancelar={() => setEleccion("")} />
             case "MisReservas":
-                return <HistorialReservas usuario={usuario} onCancelar={() => setEleccion("")} />
+                return <HistorialReservas usuario={usuario} listadoUsuarios={listadoUsuarios} onCancelar={() => setEleccion("")} />
             default: break;
         }
     }
     return eleccion === "" ? <>
-        <div className="p-4 border rounded mt-4">
+        <div className="p-4 rounded mt-5 shadow col-md-8 mx-auto">
 
-            <h3 className="font-bold text-center">Espacio Común</h3>
+            <h3 className="font-bold text-center mb-md-3">Espacio Común</h3>
 
             <div style={{ display: 'grid' }}/* className="d-grid" */>
                 {usuario.rol === "ADMINISTRADOR" && <button name="verEspacio" className="modal-btn modal-btn-green my-2" onClick={changeEleccion}>Ver Espacios Comunes</button>}

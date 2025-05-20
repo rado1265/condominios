@@ -33,7 +33,7 @@ export default function ListaEspacios(props: any) {
     <div className="p-md-4 p-2">
       <h2 className="font-bold text-xl mb-2">Espacios creados</h2>
       <ul className="space-y-2">
-        <button type="submit" className="modal-btn modal-btn-green" onClick={() => setCrearNuevo(true)}>+ Crear Nuevo</button>
+        <button type="submit" className="modal-btn modal-btn-green" onClick={() => {setCrearNuevo(true); setEspacio([])}}>+ Crear Nuevo</button>
         {espacios.map((e) => (
           <li key={e.id} className="border py-3 pl-4 rounded justify-content-space-beetween w-100">
             <button type="button" className="iconoVolver mr-4" style={{ float: 'right'}} onClick={() => { setEspacio(e); setEditar(true); }}>

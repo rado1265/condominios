@@ -1903,38 +1903,6 @@ a:hover {
   cursor: pointer;
 }
 
-@media (max-width: 600px) {
-  .icon-deleteComentario {
-    right: 40px;
-    margin-top: -20px;
-    position: absolute;
-  }
-}
-
-@media (min-width: 600px) {
-  .calendario {
-    height: 50vh;
-  }
-
-  .fecha {
-    font-weight: bold;
-    margin-bottom: 3px;
-    width: 25px;
-    height: 25px !important;
-    min-height: 14px;
-    justify-content: center;
-    display: flex;
-    margin: 0;
-    cursor: pointer;
-  }
-
-  .icon-deleteComentario {
-    margin-top: -20px;
-    float: right;
-    margin-right: -15px;
-  }
-}
-
 .reserva-container {
   background: #fff;
   border-radius: 1.5rem;
@@ -2002,17 +1970,58 @@ a:hover {
   font-size: medium;
 }
 
-.container-reserva {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
+.container-reserva>button {
+  float: right;
 }
 
 .container-reserva>strong {
   display: contents;
 }
 
-.container-reserva>button {
-  float: right;
+@media (max-width: 600px) {
+  .icon-deleteComentario {
+    right: 40px;
+    margin-top: -20px;
+    position: absolute;
+  }
+
+  .container-reserva {
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .container-reserva>button {
+    margin-top: 5px;
+  }
+}
+
+@media (min-width: 600px) {
+  .calendario {
+    height: 50vh;
+  }
+
+  .fecha {
+    font-weight: bold;
+    margin-bottom: 3px;
+    width: 25px;
+    height: 25px !important;
+    min-height: 14px;
+    justify-content: center;
+    display: flex;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .icon-deleteComentario {
+    margin-top: -20px;
+    float: right;
+    margin-right: -15px;
+  }
+
+  .container-reserva {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
 }

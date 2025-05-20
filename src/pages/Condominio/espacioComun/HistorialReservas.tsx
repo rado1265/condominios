@@ -13,6 +13,7 @@ export interface ReservaUsuario {
   fechaSolicitud: Date;
   estado: boolean;
   espacioComun: string;
+  direccion: string;
 }
 export default function HistorialReservas(props: any) {
   const [reservas, setReservas] = useState<ReservaUsuario[]>([]);
@@ -46,9 +47,9 @@ export default function HistorialReservas(props: any) {
   }, []);
 
   return (!crearNuevo) ?
-    <div className="p-4 p-md-5 rounded mt-5 shadow mx-auto col-md-8">
+    <div className="p-4 p-md-5 rounded mt-2 mt-md-5 shadow mx-auto col-md-8">
       <div className="d-flex">
-        <h3 className="font-bold">Mis Reservas</h3>
+        <h3 className="font-bold">{props.usuario.rol === "ADMINISTRADOR" ? "Ver Solicitudes" : "Mis Reservas"}</h3>
         <button type="submit" className="modal-btn modal-btn-green ml-3 btn-newReserva" onClick={() => setCrearNuevo(true)}>+ Reservar</button>
       </div>
       {!reservasCargadas ? (
@@ -59,9 +60,9 @@ export default function HistorialReservas(props: any) {
         ) : (
           <ul>
             {reservas.map((r) => (
-              <li key={r.id} className="shadow px-4 py-3 rounded container-reserva">
+              <li key={r.id} className="shadow px-4 py-3 pb-5 pb-md-3 rounded container-reserva">
                 <strong>{r.espacioComun} {r.espacio} #{r.unidad} </strong><br></br>
-                {r.usuario} <br></br>
+                {r.usuario} ({r.direccion})<br></br>
                 {new Date(r.fechaInicio).toLocaleString('es-ES', {
                   day: '2-digit',
                   month: '2-digit',
@@ -91,5 +92,5 @@ export default function HistorialReservas(props: any) {
       <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Volver</button>
     </div>
     :
-    <ReservaConHorario onCancelar={() => { setCrearNuevo(false); cargarReservas() }} usuario={props.usuario} />
+    <ReservaConHorario onCancelar={() => { setCrearNuevo(false); cargarReservas() }} usuario={props.usuario} listadoUsuarios={props.listadoUsuarios} />
 }

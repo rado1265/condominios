@@ -323,8 +323,13 @@ const AvisoPanel: React.FC<Props> = ({
                                 <option key={a.id} value={a.descripcion}>{a.descripcion}</option>
                             ))}
                         </select>
-                        <button type="button" className="iconoVolver  mt-2" onClick={() => setCrearTipoAviso(true)}>
-                            <img width={20} height={20} src={agregar} />
+                        <button title='Crear Tipo Aviso' type="button" className="iconoVolver  mt-2" aria-label='Crear Tipo Aviso' onClick={() => setCrearTipoAviso(true)}>
+                            <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
+                                <circle cx="9" cy="9" r="9" fill="#336699">
+                                </circle>
+                                <path d="M9 5v8M5 9h8" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                                </path>
+                            </svg>
                         </button>
                     </div>
                     <div className="modal-actions">
@@ -351,7 +356,7 @@ const AvisoPanel: React.FC<Props> = ({
             </div>
             <div className={`modal-overlay ${crearTipoAviso || editarTipoAviso ? "" : "d-none"}`}>
                 <div className="modal-content">
-                    <h5 className="modal-title">{crearTipoAviso ? "Crear Tipo Aviso" : "Editar Tipo Aviso"}<br /></h5>
+                    <h5 className="modal-title w-75 mx-auto">{crearTipoAviso ? "Crear nuevo tipo de aviso" : "Editar Tipo Aviso"}<br /></h5>
                     <input
                         className="modal-input"
                         type="text"

@@ -702,7 +702,7 @@ const Condominio = () => {
                             console.error(err);
                         });
 
-                } else if (data.imagen.includes("http")) {
+                } else if (data.imagen && data.imagen.includes("http")) {
                     setImagenPerfil(data.imagen);
                 } else {
                     setImagenPerfil("");
@@ -1324,10 +1324,13 @@ const Condominio = () => {
                 cerrarMenu();
                 changeMenu(999);
                 setVerEspacioComun(true);
+                if(usuario.rol === "ADMINISTRADOR"){
+                    ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
+                }
                 break;
             default:
 
-                break;
+            break;
         }
     }
 
@@ -2500,7 +2503,7 @@ const Condominio = () => {
                     </div>
                     {
                         verEspacioComun &&
-                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} />
+                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} listadoUsuarios={listadousuarios}/>
                     }
                 </div>
                 {/*modalOpenImg && (
