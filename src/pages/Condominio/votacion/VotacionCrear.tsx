@@ -60,7 +60,7 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
     };
 
     return (
-        <div key={1} className="w-100 mt-4" style={{ maxWidth: '700px', margin: '0 auto' }}>
+        <div key={1} className="col-12 mt-4">
             <div className="survey-creator-container">
                 <h2 className="creator-title">Creador de Votaciones</h2>
 
@@ -91,6 +91,7 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
                             <input
                                 id={index.toString()}
                                 type="text"
+                                className='w-100'
                                 value={option.value}
                                 onChange={(e) => handleOptionChange(option.id, e.target.value)}
                                 placeholder={`Opción ${index + 1}`}

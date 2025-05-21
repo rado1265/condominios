@@ -133,7 +133,7 @@ const AnunciosPanel: React.FC<Props> = ({
             }
 
             <div className="v2-anuncio-footer">
-                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador} <span className={`dirUserAnuncio ml-1 ${anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "" : "d-none"}`}>{anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "(" + anuncio.direccionOrganizador + ")" : ""}</span></span>
+                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador}</span>
             </div>
 
             <small className="v2-anuncio-fecha">

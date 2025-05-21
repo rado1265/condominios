@@ -8,12 +8,19 @@ import HomeDesktop from './pages/HomeDesktop/HomeDesktop';
 import { Analytics } from "@vercel/analytics/react";
 import { isMobile } from 'react-device-detect';
 import Precios from './pages/Precios/Precios';
+import { useEffect } from 'react';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 const validateMobile = false;
+
+let urlActual = window.location.href;
+
+if(!urlActual.includes("wwww.") && !urlActual.includes("localhost")){
+  window.location.href = "https://www.conexionresidencial.cl/"
+}
 
 root.render(
   <BrowserRouter>

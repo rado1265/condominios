@@ -263,17 +263,19 @@ const AvisoPanel: React.FC<Props> = ({
             <div className='col-12 col-md-5'>
                 <div className='container-title-eventosdelDia'>
                     <h5 className='title-eventosdeldia'>Eventos {diaMesSelect.dia} de {monthTitle}</h5>
-                    <button className="avisos-add" title="Agregar Evento" onClick={() => { setCrearEvento(true) }}>
-                        <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
-                            <circle cx="9" cy="9" r="9" fill="#336699" />
-                            <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
-                    </button>
+                    {usuario.rol === "ADMINISTRADOR" && (
+                        <button className="avisos-add" title="Agregar Evento" onClick={() => { setCrearEvento(true) }}>
+                            <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
+                                <circle cx="9" cy="9" r="9" fill="#336699" />
+                                <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
                 {avisosParse?.map((a: any, i: number) => {
                     return (
                         <div className='avisos-dia' key={i} style={{ borderBottom: `4px solid ${a.color}`, background: `${a.color}12`, color: a.color }}>
-                            {a.idReserva === 0 && <div style={{ float: 'right', display: 'flex', alignItems: 'center', marginTop: '-5px' }}>
+                            {(a.idReserva === 0 && usuario.rol === "ADMINISTRADOR") && <div style={{ float: 'right', display: 'flex', alignItems: 'center', marginTop: '-5px' }}>
                                 <button type="button" className="iconoVolver " onClick={() => onEnviarNotificacion(a.cabecera + ": " + a.mensaje)}>
                                     <img width={20} height={20} src={iconNotificacion} />
                                 </button>

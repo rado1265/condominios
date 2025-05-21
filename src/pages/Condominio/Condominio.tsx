@@ -2451,7 +2451,7 @@ const Condominio = () => {
                                 />
                             </>
                         }
-                        {(verDetalle && tipo !== 2) &&
+                        {(verDetalle) &&
                             <>
                                 <DetalleAnuncioPanel
                                     anuncio={dataDetalle}
@@ -2507,7 +2507,7 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            (tipo <= 4 && !iniciarSesion && !verPerfil && !crear && !editar && enComunidad && !verDetalle && !verEspacioComun) &&
+                            (tipo <= 4 && !iniciarSesion && !encuesta && !verPerfil && !crear && !editar && enComunidad && !verDetalle && !verEspacioComun) &&
                             <div className="mt-4 row justify-content-around">
                                 {dataFullParse.anuncios !== null && ordenarListado(dataFullParse.anuncios).map((a: any, i: any) => {
                                     if (Number(tipo) === Number(a.idTipo) || Number(tipo) === 4)
