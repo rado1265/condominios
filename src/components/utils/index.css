@@ -24,7 +24,7 @@
     margin: -75px 0 0 -75px;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: var(--colorPrincipal);
+    border-top-color: var(--colorSecundario);
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
 }
@@ -38,7 +38,7 @@
     bottom: 5px;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: var(--colorPrincipalVariante);
+    border-top-color: var(--colorSecundarioVariante);
     -webkit-animation: spin 3s linear infinite;
     animation: spin 3s linear infinite;
 }

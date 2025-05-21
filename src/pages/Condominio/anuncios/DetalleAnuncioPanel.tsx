@@ -77,7 +77,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
 
     return <>{!loading &&
         <div className="mx-3">
-            <button type="button" className="iconoVolver mb-4 mt-2" onClick={onCerrar}>
+            <button type="button" className="iconoVolver volverPublicaciones mb-4 mt-2" onClick={onCerrar}>
                 <img width={30} height={30} src={volverWhite} style={{marginRight:'10px'}}/>
                 Volver a publicaciones
             </button>

@@ -2347,6 +2347,7 @@ const Condominio = () => {
                             votaciones &&
                             <>
                                 <VotacionPanel
+                                    arrayImgUsers={arrayImgUsers}
                                     votaciones={dataVotaciones}
                                     onCambiarEstado={(votacion, activo) => {
                                         setLoading(true);

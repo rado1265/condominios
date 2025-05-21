@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import iconList from '../../../components/utils/img/menuInferior/list.png';
 
 interface Opcion {
@@ -20,11 +20,29 @@ interface Props {
     loading?: boolean;
     usuario?: any;
     onCambiarVoto: (e: any) => void;
+    arrayImgUsers: any[];
 }
 
-const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiarVoto, loading = false, usuario = "" }) => {
+const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiarVoto, loading = false, usuario = "", arrayImgUsers }) => {
     const [verListadoVotantes, setVerListadoVotantes] = useState(false);
     const [dataListado, setDataListado] = useState([]);
+
+    useEffect(() => {
+        if (dataListado) {
+            dataListado.map((b: any, o: number) => {
+                if (b.votaciones) {
+                    b.votaciones.map((p: any) => {
+                        const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === p.imgUsuario);
+                        if (matchArchivo) {
+                            p.imgUsuari = matchArchivo;
+                        } else if (p.imgUsuario && p.imgUsuario.includes("https")) {
+                            p.imgUsuario = p.imgUsuario;
+                        }
+                    })
+                }
+            })
+        }
+    }, [dataListado])
 
     return <>{!loading && <div className='row justify-content-around' style={{ fontFamily: 'Arial, sans-serif' }}>
         <h2 className="mt-3 mb-4 text-center col-12">VOTACIONES</h2>
@@ -79,6 +97,7 @@ const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiar
                                 {b.votaciones && (b.votaciones.map((p: any) => {
                                     return (
                                         <li key={o} style={{ marginBottom: '10px' }}>
+                                            <img className="imgUserAnuncio shadow mr-2" src={p.imgUsuario} />
                                             {p.nombreUsuario}
                                         </li>)
                                 })
