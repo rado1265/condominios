@@ -116,9 +116,9 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
-    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "" }]);
-    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "" }]);
-    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "" });
+    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false }]);
+    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false }]);
+    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false });
     const [verUsuarioInd, setVerUserInd] = useState(false);
     const [usuarioDetalle, setUsuarioDetalle] = useState({
         nombre: "",
@@ -139,7 +139,7 @@ const Condominio = () => {
     });
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
-    const [arrayImgUsers, setArrayImgUsers] = useState([{nombre: "", url: ""}]);
+    const [arrayImgUsers, setArrayImgUsers] = useState([{ nombre: "", url: "" }]);
     const [loguear, setLoguear] = useState({
         usuario: "",
         clave: "",
@@ -209,6 +209,7 @@ const Condominio = () => {
     const [horaAviso, setHoraAviso] = useState(new Date().toLocaleTimeString());
     const [idAviso, setIdAviso] = useState(0);
     const [emergenciaDetalle, setEmergenciaDetalle] = useState([]);
+    const [usuarioComunidad, setUsuarioComunidad] = useState(false)
     const [emergencia, setEmergencia] = useState({
         id: 0,
         descripcion: '',
@@ -704,7 +705,7 @@ const Condominio = () => {
                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                 /*FIN SE ABRE CALENDARIO COMO PRINCIPAL*/
                 obtenerImgenesPerfil();
-            } 
+            }
             else {
                 toast.info('Credenciales incorrectas', {
                     position: posicionAlertas,
@@ -1334,7 +1335,7 @@ const Condominio = () => {
             ["mostrarDireccion"]: e
         }));
     };
-    
+
     const changeMenu = (a: number) => {
         window.scrollTo(0, 0);
         setAlerta({ tipo: 1, mensaje: "" })
@@ -1774,14 +1775,19 @@ const Condominio = () => {
                                         <h2 className="usuarios-title">Listado Usuarios</h2>
                                         {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
                                             <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
-                                                setAgregarUsuario(true); setNewUser({ id: 0, usuario: '', nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
+                                                if (usuario.rol === "ADMINISTRADOR") {
+                                                    setAgregarUsuario(true); setNewUser({ id: 0, usuario: '', nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
+                                                }
                                             }}>
-                                                <button className="cupo-usuarios-add" title="Agregar usuario">
-                                                    <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
-                                                        <circle cx="9" cy="9" r="9" fill="#009688" />
-                                                        <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-                                                    </svg>
-                                                </button>
+                                                {
+                                                    usuario.rol === "ADMINISTRADOR" && <button className="cupo-usuarios-add" title="Agregar usuario">
+                                                        <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
+                                                            <circle cx="9" cy="9" r="9" fill="#009688" />
+                                                            <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                                                        </svg>
+                                                    </button>
+                                                }
+
                                                 <span className="cupo-usuarios">
                                                     {cupoUsuarios.usados}/{cupoUsuarios.cupo}
                                                 </span>
@@ -1805,7 +1811,7 @@ const Condominio = () => {
                                         </div>
                                         <div>
                                             {listadousuariosParse.map((a, idx) => (
-                                                <div className="usuarios-listado" key={idx} onClick={() => { setDataUserSelect(a); setVerUserInd(true); }}>
+                                                <div className="usuarios-listado" key={idx} onClick={() => { setLoading(true); setDataUserSelect(a); setVerUserInd(true); setVerMisAnuncios(true); ObtenerMisAnuncioLogic(selMisAnuncios, a.id.toString()); setUsuarioComunidad(true); }}>
                                                     <div className="usuarios-item">
                                                         <span className="usuarios-item-title">Nombre</span>
                                                         <span className="usuarios-item-value">{a.nombre}</span>
@@ -1814,14 +1820,18 @@ const Condominio = () => {
                                                         <span className="usuarios-item-title">Rol</span>
                                                         <span className="usuarios-item-value">{a.rol}</span>
                                                     </div>
-                                                    <div className="usuarios-item">
-                                                        <span className="usuarios-item-title">Fecha Caducidad</span>
-                                                        <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
-                                                    </div>
-                                                    <div className="usuarios-item">
-                                                        <span className="usuarios-item-title">Estado</span>
-                                                        <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
-                                                    </div>
+                                                    {
+                                                        usuario.rol === "ADMINISTRADOR" && <>
+                                                            <div className="usuarios-item">
+                                                                <span className="usuarios-item-title">Fecha Caducidad</span>
+                                                                <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
+                                                            </div>
+                                                            <div className="usuarios-item">
+                                                                <span className="usuarios-item-title">Estado</span>
+                                                                <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
+                                                            </div>
+                                                        </>
+                                                    }
                                                 </div>
                                             ))}
                                         </div>
@@ -1831,25 +1841,30 @@ const Condominio = () => {
                                 <div className="perfil-box w-100" style={{ padding: '20px' }}>
                                     <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
                                         setVerUserInd(false)
+                                        setVerMisAnuncios(false);
+                                        setUsuarioComunidad(false);
                                     }}>
                                         <img width={35} src={volver} alt="Icono volver" />
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="perfil-edit-btn"
-                                        onClick={() => { EliminarUsuario({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
-                                        aria-label="Editar perfil"
-                                    >
-                                        <img src={iconborrar} />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="perfil-edit-btn mr-5"
-                                        onClick={() => { setAgregarUsuario(true); setNewUser({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
-                                        aria-label="Editar perfil"
-                                    >
-                                        <img src={iconeditar} />
-                                    </button>
+                                    {
+                                        usuario.rol === "ADMINISTRADOR" && <> <button
+                                            type="button"
+                                            className="perfil-edit-btn"
+                                            onClick={() => { EliminarUsuario({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
+                                            aria-label="Editar perfil"
+                                        >
+                                            <img src={iconborrar} />
+                                        </button>
+                                            <button
+                                                type="button"
+                                                className="perfil-edit-btn mr-5"
+                                                onClick={() => { setAgregarUsuario(true); setNewUser({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
+                                                aria-label="Editar perfil"
+                                            >
+                                                <img src={iconeditar} />
+                                            </button></>
+                                    }
+
                                     <div className="perfil-avatar">
                                         {dataUserSelect.imagen ? (
                                             <img
@@ -1870,36 +1885,43 @@ const Condominio = () => {
                                                 <span>Rol</span>
                                                 {dataUserSelect.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
                                             </div>
-                                            <div className="container-dataPerfil">
-                                                <span>Dirección</span>
-                                                {dataUserSelect.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
-                                            </div>
+                                            {
+                                                dataUserSelect.mostrarDireccion && <div className="container-dataPerfil">
+                                                    <span>Dirección</span>
+                                                    {dataUserSelect.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
+                                                </div>
+                                            }
                                             <div className="container-dataPerfil">
                                                 <span>Teléfono</span>
                                                 {dataUserSelect.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                             </div>
-                                            <div className="container-dataPerfil">
-                                                <span>Notif. Anuncios</span>
-                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
-                                            </div>
-                                            <div className="container-dataPerfil">
-                                                <span>Notif. Mensajes</span>
-                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
-                                            </div>
-                                            <div className="container-dataPerfil">
-                                                <span>Notif. Votaciones</span>
-                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
-                                            </div>
-                                            <div className="container-dataPerfil">
-                                                <span>Notif. Calendario</span>
-                                                <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
-                                            </div>
-                                            <div className="container-dataPerfil">
-                                                <span>Fecha Caducidad</span>
-                                                {dataUserSelect.fechaCaducidad && (
-                                                    <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(dataUserSelect.fechaCaducidad).toLocaleDateString()}</span>
-                                                )}
-                                            </div>
+                                            {
+                                                usuario.rol === "ADMINISTRADOR" && <>
+                                                    <div className="container-dataPerfil">
+                                                        <span>Notif. Anuncios</span>
+                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
+                                                    </div>
+                                                    <div className="container-dataPerfil">
+                                                        <span>Notif. Mensajes</span>
+                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
+                                                    </div>
+                                                    <div className="container-dataPerfil">
+                                                        <span>Notif. Votaciones</span>
+                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
+                                                    </div>
+                                                    <div className="container-dataPerfil">
+                                                        <span>Notif. Calendario</span>
+                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
+                                                    </div>
+                                                    <div className="container-dataPerfil">
+                                                        <span>Fecha Caducidad</span>
+                                                        {dataUserSelect.fechaCaducidad && (
+                                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(dataUserSelect.fechaCaducidad).toLocaleDateString()}</span>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            }
+
                                         </div>
                                     </div>
                                 </div>
@@ -2050,6 +2072,9 @@ const Condominio = () => {
         setEncuesta(false);
         setVerEspacioComun(false);
         noFiltrar();
+        setVerUserInd(false)
+        setVerMisAnuncios(false);
+        setUsuarioComunidad(false);
     }
 
     const selSuscribir2 = (error: Boolean, err: string, data: any) => {
@@ -2448,8 +2473,8 @@ const Condominio = () => {
                         {
                             (verMisAnuncios && !verDetalle) &&
                             <>
-                                <h2 className="col-12 text-center mt-4">MIS PUBLICACIONES</h2>
-                                {misAnuncios !== null && ordenarListado(misAnuncios).map((a: any, i: any) => (
+                                <h2 className="col-12 text-center mt-4">{usuarioComunidad ? "PUBLICACIONES" : "MIS PUBLICACIONES"}</h2>
+                                {misAnuncios !== null && !loading && ordenarListado(misAnuncios).map((a: any, i: any) => (
                                     <AnunciosPanel
                                         key={i}
                                         anuncio={a}
