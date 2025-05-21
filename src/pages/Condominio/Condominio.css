@@ -2078,3 +2078,13 @@ a:hover {
   border-radius: 15px;
   border: 1px solid var(--colorSecundario);
 }
+
+.volverPublicaciones {
+  display: block;
+  width: auto;
+  font-size: 14px;
+  color: #ffffff;
+  background: #009688;
+  border-radius: 15px;
+  padding: 2px 10px 2px 5px;
+}

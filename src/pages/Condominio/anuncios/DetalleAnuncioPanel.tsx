@@ -1,6 +1,8 @@
 import React, { ChangeEventHandler, useEffect, useState } from 'react';
 import iconborrar from './../../../components/utils/img/iconborrar.png'
 import iconvolver from './../../../components/utils/img/volver.png'
+import volverWhite from './../../../components/utils/img/volverWhite.png'
+
 interface Comentario {
     id: number;
     descripcion: string;
@@ -75,8 +77,9 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
 
     return <>{!loading &&
         <div className="mx-3">
-            <button type="button" className="iconoVolver icon-deleteComentario" onClick={onCerrar}>
-                <img width={20} height={20} src={iconvolver} />
+            <button type="button" className="iconoVolver mb-4 mt-2" onClick={onCerrar}>
+                <img width={30} height={30} src={volverWhite} style={{marginRight:'10px'}}/>
+                Volver a publicaciones
             </button>
             <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{anuncio.cabecera}</h4>
             <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: anuncio.descripcion }} />
