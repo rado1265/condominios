@@ -49,6 +49,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
     const [preview, setPreview] = useState<string | null>(null);
     const [tipoSubir, setTipoSubir] = useState(1);
     const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
+    console.log(usuario)
     useEffect(() => {
         if (anuncio != null && anuncio?.id > 0) {
             setForm(anuncio)
@@ -57,9 +58,9 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
     /* useEffect(() => {
         setForm(prev => ({
             ...prev,
-            ["organizador"]: usuario.nombre
+            ["telefono"]: usuario.telefono
         }));
-    }, [form]) */
+    }, []) */
     useEffect(() => {
         if (archivoTemp) {
             const url = URL.createObjectURL(archivoTemp);
@@ -206,7 +207,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     value={usuario.nombre/* form.organizador */}
                     disabled
                 />
-                <label htmlFor="textfield" className="search-label-admin">
+                {/* <label htmlFor="textfield" className="search-label-admin">
                     Teléfono
                 </label>
                 <input
@@ -215,7 +216,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     className="search-input"
                     value={form.telefono}
                     onChange={handleChange}
-                />
+                /> */}
                 <label htmlFor="textfield" className="search-label-admin mt-3">
                     Fecha Hasta
                 </label>

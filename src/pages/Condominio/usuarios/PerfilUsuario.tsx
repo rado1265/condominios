@@ -16,6 +16,7 @@ interface UsuarioDetalle {
     tieneSuscripcionEspacioComun: boolean;
     rol: string;
     mostrarDireccion: boolean;
+    mostrarTelefono: boolean;
 }
 
 interface Props {
@@ -26,6 +27,8 @@ interface Props {
     onChangeCreateSub: (tiene: any, id: any, ev: any) => void;
     loading?: boolean;
     onChangedireccion: (e: boolean) => void
+    onChangetelefono: (e: boolean) => void
+    sinNotificaciones: boolean;
 }
 
 const PerfilUsuario: React.FC<Props> = ({
@@ -35,7 +38,9 @@ const PerfilUsuario: React.FC<Props> = ({
     onCancelar,
     onChangeCreateSub,
     loading = false,
-    onChangedireccion
+    onChangedireccion,
+    onChangetelefono,
+    sinNotificaciones
 }) => {
     const [preview, setPreview] = useState<string>("");
     const [editarPerfil, setEditarPerfil] = useState(false)
@@ -69,6 +74,7 @@ const PerfilUsuario: React.FC<Props> = ({
                 type="checkbox"
                 checked={activa}
                 defaultChecked={activa}
+                disabled={sinNotificaciones}
                 className="switch-checkbox"
             />
             <span className="switch-slider" />
@@ -131,9 +137,6 @@ const PerfilUsuario: React.FC<Props> = ({
                                 value={usuario.direccion}
                                 onChange={onChange}
                             />
-                            {/* <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
-                                Visible Depto./Casa
-                            </label> */}
                             <div className="container-dataPerfil">
                                 <button type="button" name='mostrarDireccion' className="submenu-item" onClick={(e: any) => {
                                     e.preventDefault(); onChangedireccion(!usuario.mostrarDireccion)
@@ -153,6 +156,14 @@ const PerfilUsuario: React.FC<Props> = ({
                                 value={usuario.telefono}
                                 onChange={onChange}
                             />
+                            <div className="container-dataPerfil">
+                                <button type="button" name='mostrarTelefono' className="submenu-item" onClick={(e: any) => {
+                                    e.preventDefault(); onChangetelefono(!usuario.mostrarTelefono)
+                                }}>
+                                    Mostrar Teléfono
+                                    {iconNotificaciones(usuario.mostrarTelefono)}
+                                </button>
+                            </div>
                             <label htmlFor="textfield" className="search-label-admin">
                                 Contraseña
                             </label>
@@ -163,12 +174,6 @@ const PerfilUsuario: React.FC<Props> = ({
                                 value={usuario.clave}
                                 onChange={onChange}
                             />
-                            {/*<div className="form-actions">
-                                <button type="submit" className="search-input" disabled={loading}>
-                                    {loading ? 'Guardando...' : 'Guardar'}
-                                </button>
-                                <button type="button" className="search-input" onClick={() => setEditarPerfil(false)}>Cancelar</button>
-                            </div>*/}
                             <div className="modal-actions">
                                 <button type="submit" className="modal-btn modal-btn-green" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</button>
                                 <button className="modal-btn modal-btn-close" onClick={() => setEditarPerfil(false)}>Cancelar</button>
@@ -210,49 +215,57 @@ const PerfilUsuario: React.FC<Props> = ({
                                     {usuario.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                 </div>
                                 <div className="container-dataPerfil">
-                                    <span>Teléfono</span>
+                                    <span>Teléfono{usuario.mostrarTelefono ? "(visible)" : "(Oculto)"}</span>
                                     {usuario.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{usuario.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                 </div>
-                                <div className="container-dataPerfil">
-                                    <button type="button" className="submenu-item" onClick={(ev) => {
-                                        onChangeCreateSub(usuario.tieneSuscripcionAnuncios, 1, ev)
-                                    }}>
-                                        Notif. Anuncios
-                                        {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
-                                    </button>
-                                </div>
-                                <div className="container-dataPerfil">
-                                    <button type="button" className="submenu-item" onClick={(ev) => {
-                                        onChangeCreateSub(usuario.tieneSuscripcionMensajes, 2, ev)
-                                    }}>
-                                        Notif. Mensajes
-                                        {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
-                                    </button>
-                                </div>
-                                <div className="container-dataPerfil">
-                                    <button type="button" className="submenu-item" onClick={(ev) => {
-                                        onChangeCreateSub(usuario.tieneSuscripcionVotaciones, 3, ev)
-                                    }}>
-                                        Notif. Votaciones
-                                        {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
-                                    </button>
-                                </div>
-                                <div className="container-dataPerfil">
-                                    <button type="button" className="submenu-item" onClick={(ev) => {
-                                        onChangeCreateSub(usuario.tieneSuscripcionAvisos, 4, ev)
-                                    }}>
-                                        Notif. Calendario
-                                        {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
-                                    </button>
-                                </div>
-                                <div className="container-dataPerfil">
-                                    <button type="button" className="submenu-item" onClick={(ev) => {
-                                        onChangeCreateSub(usuario.tieneSuscripcionEspacioComun, 5, ev)
-                                    }}>
-                                        Notif. Espacio Común
-                                        {iconNotificaciones(usuario.tieneSuscripcionEspacioComun)}
-                                    </button>
-                                </div>
+                                {
+                                    sinNotificaciones ?
+                                        <div className="container-dataPerfil">
+                                            <span>Para poder activar las notificaciones es necesario dar permisos para notificaciones a la app</span>
+                                        </div>
+                                        :
+                                        <> <div className="container-dataPerfil">
+                                            <button type="button" className="submenu-item" onClick={(ev) => {
+                                                if (!sinNotificaciones) onChangeCreateSub(usuario.tieneSuscripcionAnuncios, 1, ev)
+                                            }}>
+                                                Notif. Anuncios
+                                                {iconNotificaciones(usuario.tieneSuscripcionAnuncios)}
+                                            </button>
+                                        </div>
+                                            <div className="container-dataPerfil">
+                                                <button type="button" className="submenu-item" onClick={(ev) => {
+                                                    if (!sinNotificaciones) onChangeCreateSub(usuario.tieneSuscripcionMensajes, 2, ev)
+                                                }}>
+                                                    Notif. Mensajes
+                                                    {iconNotificaciones(usuario.tieneSuscripcionMensajes)}
+                                                </button>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <button type="button" className="submenu-item" onClick={(ev) => {
+                                                    if (!sinNotificaciones) onChangeCreateSub(usuario.tieneSuscripcionVotaciones, 3, ev)
+                                                }}>
+                                                    Notif. Votaciones
+                                                    {iconNotificaciones(usuario.tieneSuscripcionVotaciones)}
+                                                </button>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <button type="button" className="submenu-item" onClick={(ev) => {
+                                                    if (!sinNotificaciones) onChangeCreateSub(usuario.tieneSuscripcionAvisos, 4, ev)
+                                                }}>
+                                                    Notif. Calendario
+                                                    {iconNotificaciones(usuario.tieneSuscripcionAvisos)}
+                                                </button>
+                                            </div>
+                                            <div className="container-dataPerfil">
+                                                <button type="button" className="submenu-item" onClick={(ev) => {
+                                                    if (!sinNotificaciones) onChangeCreateSub(usuario.tieneSuscripcionEspacioComun, 5, ev)
+                                                }}>
+                                                    Notif. Espacio Común
+                                                    {iconNotificaciones(usuario.tieneSuscripcionEspacioComun)}
+                                                </button>
+                                            </div></>
+                                }
+
                                 <div className="container-dataPerfil">
                                     <span>Fecha Caducidad</span>
                                     {usuario.fechaCaducidad && (
