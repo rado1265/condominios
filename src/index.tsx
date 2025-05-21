@@ -18,7 +18,7 @@ const validateMobile = false;
 
 let urlActual = window.location.href;
 
-if(!urlActual.includes("wwww.") && !urlActual.includes("localhost")){
+if(!urlActual.includes("www.") && !urlActual.includes("localhost")){
   window.location.href = "https://www.conexionresidencial.cl/"
 }
 

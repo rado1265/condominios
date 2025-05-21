@@ -2008,6 +2008,14 @@ a:hover {
   .v2-anuncio {
     /*width: 50vh;*/
   }
+
+  .f-solicitud {
+    position: absolute;
+    margin-top: 15px;
+    font-size: 12px;
+    display: block;
+    color: #34495e;
+  }
 }
 
 @media (min-width: 600px) {
@@ -2050,6 +2058,14 @@ a:hover {
 
   .v2-anuncio {
     min-width: 250px;
+  }
+
+  .f-solicitud {
+    position: absolute;
+    margin-top: 15px;
+    font-size: 12px;
+    display: contents;
+    color: #34495e;
   }
 }
 

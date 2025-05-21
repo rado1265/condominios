@@ -2084,7 +2084,7 @@ const Condominio = () => {
                     position: posicionAlertas,
                 });
                 let newData = data;
-                if (newData.imagen) {
+                if (newData.imagen && !newData.imagen.includes("https")) {
                     const imageRef = ref(storage, `perfiles/${newData.imagen}`);
 
                     getDownloadURL(imageRef)
@@ -2187,7 +2187,7 @@ const Condominio = () => {
     }
     async function SuscripcionTotal(tipoSuscripcion: any, _usuario: any) {
         var result: any = await solicitarPermisoNotificaciones()
-        if (result) {
+        if (result && localStorage.getItem("idCondominio")) {
             SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), _usuario.id, tipoSuscripcion, result)
         }
     }
