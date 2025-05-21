@@ -563,7 +563,7 @@ const Condominio = () => {
                 });
             }
             if (verMisAnuncios) {
-                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString())
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString())
             } else {
                 setDataFull(data);
                 setActualizarData(true);
@@ -941,7 +941,7 @@ const Condominio = () => {
             }
             if (tipo === 8) {
                 setLoading(true);
-                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString());
             } else {
                 setDataFull(data);
                 setActualizarData(true);
@@ -1229,7 +1229,7 @@ const Condominio = () => {
                 setVerMisAnuncios(true)
                 setTipo(8);
                 setLoading(true);
-                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString());
+                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString());
                 break;
             case "comunidad":
                 cerrarMenu()
@@ -1810,7 +1810,7 @@ const Condominio = () => {
                                         </div>
                                         <div>
                                             {listadousuariosParse.map((a, idx) => (
-                                                <div className="usuarios-listado" key={idx} onClick={() => { setLoading(true); setDataUserSelect(a); setVerUserInd(true); setVerMisAnuncios(true); ObtenerMisAnuncioLogic(selMisAnuncios, a.id.toString()); setUsuarioComunidad(true); }}>
+                                                <div className="usuarios-listado" key={idx} onClick={() => { setLoading(true); setDataUserSelect(a); setVerUserInd(true); setVerMisAnuncios(true); ObtenerMisAnuncioLogic(selMisAnuncios, a.id.toString(), usuario.id.toString()); setUsuarioComunidad(true); }}>
                                                     <div className="usuarios-item">
                                                         <span className="usuarios-item-title">Nombre</span>
                                                         <span className="usuarios-item-value">{a.nombre}</span>
