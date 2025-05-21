@@ -69,7 +69,7 @@ const AnunciosPanel: React.FC<Props> = ({
         const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === anuncio.imgOrganizador);
         if (matchArchivo) {
             setImgAnuncio(matchArchivo);
-        }else if(anuncio.imgOrganizador.includes("https")){
+        } else if (anuncio.imgOrganizador.includes("https")) {
             setImgAnuncio(anuncio.imgOrganizador);
         }
     }, [])
@@ -133,23 +133,21 @@ const AnunciosPanel: React.FC<Props> = ({
             }
 
             <div className="v2-anuncio-footer">
-                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador} <span className={`dirUserAnuncio ml-1 ${anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "" : "d-none" }`}>{anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "(" + anuncio.direccionOrganizador + ")" : "" }</span></span>
-                <span className="v2-anuncio-telefono">{anuncio.telefono}</span>
+                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador} <span className={`dirUserAnuncio ml-1 ${anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "" : "d-none"}`}>{anuncio.direccionOrganizador != "" && anuncio.direccionOrganizador != null ? "(" + anuncio.direccionOrganizador + ")" : ""}</span></span>
             </div>
 
             <small className="v2-anuncio-fecha">
                 Fecha publicación: {new Date(anuncio.fechaDesde).toLocaleString()}
             </small>
 
-            {anuncio.idTipo !== 2 && (
-                <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
-                    <svg fill="#28bd06" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                        width="24px" height="24px" viewBox="0 0 483.789 483.789" onClick={() => onVerDetalle(anuncio)}>
+            <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
+                <svg fill="#28bd06" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                    width="24px" height="24px" viewBox="0 0 483.789 483.789" onClick={() => onVerDetalle(anuncio)}>
+                    <g>
                         <g>
-                            <g>
-                                <polygon points="434.77,405.332 465.895,405.332 465.895,122.667 329.895,122.667 329.895,280.288 329.895,293.333 
+                            <polygon points="434.77,405.332 465.895,405.332 465.895,122.667 329.895,122.667 329.895,280.288 329.895,293.333 
             316.073,293.333 167.228,293.333 167.228,405.332 361.895,405.332 361.895,483.789 		"/>
-                                <path d="M17.895,280h30.88l73.12,79.973V280h45.333h149.333V122.667V0H17.895V280z M266.138,116.6
+                            <path d="M17.895,280h30.88l73.12,79.973V280h45.333h149.333V122.667V0H17.895V280z M266.138,116.6
             c6.267,0,11.989,3.4,16.407,6.067c5.43,5.333,8.885,11.845,8.885,19.549c0,13.968-11.325,25.453-25.292,25.453
             c-13.968,0-25.294-11.565-25.294-25.533c0-7.701,3.453-14.133,8.886-19.467C254.145,120,259.867,116.6,266.138,116.6z
              M199.927,116.6c6.267,0,11.99,3.4,16.408,6.067c5.429,5.333,8.886,11.845,8.886,19.549c0,13.968-11.326,25.453-25.294,25.453
@@ -158,12 +156,11 @@ const AnunciosPanel: React.FC<Props> = ({
             c-13.968,0-25.293-11.325-25.293-25.293C108.422,128.565,119.748,117.243,133.715,117.243z M67.507,117.243
             c13.968,0,25.293,11.326,25.293,25.293c0,13.968-11.326,25.293-25.293,25.293c-13.971,0-25.293-11.325-25.293-25.293
             C42.214,128.565,53.538,117.243,67.507,117.243z"/>
-                            </g>
                         </g>
-                    </svg>
-                    <span className="v2-comment-count">{anuncio.cantComentarios}</span>
-                </div>
-            )}
+                    </g>
+                </svg>
+                <span className="v2-comment-count">{anuncio.cantComentarios}</span>
+            </div>
 
             <div className="v2-anuncio-like" onClick={(e) => e.stopPropagation()}>
                 <svg

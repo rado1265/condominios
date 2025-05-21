@@ -146,10 +146,6 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
         setMenuOpen((open) => !open);
     };
 
-    useEffect(() => {
-        setMenuOpen(false);
-    }, [onChangeMenu])
-
     return (
         <>
                 <nav className="bottom-nav">

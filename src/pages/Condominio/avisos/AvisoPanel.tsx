@@ -327,7 +327,7 @@ const AvisoPanel: React.FC<Props> = ({
                             <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
                                 <circle cx="9" cy="9" r="9" fill="#336699">
                                 </circle>
-                                <path d="M9 5v8M5 9h8" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                                <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round">
                                 </path>
                             </svg>
                         </button>

@@ -1352,7 +1352,8 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border: 1px solid var(--colorSecundarioVarianteDos)
+  border: 1px solid var(--colorSecundarioVarianteDos);
+
 }
 
 .v2-anuncio:hover {
@@ -2002,6 +2003,10 @@ a:hover {
 
   .dirUserAnuncio {
     max-width: 150px;
+  }
+
+  .v2-anuncio {
+    /*width: 50vh;*/
   }
 }
 

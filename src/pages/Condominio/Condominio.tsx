@@ -139,7 +139,7 @@ const Condominio = () => {
     });
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
-    const [arrayImgUsers, setArrayImgUsers] = useState([{nombre: "", url: ""}]);
+    const [arrayImgUsers, setArrayImgUsers] = useState([{ nombre: "", url: "" }]);
     const [loguear, setLoguear] = useState({
         usuario: "",
         clave: "",
@@ -349,7 +349,6 @@ const Condominio = () => {
     };
 
     const obtenerImgenesPerfil = async () => {
-        console.log("Entra");
         const folderRef = ref(storage, `perfiles/`);
         try {
             const res = await listAll(folderRef);
@@ -704,7 +703,7 @@ const Condominio = () => {
                 ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                 /*FIN SE ABRE CALENDARIO COMO PRINCIPAL*/
                 obtenerImgenesPerfil();
-            } 
+            }
             else {
                 toast.info('Credenciales incorrectas', {
                     position: posicionAlertas,
@@ -1334,7 +1333,7 @@ const Condominio = () => {
             ["mostrarDireccion"]: e
         }));
     };
-    
+
     const changeMenu = (a: number) => {
         window.scrollTo(0, 0);
         setAlerta({ tipo: 1, mensaje: "" })
@@ -2179,6 +2178,15 @@ const Condominio = () => {
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
         }
     }
+    const inputBuscarRef = useRef(null);
+
+    const handleClickBuscar = () => {
+        setBuscarEnMenu(true);
+        setTimeout(() => {
+            inputBuscarRef.current && (inputBuscarRef.current as HTMLInputElement).focus();
+        }, 0);
+    };
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
         <React.Fragment>
@@ -2219,7 +2227,7 @@ const Condominio = () => {
                             {!buscarenmenu ?
                                 <button
                                     className={`nav-button shadow iconbuscarAnuncios`}
-                                    onClick={() => setBuscarEnMenu(true)}
+                                    onClick={handleClickBuscar}
                                     aria-label="Buscar"
                                 >
                                     <img src={iconBuscar} />
@@ -2258,6 +2266,7 @@ const Condominio = () => {
                                                 </svg>
                                             </span>
                                             <input
+                                                ref={inputBuscarRef}
                                                 type="text"
                                                 placeholder="Buscar por título o creador"
                                                 onChange={filtrarDataFull}

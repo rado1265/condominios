@@ -81,6 +81,17 @@ export default function ReservaConHorario(props: any) {
     }
   }, [espacioId]);
 
+  const handleFechaInicio = (date: any) => {
+    setFechaInicio(date);
+    if (fechaFin && date && fechaFin < date) {
+      setFechaFin(null);
+    }
+  };
+
+  const handleFechaFin = (date: any) => {
+    setFechaFin(date);
+  };
+
   return (
     <div className="reserva-container shadow-lg p-4 rounded-4 bg-white mx-auto mt-3 mt-md-5" style={{ maxWidth: 420 }}>
       <h3 className="fw-bold mb-4 text-center">
@@ -123,26 +134,29 @@ export default function ReservaConHorario(props: any) {
           <label className="form-label">Desde</label>
           <DatePicker
             selected={fechaInicio}
-            onChange={(date) => setFechaInicio(date)}
+            onChange={handleFechaInicio}
             showTimeSelect
-            locale="es"
+            locale={es}
             timeIntervals={30}
             dateFormat="Pp"
             placeholderText="Inicio"
             className="form-control"
+            maxDate={fechaFin ?? undefined}
           />
         </div>
         <div className="col-12 mt-3">
           <label className="form-label">Hasta</label>
           <DatePicker
             selected={fechaFin}
-            onChange={(date) => setFechaFin(date)}
+            onChange={handleFechaFin}
             showTimeSelect
-            locale="es"
+            locale={es}
             timeIntervals={30}
             dateFormat="Pp"
             placeholderText="Fin"
             className="form-control"
+            minDate={fechaInicio ?? undefined}
+            disabled={!fechaInicio}
           />
         </div>
       </div>

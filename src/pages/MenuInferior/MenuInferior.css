@@ -36,7 +36,6 @@
     color: var(--colorSecundario);
 }
 
-/* Botón central crear */
 .create-container {
     position: relative;
     display: flex;
