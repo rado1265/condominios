@@ -79,8 +79,8 @@ export const EnviarNotifAvisoLogic = (selListado: any, aviso: any) => {
     return EnviarNotifAviso(selListado, aviso);
 }
 
-export const ObtenerMisAnuncioLogic = (selListado: any, idUsuario: string) => {
-    return ObtenerMisAnuncio(selListado, idUsuario);
+export const ObtenerMisAnuncioLogic = (selListado: any, idUsuario: string, idSolicitante: string) => {
+    return ObtenerMisAnuncio(selListado, idUsuario, idSolicitante);
 }
 
 export const CrearUsuarioLogic = (selListado: any, usuario: any, eliminar: boolean) => {

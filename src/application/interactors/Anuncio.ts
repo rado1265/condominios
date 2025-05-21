@@ -259,8 +259,8 @@ export const EnviarNotifAviso = (selListado: any, aviso: any) => {
         }
     });
 };
-export const ObtenerMisAnuncio = (selListado: any, idUsuario: string) => {
-    SVCAnuncio.ObtenerMisAnuncio(idUsuario).then((res: IServiceResult<any>) => {
+export const ObtenerMisAnuncio = (selListado: any, idUsuario: string, idSolicitante: string) => {
+    SVCAnuncio.ObtenerMisAnuncio(idUsuario, idSolicitante).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);

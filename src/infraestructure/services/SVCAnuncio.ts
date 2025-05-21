@@ -658,10 +658,10 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async ObtenerMisAnuncio(idUsuario: string): Promise<IServiceResult<any>> {
+    public static async ObtenerMisAnuncio(idUsuario: string, idSolicitante: string): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/getAnunciosPorUsuario?idUsuario=" + idUsuario;
+        const url: string = _ruta + "Condominios/getAnunciosPorUsuario?idUsuario=" + idUsuario + "&idSolicitante=" + idSolicitante;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios
