@@ -63,11 +63,11 @@ export const SuscribirNotificaciones = (selListado: any, tipoSuscripcion: any, r
         }
     });
 }
-export const SuscribirNotificaciones2 = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any) => {
+export const SuscribirNotificaciones2 = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any, notificar: boolean) => {
     SVCAnuncio.SuscribirNotificaciones2(idCondominio, idUsuario, tipoSuscripcion, subscription).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
-            selListado(false, tipoSuscripcion.toString(), data);
+            selListado(false, tipoSuscripcion.toString(), data, notificar);
         } else {
             selListado(true, 'error', []);
         }
@@ -167,6 +167,16 @@ export const EditUsuarioPorId = (selListado: any, usuario: any) => {
 };
 export const ObtenerUsuarioPorId = (selListado: any, idUsuario: string, idCondominio: string, registration: any) => {
     SVCAnuncio.ObtenerUsuarioPorId(idUsuario, idCondominio, registration).then((res: IServiceResult<any>) => {
+        if (res.result !== undefined) {
+            let data: any = res.result;
+            selListado(false, '', data);
+        } else {
+            selListado(true, 'error', []);
+        }
+    });
+};
+export const ObtenerUsuarioPorIdSinNotificiaciones = (selListado: any, idUsuario: string, idCondominio: string) => {
+    SVCAnuncio.ObtenerUsuarioPorIdSinNotificiaciones(idUsuario, idCondominio).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, '', data);

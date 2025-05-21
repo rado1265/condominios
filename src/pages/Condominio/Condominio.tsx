@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "../../components/utils/loading";
 import './Condominio.css';
-import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
+import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuarioPorIdSinNotificiacionesLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage } from "../../components/utils/messages";
 import volver from './../../components/utils/img/volver.png';
 import axios from 'axios';
@@ -116,9 +116,9 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
-    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false }]);
-    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false }]);
-    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false });
+    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false }]);
+    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false }]);
+    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false });
     const [verUsuarioInd, setVerUserInd] = useState(false);
     const [usuarioDetalle, setUsuarioDetalle] = useState({
         nombre: "",
@@ -135,7 +135,8 @@ const Condominio = () => {
         fechaCaducidad: new Date(),
         imagen: '',
         clave: '',
-        mostrarDireccion: false
+        mostrarDireccion: false,
+        mostrarTelefono: false
     });
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
@@ -145,7 +146,7 @@ const Condominio = () => {
         clave: "",
         idCondominio: localStorage.getItem("idCondominio") ?? ""
     });
-
+    const [sinNotificaciones, setSinNotificaciones] = useState(false)
     const posicionAlertas = "bottom-left";
 
     /*
@@ -482,6 +483,10 @@ const Condominio = () => {
         if (result) {
             setLoading(true)
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
+            setSinNotificaciones(false)
+        } else {
+            ObtenerUsuarioPorIdSinNotificiacionesLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString());
+            setSinNotificaciones(true)
         }
     }
     async function registerPush() {
@@ -520,7 +525,7 @@ const Condominio = () => {
 
     const cerrarSesion = () => {
         localStorage.clear();
-
+        cerrarMenu()
         setDataCondominios([]);
         setUsuario({
             usuario: '',
@@ -1081,6 +1086,11 @@ const Condominio = () => {
         if (result) {
             ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
             setEditarPerfil(false);
+            setSinNotificaciones(false)
+        } else {
+            setSinNotificaciones(true)
+            ObtenerUsuarioPorIdSinNotificiacionesLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString());
+            setEditarPerfil(false);
         }
     }
     const selEditarPerfil = (error: Boolean, err: string, data: any) => {
@@ -1332,6 +1342,13 @@ const Condominio = () => {
         setUsuarioDetalle(prev => ({
             ...prev,
             ["mostrarDireccion"]: e
+        }));
+    };
+    const handleChangePerfilTelefono = (e: boolean) => {
+        console.log(e)
+        setUsuarioDetalle(prev => ({
+            ...prev,
+            ["mostrarTelefono"]: e
         }));
     };
 
@@ -1890,10 +1907,13 @@ const Condominio = () => {
                                                     {dataUserSelect.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
                                                 </div>
                                             }
-                                            <div className="container-dataPerfil">
-                                                <span>Teléfono</span>
-                                                {dataUserSelect.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
-                                            </div>
+                                            {
+                                                dataUserSelect.mostrarTelefono &&
+                                                <div className="container-dataPerfil">
+                                                    <span>Teléfono</span>
+                                                    {dataUserSelect.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
+                                                </div>
+                                            }
                                             {
                                                 usuario.rol === "ADMINISTRADOR" && <>
                                                     <div className="container-dataPerfil">
@@ -2076,42 +2096,46 @@ const Condominio = () => {
         setUsuarioComunidad(false);
     }
 
-    const selSuscribir2 = (error: Boolean, err: string, data: any) => {
+    const selSuscribir2 = (error: Boolean, err: string, data: any, notificar: boolean) => {
         setLoading(false);
         try {
             if (data) {
-                toast.success('Su suscripción a las notificaciones fue realizada correctamente.', {
-                    position: posicionAlertas,
-                });
-                let newData = data;
-                if (newData.imagen) {
-                    const imageRef = ref(storage, `perfiles/${newData.imagen}`);
+                if (notificar) {
+                    toast.success('Su suscripción a las notificaciones fue realizada correctamente.', {
+                        position: posicionAlertas,
+                    });
+                    let newData = data;
+                    if (newData.imagen) {
+                        const imageRef = ref(storage, `perfiles/${newData.imagen}`);
 
-                    getDownloadURL(imageRef)
-                        .then((url) => {
-                            newData.imagen = url;
-                            setUsuarioDetalle(newData);
-                            setLoading(false);
-                        })
-                        .catch((err) => {
-                            setUsuarioDetalle(newData);
-                            console.error(err);
-                            setLoading(false);
-                        });
-                } else {
-                    setUsuarioDetalle(newData);
-                    setLoading(false);
+                        getDownloadURL(imageRef)
+                            .then((url) => {
+                                newData.imagen = url;
+                                setUsuarioDetalle(newData);
+                                setLoading(false);
+                            })
+                            .catch((err) => {
+                                setUsuarioDetalle(newData);
+                                console.error(err);
+                                setLoading(false);
+                            });
+                    } else {
+                        setUsuarioDetalle(newData);
+                        setLoading(false);
+                    }
                 }
             }
             else {
+                if (notificar)
+                    toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
+                        position: posicionAlertas,
+                    });
+            }
+        } catch (er) {
+            if (notificar)
                 toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
-            }
-        } catch (er) {
-            toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
         }
     }
     const changeComentario = (ev: any) => {
@@ -2125,18 +2149,7 @@ const Condominio = () => {
                 toast.info('Su desuscribipción a las notificaciones fue realizada correctamente.', {
                     position: posicionAlertas,
                 });
-                setUsuario({
-                    usuario: usuario.usuario,
-                    nombre: usuario.nombre,
-                    tieneSuscripcionMensajes: err === "2" ? false : usuario.tieneSuscripcionMensajes,
-                    tieneSuscripcionVotaciones: err === "3" ? false : usuario.tieneSuscripcionVotaciones,
-                    tieneSuscripcionAnuncios: err === "1" ? false : usuario.tieneSuscripcionAnuncios,
-                    tieneSuscripcionAvisos: err === "4" ? false : usuario.tieneSuscripcionAvisos,
-                    rol: usuario.rol,
-                    id: usuario.id
-                });
-                let campo = err === "2" ? "tieneSuscripcionMensajes" : err === "3" ? "tieneSuscripcionVotaciones" : "tieneSuscripcionAnuncios";
-                localStorage.setItem(campo, "false");
+                Perfil()
             }
             else {
                 toast.info('Error al quitar suscripción. Comuníquese con el Administrador.', {
@@ -2181,14 +2194,15 @@ const Condominio = () => {
     }
     async function Suscripcion(tipoSuscripcion: any) {
         var result: any = await solicitarPermisoNotificaciones()
+        console.log(result)
         if (result) {
-            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result)
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result, true)
         }
     }
     async function SuscripcionTotal(tipoSuscripcion: any, _usuario: any) {
         var result: any = await solicitarPermisoNotificaciones()
         if (result) {
-            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), _usuario.id, tipoSuscripcion, result)
+            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), _usuario.id, tipoSuscripcion, result, false)
         }
     }
 
@@ -2196,13 +2210,6 @@ const Condominio = () => {
 
     const [openNotificaciones, setOpenNotificaciones] = useState(false);
 
-    async function UsuarioObtener() {
-
-        var result: any = await solicitarPermisoNotificaciones()
-        if (result) {
-            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
-        }
-    }
     const inputBuscarRef = useRef(null);
 
     const handleClickBuscar = () => {
@@ -2414,12 +2421,14 @@ const Condominio = () => {
                                     usuario={usuarioDetalle}
                                     onChange={handleChangePerfil}
                                     onChangedireccion={handleChangePerfilDireccion}
+                                    onChangetelefono={handleChangePerfilTelefono}
                                     onCancelar={() => setEditarPerfil(false)}
                                     loading={loading}
                                     onGuardar={(archivo: any) => {
                                         EditarPerfil(archivo);
                                     }}
                                     onChangeCreateSub={createSuscripcion}
+                                    sinNotificaciones={sinNotificaciones}
                                 />
                             </>
                         }

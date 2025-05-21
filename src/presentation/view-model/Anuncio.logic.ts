@@ -1,4 +1,4 @@
-import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios, ObtenerAvisos, CrearAvisos, ObtenerEmergencias, CrearEmergencia, SuscribirNotificaciones2, CambiarNormas, EnviarNotifAviso, ObtenerMisAnuncio, CrearUsuario } from "../../application/interactors/Anuncio";
+import { ListadoAnuncios, ObteneCondominio, EliminarAnuncio, CrearAnuncio, Login, SuscribirNotificaciones, DesscribirNotificaciones, DarQuitarLike, ObtenerVotaciones, CambiarEstadoVotacion, Votar, CrearVotacion, CrearComentarioAnuncio, ObtenerAnuncioPorId, EditUsuarioPorId, ObtenerUsuarioPorId, ObtenerUsuarios, ObtenerAvisos, CrearAvisos, ObtenerEmergencias, CrearEmergencia, SuscribirNotificaciones2, CambiarNormas, EnviarNotifAviso, ObtenerMisAnuncio, CrearUsuario, ObtenerUsuarioPorIdSinNotificiaciones } from "../../application/interactors/Anuncio";
 
 export const ObtenerListadoAnuncioLogic = (selListado: any, idCondominio: string) => {
     return ListadoAnuncios(selListado, idCondominio);
@@ -18,8 +18,8 @@ export const LoginLogic = (selListado: any, usuario: any, suscribir: boolean) =>
 export const SuscribirNotificacionesLogic = (selListado: any, tipoSuscripcion: any, registration: any) => {
     return SuscribirNotificaciones(selListado, tipoSuscripcion, registration);
 }
-export const SuscribirNotificaciones2Logic = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any) => {
-    return SuscribirNotificaciones2(selListado, idCondominio, idUsuario, tipoSuscripcion, subscription);
+export const SuscribirNotificaciones2Logic = (selListado: any, idCondominio: any, idUsuario: any, tipoSuscripcion: any, subscription: any, notificar: boolean) => {
+    return SuscribirNotificaciones2(selListado, idCondominio, idUsuario, tipoSuscripcion, subscription, notificar);
 }
 export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any, tipoSuscripcion: any) => {
     return DesscribirNotificaciones(selListado, idUsuario, tipoSuscripcion);
@@ -53,6 +53,9 @@ export const EditUsuarioPorIdLogic = (selListado: any, usuario: any) => {
 
 export const ObtenerUsuarioPorIdLogic = (selListado: any, idUsuario: string, idCondominio: string, registration: any) => {
     return ObtenerUsuarioPorId(selListado, idUsuario, idCondominio, registration);
+}
+export const ObtenerUsuarioPorIdSinNotificiacionesLogic = (selListado: any, idUsuario: string, idCondominio: string) => {
+    return ObtenerUsuarioPorIdSinNotificiaciones(selListado, idUsuario, idCondominio);
 }
 
 export const ObtenerUsuariosLogic = (selListado: any, idCondominio: string) => {

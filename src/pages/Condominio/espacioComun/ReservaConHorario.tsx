@@ -83,6 +83,8 @@ export default function ReservaConHorario(props: any) {
 
   const handleFechaInicio = (date: any) => {
     setFechaInicio(date);
+    setUnidadesDisponibles([]);
+    setVerDisp(false);
     if (fechaFin && date && fechaFin < date) {
       setFechaFin(null);
     }
@@ -90,6 +92,8 @@ export default function ReservaConHorario(props: any) {
 
   const handleFechaFin = (date: any) => {
     setFechaFin(date);
+    setUnidadesDisponibles([]);
+    setVerDisp(false);
   };
 
   return (

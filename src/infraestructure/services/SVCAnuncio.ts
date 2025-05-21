@@ -416,21 +416,37 @@ export class SVCAnuncio {
     }
     public static async ObtenerUsuarioPorId(idUsuario: string, idCondominio: string, subscription: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
-        /* const response = await axios.get(_ruta + 'Condominios/obtenerKey');
-        console.log(response.data)
-        const vapidPublicKey = response.data;
-        const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-        console.log(registration)
-        const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: convertedVapidKey,
-        }); */
 
         const url: string = _ruta + "Condominios/getUsuarioPorId?idUsuario=" + idUsuario + "&idCondominio=" + idCondominio;
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios
             .post(url, subscription, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
+                }
+            })
+            .then((res: AxiosResponse) => {
+                if (res.data !== undefined) {
+                    sr.result = res.data;
+                }
+            })
+            .catch((err: any) => {
+                sr.errorMessage = "Error al leer";
+                sr.errorDetails = err;
+            });
+
+        return sr;
+    }
+    public static async ObtenerUsuarioPorIdSinNotificiaciones(idUsuario: string, idCondominio: string): Promise<IServiceResult<any>> {
+        let _ruta: string = con.RetornaRuta();
+
+        const url: string = _ruta + "Condominios/getUsuarioPorIdSinNotificaciones?idUsuario=" + idUsuario + "&idCondominio=" + idCondominio;
+        let sr: ServiceResult<any> = new ServiceResult<any>();
+        sr.errorMessage = "Inicializando invocación";
+        await axios
+            .post(url, [], {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",
