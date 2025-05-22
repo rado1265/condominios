@@ -1518,6 +1518,7 @@ const Condominio = () => {
                 onChangeMenu={handleChangeMenu}
                 active={active}
                 orden={orden}
+                usuario={usuario}
                 onChangeCriterio={handleChangeCriterio}
                 onFiltrarDataFull={filtrarDataFull}
                 onChangeOrden={handleChangeOrden}

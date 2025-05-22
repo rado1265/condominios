@@ -32,6 +32,7 @@ interface Props {
     onChangeCriterio: (e: string) => void;
     onFiltrarDataFull: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onChangeOrden: (e: string) => void;
+    usuario: any;
 }
 
 const icons = {
@@ -118,7 +119,7 @@ const icons = {
     ),
 };
 
-const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCriterio, onFiltrarDataFull, onChangeOrden }) => {
+const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCriterio, onFiltrarDataFull, onChangeOrden, usuario }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const containerRef = useRef(null);
 
@@ -205,14 +206,16 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                                     {icons.anunciosSelect}
                                     <span className='txtOpcion'>Crear <br></br>Anuncio</span>
                                 </button>
-                                <button
-                                    className={`nav-button container-Opcion`}
-                                    onClick={() => { onChangeMenu('crearVotacion'); cerrarMenuInf() }}
-                                    aria-label="Crear Votación"
-                                >
-                                    {icons.votacionesSelect}
-                                    <span className='txtOpcion'>Crear <br></br>Votación</span>
-                                </button>
+                                {usuario.rol === "ADMINISTRADOR" && (
+                                    <button
+                                        className={`nav-button container-Opcion`}
+                                        onClick={() => { onChangeMenu('crearVotacion'); cerrarMenuInf() }}
+                                        aria-label="Crear Votación"
+                                    >
+                                        {icons.votacionesSelect}
+                                        <span className='txtOpcion'>Crear <br></br>Votación</span>
+                                    </button>
+                                )}
                                 <button
                                     className={`nav-button container-Opcion`}
                                     onClick={() => { onChangeMenu('reglas'); cerrarMenuInf() }}

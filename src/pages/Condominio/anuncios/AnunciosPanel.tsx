@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import iconAdmin from '../../../components/utils/img/admin.png';
 
 interface Anuncio {
     id: number;
@@ -16,6 +17,7 @@ interface Anuncio {
     likes: number;
     imgOrganizador: string;
     direccionOrganizador: string;
+    rolOrganizador: string;
 }
 
 interface Props {
@@ -76,7 +78,7 @@ const AnunciosPanel: React.FC<Props> = ({
 
 
     return <>
-        {!loading && <div className="v2-anuncio card-shadow col-10 col-md-3 my-3 mx-md-1 pb-5 pt-5">
+        {!loading && <div className={`v2-anuncio card-shadow col-10 col-md-3 my-3 mx-md-1 pb-5 ${esPropietario ? "pt-5" : "pt-4"}`}>
             <div className="v2-anuncio-header">
                 {esPropietario && (
                     <div className="v2-anuncio-actions">
@@ -133,11 +135,22 @@ const AnunciosPanel: React.FC<Props> = ({
             }
 
             <div className="v2-anuncio-footer">
-                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador}</span>
+                <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={imgAnuncio} /> {anuncio.organizador}
+                    {anuncio.rolOrganizador == "ADMINISTRADOR" && (
+                        <img title='Administrador' alt='Administrador' className="imgUserAnuncio ml-1" src={iconAdmin} style={{ border: 'none' }} />
+                    )}
+                </span>
             </div>
 
             <small className="v2-anuncio-fecha">
-                Fecha publicación: {new Date(anuncio.fechaDesde).toLocaleString()}
+                Fecha publicación: {new Date(anuncio.fechaDesde).toLocaleString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                })}
             </small>
 
             <div className="v2-anuncio-comment" onClick={(e) => e.stopPropagation()}>
