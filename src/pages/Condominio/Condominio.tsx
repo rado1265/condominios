@@ -69,13 +69,13 @@ const Condominio = () => {
         measurementId: "G-54LZY2M3BN"
     };
     const secret = "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79";
-
+    const [loading, setLoading] = useState(false);
     const app = initializeApp(firebaseConfig);
     const storage = getStorage(app);
     const [buscarDataFull, setBuscarDataFull] = useState("");
     const [imagenPerfil, setImagenPerfil] = useState("");
     const [agregarUsuario, setAgregarUsuario] = useState(false);
-    const [loading, setLoading] = useState(false);
+
     const [editarTextRich, setEditarTextRich] = useState(false);
     const [actualizarData, setActualizarData] = useState(false);
     const [newTextRich, setNewTextRich] = useState("");
@@ -141,14 +141,10 @@ const Condominio = () => {
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
     const [arrayImgUsers, setArrayImgUsers] = useState([{ nombre: "", url: "" }]);
-    const [loguear, setLoguear] = useState({
-        usuario: "",
-        clave: "",
-        idCondominio: localStorage.getItem("idCondominio") ?? ""
-    });
+
     const [sinNotificaciones, setSinNotificaciones] = useState(false)
     const posicionAlertas = "bottom-left";
-
+    const [logueado, setLogueado] = useState(false)
     /*
         1 - Información / Celeste - Defecto
         2 - Success / Verde
@@ -160,13 +156,13 @@ const Condominio = () => {
         mensaje: ""
     });
     const [alertaCerrada, setAlertaCerrada] = useState(false)
-    const [iniciarSesion, setIniciarSesion] = useState(false)
+    const [iniciarSesion, setIniciarSesion] = useState(true)
     const [crear, setCrear] = useState(false)
     const [editar, setEditar] = useState(false)
     const [votaciones, setVotaciones] = useState(false)
     const [encuesta, setEncuesta] = useState(false)
     const [menuOpciones, setMenuOpciones] = useState(false)
-    const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
+
     const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: [], organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false, imgOrganizador: "" })
     const [verDetalle, setVerDetalle] = useState(false)
     const menuRef = useRef(null);
@@ -195,21 +191,11 @@ const Condominio = () => {
     const [verReglasNormas, setVerReglasNormas] = useState(false)
     const [editarPerfil, setEditarPerfil] = useState(false)
     const [verAvisos, setVerAvisos] = useState(false)
-    const [editarAvisos, setEditarAvisos] = useState(false)
+    
     const [verEmergencia, setVerEmergencia] = useState(false)
-    const [editarEmergencia, setEditarEmergencia] = useState(false)
+
     const [verMisAnuncios, setVerMisAnuncios] = useState(false)
     const [verPuntosInteres, setVerPuntosInteres] = useState(false)
-    const [days, setDays] = useState([]);
-    const [monthTitle, setMonthTitle] = useState('');
-    const [avisos, setAvisos] = useState([]);
-    const [año, setAño] = useState(new Date().getFullYear());
-    const [mes, setMes] = useState(new Date().getMonth());
-    const [mensajeAviso, setMensajeAviso] = useState('');
-    const [fechaAviso, setFechaAviso] = useState('');
-    const [horaAviso, setHoraAviso] = useState(new Date().toLocaleTimeString());
-    const [idAviso, setIdAviso] = useState(0);
-    const [emergenciaDetalle, setEmergenciaDetalle] = useState([]);
     const [usuarioComunidad, setUsuarioComunidad] = useState(false)
     const [emergencia, setEmergencia] = useState({
         id: 0,
@@ -229,7 +215,6 @@ const Condominio = () => {
     })
     const [verEspacioComun, setVerEspacioComun] = useState(false)
     const [serviceWorker, setServiceWorker] = useState({})
-    const [estadoServiceWorker, setEstadoServiceWorker] = useState('aun nada')
 
 
     function formatToLocalISOString(date: Date) {
@@ -313,25 +298,6 @@ const Condominio = () => {
 
     const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
 
-    const obtenerArchivosComunidad = async (idCondominio: string) => {
-        const folderRef = ref(storage, `comunidad-${idCondominio}/`);
-        try {
-            const res = await listAll(folderRef);
-            const arrayArchivos = await Promise.all(
-                res.items.map(async (itemRef) => {
-                    const nombreArchivo = itemRef.name;
-                    const url = await getDownloadURL(itemRef);
-                    const esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(itemRef.fullPath)
-                    return { nombre: nombreArchivo, url: url, esVideo: esVideo };
-                })
-            );
-            return arrayArchivos;
-        } catch (error) {
-            console.error("Error al listar archivos:", error);
-            return [];
-        }
-    };
-
     const obtenerArchivosPerfil = async () => {
         const folderRef = ref(storage, `perfiles/`);
         try {
@@ -369,47 +335,7 @@ const Condominio = () => {
         }
     };
 
-    useEffect(() => {
-        const cargarDatos = async () => {
-            if (!actualizarData) return;
-
-            const idCondominio = localStorage.getItem("idCondominio");
-            if (!idCondominio) return;
-
-            const archivos = await obtenerArchivosComunidad(idCondominio);
-
-            setDataArchivosComunidad(archivos);
-
-            const newDataFull = {
-                ...dataFull,
-                anuncios: dataFull.anuncios.map((a: any) => {
-                    const nombreBuscado = a.amedida || "";
-                    const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
-                    let esVideodesdeURL = false;
-                    if (!matchArchivo) {
-                        esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(a.amedida)
-                    }
-                    return {
-                        ...a,
-                        amedida: matchArchivo ? matchArchivo.url : a.amedida,
-                        esVideo: matchArchivo ? matchArchivo.esVideo : esVideodesdeURL
-                    };
-                }),
-            };
-
-            if (JSON.stringify(newDataFull) !== JSON.stringify(dataFull)) {
-                setDataFull(newDataFull);
-                setDataFullParse(newDataFull as any);
-                setBuscarDataFull("");
-            }
-
-            setActualizarData(false);
-        };
-
-        cargarDatos();
-    }, [actualizarData]);
-
-    useEffect(() => {
+    /* useEffect(() => {
         if (navigator.onLine) {
             if ((localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") && localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") != 'undefined')) {
                 const jsonData = JSON.stringify(deserializeFromAscii(localStorage.getItem("ZXN0byBlcyBzZWNyZXRv")!));
@@ -440,7 +366,38 @@ const Condominio = () => {
             setEnComunidad(true)
             setLoading(false)
         }
-    }, [])
+    }, []) */
+    useEffect(() => {
+        if (navigator.onLine && logueado) {
+            if ((localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") && localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") != 'undefined')) {
+                const jsonData = JSON.stringify(deserializeFromAscii(localStorage.getItem("ZXN0byBlcyBzZWNyZXRv")!));
+                const hash = CryptoJS.HmacSHA256(jsonData, secret).toString();
+                const paquete = {
+                    datos: jsonData,
+                    firma: hash
+                };
+                LoginLogic(selLogin, paquete, false)
+            }
+            else {
+                cerrarSesion()
+            }
+        } else {
+            obtenerUltimoRegistro()
+            setUsuario({
+                usuario: localStorage.getItem("usuario") ?? "",
+                nombre: localStorage.getItem("nombreUsuario") ?? "",
+                tieneSuscripcionMensajes: false,
+                tieneSuscripcionVotaciones: false,
+                tieneSuscripcionAnuncios: false,
+                tieneSuscripcionAvisos: false,
+                rol: localStorage.getItem("rolUsuario") ?? "",
+                id: parseInt(localStorage.getItem("idUsuario") ?? "")
+            })
+            setTipo(1)
+            setEnComunidad(true)
+            setLoading(false)
+        }
+    }, [logueado])
 
     ///////////////////////////////////////////////////////////////////
     function urlBase64ToUint8Array(base64String: string) {
@@ -613,33 +570,10 @@ const Condominio = () => {
         }, localStorage.getItem("idCondominio")!.toString(), true);
     }
 
-    const normalizarLogin = (data: any) => {
-        return {
-            usuario: data.usuario ?? "",
-            clave: data.clave ?? "",
-            idCondominio: 0
-        };
-    };
 
-    const login = () => {
-        try {
-            const jsonData = JSON.stringify(normalizarLogin(loguear));
-            const hash = CryptoJS.HmacSHA256(jsonData, secret).toString();
-            const paquete = {
-                datos: jsonData,
-                firma: hash
-            };
-            setLoading(true);
-            localStorage.setItem("ZXN0byBlcyBzZWNyZXRv", serializeToAscii(loguear));
-            LoginLogic(selLogin, paquete, true)
-        } catch (er) {
-        }
-    }
-    function serializeToAscii(data: any): string {
-        const json = JSON.stringify(data);
-        const asciiCodes = Array.from(json).map(char => char.charCodeAt(0));
-        return asciiCodes.join(',');
-    }
+
+
+
     function deserializeFromAscii<T>(asciiStr: string): T {
         const bytes = asciiStr.split(',').map(Number);
         const json = String.fromCharCode(...bytes);
@@ -650,35 +584,11 @@ const Condominio = () => {
         try {
             setLoading(false);
             if (data.nombre && data.nombre != null && data.nombre != "") {
-                if (localStorage.getItem("idCondominio")) {
-                    const cargarDatos = async () => {
-                        const archivos = await obtenerArchivosComunidad(localStorage.getItem("idCondominio")!);
-                        setDataArchivosComunidad(archivos);
-                    }
-                    cargarDatos();
-                }
-                registerPush();
                 setUsuario(data);
                 setTipo(4)
                 setIniciarSesion(false)
-                if (data.imagen && !data.imagen.includes("http")) {
-                    const imageRef = ref(storage, `perfiles/${data.imagen}`);
 
-                    getDownloadURL(imageRef)
-                        .then((url) => {
-                            setImagenPerfil(url)
-                        })
-                        .catch((err) => {
-                            console.error(err);
-                        });
-
-                } else if (data.imagen && data.imagen.includes("http")) {
-                    setImagenPerfil(data.imagen);
-                } else {
-                    setImagenPerfil("");
-                }
                 setDataCondominios(data.condominios);
-                //guardarUltimoRegistro(data.condominios, 'condominios')
 
                 if (localStorage.getItem("idCondominio")) {
                     let condSelect = data.condominios.filter((a: any) => a.id.toString() === localStorage.getItem("idCondominio")!.toString());
@@ -706,7 +616,7 @@ const Condominio = () => {
                 changeMenu(999)
                 setVerAvisos(true)
                 setLoading(true)
-                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
+                /* ObtenerAvisosLogic(selListadoAvisos, (5 + 1).toString(), localStorage.getItem("idCondominio")!.toString(), "2025".toString()); */
                 /*FIN SE ABRE CALENDARIO COMO PRINCIPAL*/
                 obtenerImgenesPerfil();
             }
@@ -714,13 +624,7 @@ const Condominio = () => {
                 toast.info('Credenciales incorrectas', {
                     position: posicionAlertas,
                 });
-
                 localStorage.clear();
-                setLoguear({
-                    usuario: "",
-                    clave: "",
-                    idCondominio: "0"
-                })
                 cerrarSesion()
             }
             if (err) {
@@ -767,15 +671,7 @@ const Condominio = () => {
             activo: !data.activo
         };
     };
-    const normalizarEmergencia = (data: any) => {
-        return {
-            id: data.id,
-            descripcion: data.descripcion,
-            telefono: data.telefono,
-            idcondominio: localStorage.getItem("idCondominio"),
-            direccion: data.direccion
-        };
-    };
+
 
     const CrearAnuncio = (form: any, archivoTemp: File | null) => {
         let anuncioParse = form;
@@ -798,97 +694,10 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const EliminarAviso = (a: any, b: any, c: any, d: any, e: any) => {
-        try {
-            let fecha: Date = new Date(b)
-            var aviso: any = {
-                id: a,
-                fecha: b,
-                mensaje: c,
-                idUsuario: usuario.id,
-                idCondominio: localStorage.getItem("idCondominio")!.toString(),
-                idReserva: 0,
-                cabecera: d,
-                color: e
-            }
-            CrearAvisosLogic(selCrearAvisos, aviso, true)
-        } catch (er) {
-        }
-    }
-    const CrearAviso = (_aviso: any) => {
-        try {
-            /*  let newFecha = fechaAviso;
- 
-             var aviso: any = {
-                 id: idAviso,
-                 fecha: newFecha,
-                 mensaje: mensajeAviso,
-                 idUsuario: usuario.id,
-                 color: colorAviso,
-                 idCondominio: localStorage.getItem("idCondominio")!.toString(),
-                 idReserva: 0,
-                 cabecera: ""
-             } */
-            /* console.log(_aviso) */
-            CrearAvisosLogic(selCrearAvisos, _aviso, false)
-        } catch (er) {
-        }
-    }
-    const EnviarNotifAviso = (a: any) => {
-        try {
-            var aviso: any = {
-                mensaje: a,
-                idCondominio: localStorage.getItem("idCondominio")!.toString(),
-                usuario: usuario.nombre
-            }
-            EnviarNotifAvisoLogic(selEnviarNotifAviso, aviso)
-        } catch (er) {
-        }
-    }
-    const selEnviarNotifAviso = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                toast.success('Aviso enviado correctamente.', {
-                    position: posicionAlertas,
-                });
-            }
-            else {
-                toast.info('Error al intentar crear publicación. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            toast.info('Error al intentar crear publicación. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
-    const selCrearAvisos = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                setAvisos(data);
-                setLoading(false);
-                setVerAvisos(true);
-                setEditarAvisos(false);
-                setMensajeAviso('');
-                setFechaAviso('');
-                setHoraAviso(new Date().toLocaleTimeString());
-                setIdAviso(0);
-                toast.success('Aviso ' + (err ? 'eliminado' : 'creado') + ' correctamente', {
-                    position: posicionAlertas,
-                });
-            }
-            else {
-                toast.info('Error al intentar Crear Aviso. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            toast.info('Error al intentar Crear Aviso. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
+    
+
+    
+
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -959,15 +768,7 @@ const Condominio = () => {
             });
         }
     }
-    const CrearEmergencia = () => {
-        try {
-            if (emergencia.descripcion.length > 0) {
-                setLoading(true);
-                CrearEmergenciaLogic(selCrearEmergencia, normalizarEmergencia(emergencia), false)
-            }
-        } catch (er) {
-        }
-    }
+
     const CrearUsuario = (eliminar: boolean) => {
         try {
             if (newUser.nombre.length > 0 && newUser.usuario.length > 3 && newUser.clave.length > 3) {
@@ -985,54 +786,6 @@ const Condominio = () => {
                 CrearUsuarioLogic(selCrearUsuario, user, true)
             }
         } catch (er) {
-        }
-    }
-    const EliminarEmergencia = () => {
-        try {
-            handleConfirmMessageEliminarEmergencia()
-        } catch (er) {
-        }
-    }
-    const SeleccionarEmergencia = (e: any) => {
-        setEmergencia(e);
-        setEditarEmergencia(true);
-    }
-    const handleConfirmMessageEliminarEmergencia = async () => {
-        const msg: any = await ConfirmMessage(`Eliminar número de emergencia`, `¿Esta seguro de querer eliminar el número de emergencia?`);
-        if (msg) {
-            if (emergencia.descripcion.length > 0) {
-                setLoading(true);
-                CrearEmergenciaLogic(selCrearEmergencia, normalizarEmergencia(emergencia), true)
-            }
-        }
-    }
-    const selCrearEmergencia = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                setEmergenciaDetalle(data);
-                setLoading(false);
-                setEditarEmergencia(false)
-                setEmergencia({
-                    id: 0,
-                    descripcion: '',
-                    telefono: '',
-                    idcondominio: 0,
-                    direccion: ''
-                })
-                toast.success('Número de emergencia creado correctamente', {
-                    position: posicionAlertas,
-                });
-            }
-            else {
-                toast.info('Error al crear número de emergencia. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-            setLoading(false)
-        } catch (er) {
-            toast.info('Error al crear número de emergencia. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
         }
     }
 
@@ -1113,15 +866,6 @@ const Condominio = () => {
         }
     }
 
-    const selListadoVotaciones = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                setDataVotaciones(data);
-            }
-            setLoading(false);
-        } catch (er) {
-        }
-    }
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -1153,38 +897,6 @@ const Condominio = () => {
         setDataCondominios(registrocondominios)
         setEnComunidad(false)
     };
-    useEffect(() => {
-        const cargarDatos = async () => {
-            if (!actualizarMisAnuncios) return;
-
-            const idCondominio = localStorage.getItem("idCondominio");
-            if (!idCondominio) return;
-
-            const archivos = await obtenerArchivosComunidad(idCondominio);
-
-            setDataArchivosComunidad(archivos);
-
-            // Crear nuevo array modificando cada elemento sin mutar el original
-            const newDataFull = misAnuncios.map((a: any) => {
-                const nombreBuscado = a.amedida || "";
-                const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
-                let esVideodesdeURL = false;
-                if (!matchArchivo) {
-                    esVideodesdeURL = /\.(mp4|webm|ogg|mov|avi|mkv)(\?|&|$)/i.test(a.amedida)
-                }
-                return {
-                    ...a,
-                    amedida: matchArchivo ? matchArchivo.url : a.amedida,
-                    esVideo: matchArchivo ? matchArchivo.esVideo : esVideodesdeURL
-                };
-            });
-
-            setMisAnuncios(newDataFull);
-            setActualizarMisAnuncios(false);
-        };
-
-        cargarDatos();
-    }, [actualizarMisAnuncios]);
 
     const selMisAnuncios = (error: Boolean, err: string, data: any) => {
         try {
@@ -1196,7 +908,7 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const selListadoAvisos = (error: Boolean, err: string, data: any) => {
+    /* const selListadoAvisos = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
                 setAvisos(data);
@@ -1204,14 +916,7 @@ const Condominio = () => {
             setLoading(false);
         } catch (er) {
         }
-    }
-    const handleChangeLogin = (e: any) => {
-        const { name, value } = e.target;
-        setLoguear(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+    } */
 
     const handleChangeCriterio = (e: any) => {
         setCriterio(e);
@@ -1280,15 +985,13 @@ const Condominio = () => {
                 cerrarMenu()
                 changeMenu(999)
                 setVerAvisos(true)
-                setLoading(true)
-                ObtenerAvisosLogic(selListadoAvisos, (mes + 1).toString(), localStorage.getItem("idCondominio")!.toString(), año.toString());
                 break;
             case "numEmergencias":
                 cerrarMenu();
                 changeMenu(999);
                 setVerEmergencia(true);
-                setLoading(true);
-                ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString())
+                /* setLoading(true); */
+                /* ObtenerEmergenciasLogic(selObtenerEmergencia, localStorage.getItem("idCondominio")!.toString()) */
                 break;
             case "cerrarSesion":
                 cerrarMenu();
@@ -1365,16 +1068,12 @@ const Condominio = () => {
         setVerDetalle(false)
         setVerPerfil(false);
         setEditarPerfil(false);
-        setEditarAvisos(false);
         setVerUsuarios(false);
-        setEditarEmergencia(false);
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
         setVerMisAnuncios(false);
         setAgregarUsuario(false);
         if (a === 5) {
-            setLoading(true);
-            ObtenerVotacionesLogic(selListadoVotaciones, localStorage.getItem("idCondominio")!.toString(), usuario.id);
             setVotaciones(true);
         } else {
             setVotaciones(false);
@@ -1434,69 +1133,6 @@ const Condominio = () => {
         }
     };
 
-    const crearVotacion = (cabecera: any, descripcion: any, options: any) => {
-        try {
-            var _opciones: any = [];
-            // eslint-disable-next-line
-            options.map((e: any) => {
-                _opciones.push({ Descripcion: e.value, IdVotacion: 0 })
-            })
-
-            var votacion: any = {
-                Id: 0,
-                Cabecera: cabecera,
-                Descripcion: descripcion,
-                Activo: true,
-                IdUsuario: usuario.id,
-                IdCondominio: localStorage.getItem("idCondominio"),
-                OpcionesVotacion: _opciones
-            }
-
-            setLoading(true);
-            CrearVotacionLogic(selCrearVotacion, (votacion))
-        } catch (er) {
-        }
-    }
-    const selCrearVotacion = (error: Boolean, err: string, data: any) => {
-        try {
-            setLoading(false);
-            if (data) {
-                toast.success('Votación creada correctamente.', {
-                    position: posicionAlertas,
-                });
-                setDataVotaciones(data);
-                setLoading(false);
-                changeMenu(5);
-            }
-            else {
-                toast.info('Error al crear votación. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            toast.info('Error al crear votación. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
-
-    const selCambiarEstadoVotacion = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                setDataVotaciones(data);
-                changeMenu(5);
-                toast.success('Estado votación cambiado correctamente', {
-                    position: posicionAlertas,
-                });
-            }
-            setLoading(false);
-        } catch (er) {
-            toast.info('Error al cambiar estado. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
-
     const mensajeSuperior = () => {
         return (
             <div className={`${alerta.tipo === 1 ? "alert-primary" : alerta.tipo === 2 ? "alert-success" : alerta.tipo === 3 ? "alert-danger" : alerta.tipo === 4 ? "alert-warning" : "alert-primary"} alert alert-dismissible fade show mx-3 text-center`} role="alert">
@@ -1526,7 +1162,7 @@ const Condominio = () => {
         </div >
     }
 
-    const panelPrincipal = () => {
+    /* const panelPrincipal = () => {
         return <div className="container">
             <div className="row">
                 <span className="w-100 text-center h2 mb-4">Tus Comunidades</span>
@@ -1544,24 +1180,7 @@ const Condominio = () => {
             </div>
 
         </div>
-    }
-
-    const cambiarVoto = (ev: any) => {
-        setLoading(true);
-        if (ev.target.id) {
-            VotarLogic(selVotar, ev.target.id, usuario.id, localStorage.getItem("idCondominio")!.toString());
-        } else {
-            VotarLogic(selVotar, ev.target.parentNode.id, usuario.id, localStorage.getItem("idCondominio")!.toString());
-        }
-    }
-
-    const selVotar = (error: Boolean, err: string, data: any) => {
-        try {
-            setDataVotaciones(data);
-            setLoading(false);
-        } catch (er) {
-        }
-    }
+    } */
 
     const selcrearComentarioAnuncio = (error: Boolean, err: string, data: any) => {
         try {
@@ -1689,15 +1308,7 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const selObtenerEmergencia = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                setEmergenciaDetalle(data);
-            }
-            setLoading(false);
-        } catch (er) {
-        }
-    }
+
 
     const filtrarUsuarios = (ev: any) => {
         let parselistadoUser = listadousuarios.filter((e) => e.nombre.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()));
@@ -1986,11 +1597,6 @@ const Condominio = () => {
         }
     }
 
-    const getObtenerAvisosDia = (dia: number, mes: number) => {
-        setDiaMesSelect({ dia: dia, mes: mes, anio: año })
-        setVerDetalleAvisos(true);
-    }
-
     function useVisible(ref: any) {
         const [visible, setVisible] = useState(false);
 
@@ -2033,12 +1639,7 @@ const Condominio = () => {
         );
     }
 
-    const cambiarMes = (a: any, b: any) => {
-        setMes(a)
-        setAño(b)
-        setLoading(true)
-        ObtenerAvisosLogic(selListadoAvisos, (a + 1).toString(), localStorage.getItem("idCondominio")!.toString(), b.toString());
-    }
+
     const iconNotificaciones = (activa: boolean) => {
         return <label className="switch">
             <input
@@ -2085,7 +1686,6 @@ const Condominio = () => {
         setVerUsuarios(false);
         setVerReglasNormas(false);
         setVerAvisos(false)
-        setEditarAvisos(false)
         setVerPuntosInteres(false)
         setVerEmergencia(false)
         setVotaciones(false);
@@ -2321,23 +1921,24 @@ const Condominio = () => {
                 <div className={`container pb-5 mb-5`}>
                     <div className={`row px-2 justify-content-around ${buscarenmenu ? "mb-5" : ""}`}>
                         {
+                            iniciarSesion &&
+                            <>
+                                <Login
+                                    onLogin={() => {
+                                        cerrarSesion();
+                                        setLogueado(false)
+                                    }}
+                                    logueado={() => { setIniciarSesion(false); setLogueado(true) }}
+                                />
+                            </>
+                        }
+                        {/* {
                             (dataCondominios.length > 1 && !enComunidad) &&
                             <>
                                 {panelPrincipal()}
                             </>
-                        }
-                        {
-                            iniciarSesion &&
-                            <>
-                                <Login
-                                    usuario={loguear.usuario}
-                                    clave={loguear.clave}
-                                    onChange={handleChangeLogin}
-                                    onLogin={login}
-                                    loading={loading}
-                                />
-                            </>
-                        }
+                        } */}
+
                         {
                             (crear || editar) &&
                             <>
@@ -2364,14 +1965,7 @@ const Condominio = () => {
                             <>
                                 <VotacionPanel
                                     arrayImgUsers={arrayImgUsers}
-                                    votaciones={dataVotaciones}
-                                    onCambiarEstado={(votacion, activo) => {
-                                        setLoading(true);
-                                        CambiarEstadoVotacionLogic(selCambiarEstadoVotacion, votacion, activo, localStorage.getItem("idCondominio")!.toString(), usuario.id);
-                                    }}
-                                    onCambiarVoto={cambiarVoto}
                                     usuario={usuario}
-                                    loading={loading}
                                 />
                             </>
                         }
@@ -2379,18 +1973,7 @@ const Condominio = () => {
                             verEmergencia &&
                             <>
                                 <Emergencia
-                                    emergencia={emergencia}
-                                    emergencias={emergenciaDetalle}
-                                    onChange={handleChangeEmergencia}
-                                    onGuardar={CrearEmergencia}
-                                    onEliminar={EliminarEmergencia}
-                                    onCancelar={() => {
-                                        setEditarEmergencia(false);
-                                    }}
-                                    onSelect={SeleccionarEmergencia}
                                     rolUsuario={usuario.rol}
-                                    loading={loading}
-                                    modoEdicion={editarEmergencia}
                                 />
                             </>
                         }
@@ -2398,10 +1981,7 @@ const Condominio = () => {
                             encuesta &&
                             <>
                                 <VotacionCrear
-                                    onCrear={(cabecera, descripcion, opciones) => {
-                                        crearVotacion(cabecera, descripcion, opciones);
-                                    }}
-                                    loading={loading}
+                                    usuario={usuario}
                                 />
                             </>
                         }
@@ -2409,17 +1989,6 @@ const Condominio = () => {
                             verAvisos &&
                             <>
                                 <AvisoPanel
-                                    avisos={avisos}
-                                    mes={mes}
-                                    año={año}
-                                    onCambiarMes={cambiarMes}
-                                    onCrear={CrearAviso}
-                                    onEditar={(_aviso: any) => {
-                                        CrearAvisosLogic(selCrearAvisos, _aviso, false)
-                                    }}
-                                    onEliminar={(a) => EliminarAviso(a.id, a.fecha, a.mensaje, a.cabecera, a.color)}
-                                    onEnviarNotificacion={EnviarNotifAviso}
-                                    loading={loading}
                                     usuario={usuario}
                                 />
                             </>

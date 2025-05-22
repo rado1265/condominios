@@ -1,21 +1,36 @@
-import React from 'react';
-import logo from './../../../components/utils/img/logo.png'
-interface Props {
-    usuario: string;
-    clave: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onLogin: () => void;
-    loading?: boolean;
-}
+import React, { useState } from 'react';
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { loginThunk, suscribirPushThunk } from '../../../store/slices/login/authSlice';
+import { toast } from 'react-toastify';
+import logo from './../../../components/utils/img/logo.png';
 
-const Login: React.FC<Props> = ({ usuario, clave, onChange, onLogin, loading = false }) => {
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onLogin();
+const posicionAlertas = 'bottom-left';
+interface Props {
+    onLogin: () => void
+    logueado: () => void
+}
+const Login: React.FC<Props> = ({ onLogin, logueado }) => {
+    const dispatch = useAppDispatch();
+    const { loading, error } = useAppSelector(state => state.auth);
+
+    const [loguear, setLoguear] = useState({ usuario: '', clave: '' });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setLoguear(prev => ({ ...prev, [name]: value }));
     };
-    const handleKeyDown = (e: any) => {
-        if (e.key === 'Enter') {
-            onLogin();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const result = await dispatch(loginThunk(loguear));
+        if (loginThunk.fulfilled.match(result)) {
+            const user = result.payload;
+            toast.success('Inicio de sesión exitoso', { position: posicionAlertas });
+            dispatch(suscribirPushThunk({ idCondominio: localStorage.getItem('idCondominio')!, idUsuario: user.id }));
+            logueado()
+        } else {
+            toast.error('Credenciales incorrectas', { position: posicionAlertas });
+            onLogin()
         }
     };
 
@@ -25,30 +40,23 @@ const Login: React.FC<Props> = ({ usuario, clave, onChange, onLogin, loading = f
                 <img className="w-75 mx-auto" alt="Logo" src={logo} />
             </div>
             <div className="w-100 search-container">
-                <label htmlFor="textfield" className="search-label">
-                    Inicio de Sesión
-                </label>
+                <label htmlFor="usuario" className="search-label">Inicio de Sesión</label>
                 <div className="login-box">
                     <input
                         type="text"
                         name="usuario"
                         className="search-input"
-                        value={usuario}
-                        onChange={onChange}
+                        value={loguear.usuario}
+                        onChange={handleChange}
                     />
                     <input
                         type="password"
                         name="clave"
                         className="search-input"
-                        value={clave}
-                        onChange={onChange}
-                        autoComplete="current-password"
+                        value={loguear.clave}
+                        onChange={handleChange}
                     />
-                    <button
-                        type="submit"
-                        className="search-button"
-                        
-                    >
+                    <button type="submit" className="search-button">
                         {loading ? 'Ingresando...' : 'Ingresar'}
                     </button>
                 </div>

@@ -1,66 +1,84 @@
+// VotacionCrear.tsx (migrado a Redux)
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import iconmenos from './../../../components/utils/img/icon-menos.png';
-type Opcion = {
-    id: number;
-    value: string;
-};
-interface Votacion {
-    Id: number;
-    Cabecera: string;
-    Descripcion: string;
-    Activo: boolean;
-    OpcionesVotacion: Opcion[];
-}
+import { AppDispatch, RootState } from '../../../store/store';
+import { crearVotacionAsync, resetVotacionCreacion } from "../../../store/slices/votacion/crearVotacionesSlice";
 
 interface Props {
-    onCrear: (cabecera: string, descripcion: string, opciones: Opcion[]) => void;
-    loading?: boolean;
+    usuario: any;
 }
 
-const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
+const posicionAlertas = 'bottom-left';
+
+const VotacionCrear: React.FC<Props> = ({ usuario }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading, error } = useSelector((state: RootState) => state.crearVotaciones);
+
     const [cabecera, setCabecera] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [options, setOptions] = useState<Opcion[]>([
+    const [options, setOptions] = useState([
         { id: 1, value: '' },
         { id: 2, value: '' },
     ]);
+
     const handleAddOption = () => {
-        const newOption = {
-            id: options.length + 1,
-            value: '',
-        };
+        const newOption = { id: options.length + 1, value: '' };
         setOptions([...options, newOption]);
     };
 
-    const crearVotacion = () => {
-        if (cabecera && options.length >= 2) {
-            onCrear(cabecera, descripcion, options);
-            setCabecera('');
-            setDescripcion('');
-            setOptions([
-                { id: 1, value: '' },
-                { id: 2, value: '' },
-            ]);
-        } else {
-            alert('Debe agregar al menos 2 opciones y un título.');
-        }
-    };
     const handleOptionChange = (id: number, value: string) => {
-        const updatedOptions = options.map(opt =>
-            opt.id === id ? { ...opt, value } : opt
-        );
-        setOptions(updatedOptions);
+        setOptions(options.map(opt => (opt.id === id ? { ...opt, value } : opt)));
     };
-
 
     const handleRemoveOption = (id: number) => {
-        const filteredOptions = options.filter(opt => opt.id !== id);
-        setOptions(filteredOptions);
-        //setShowAddButton(true);
+        setOptions(options.filter(opt => opt.id !== id));
+    };
+
+    const crearVotacion = () => {
+        if (!cabecera || options.length < 2) {
+            toast.error('Debe agregar al menos 2 opciones y un título.', {
+                position: posicionAlertas,
+            });
+            return;
+        }
+
+        const _opciones = options.map(opt => ({ Descripcion: opt.value, IdVotacion: 0 }));
+
+        const votacion: any = {
+            Id: 0,
+            Cabecera: cabecera,
+            Descripcion: descripcion,
+            Activo: true,
+            IdUsuario: usuario.id,
+            IdCondominio: localStorage.getItem('idCondominio') || '',
+            OpcionesVotacion: _opciones,
+        };
+
+        dispatch(crearVotacionAsync(votacion))
+            .unwrap()
+            .then(() => {
+                toast.success('Votación creada correctamente.', {
+                    position: posicionAlertas,
+                });
+                setCabecera('');
+                setDescripcion('');
+                setOptions([
+                    { id: 1, value: '' },
+                    { id: 2, value: '' },
+                ]);
+                dispatch(resetVotacionCreacion());
+            })
+            .catch(() => {
+                toast.error('Error al crear votación. Comuníquese con el Administrador.', {
+                    position: posicionAlertas,
+                });
+            });
     };
 
     return (
-        <div key={1} className="col-12 mt-4">
+        <div className="col-12 mt-4">
             <div className="survey-creator-container">
                 <h2 className="creator-title">Creador de Votaciones</h2>
 
@@ -74,24 +92,25 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
                         rows={2}
                     />
                 </div>
+
                 <div className="input-group">
-                    <label className="h4" htmlFor="question">Descripción:</label>
+                    <label className="h4" htmlFor="descripcion">Descripción:</label>
                     <textarea
-                        id="question"
+                        id="descripcion"
                         value={descripcion}
                         onChange={(e) => setDescripcion(e.target.value)}
                         placeholder="Escribe tu descripción aquí..."
                         rows={2}
                     />
                 </div>
+
                 <div className="options-section">
                     <h4>Opciones de respuesta:</h4>
                     {options.map((option, index) => (
-                        <div id={option.id.toString()} className="option-item">
+                        <div key={option.id} className="option-item">
                             <input
-                                id={index.toString()}
                                 type="text"
-                                className='w-100'
+                                className="w-100"
                                 value={option.value}
                                 onChange={(e) => handleOptionChange(option.id, e.target.value)}
                                 placeholder={`Opción ${index + 1}`}
@@ -100,25 +119,25 @@ const VotacionCrear: React.FC<Props> = ({ onCrear, loading = false }) => {
                                 <button
                                     className="remove-option"
                                     onClick={() => handleRemoveOption(option.id)}
-                                    aria-label="Eliminar opción"
                                 >
                                     <img width={25} src={iconmenos} alt="icono de eliminar" />
                                 </button>
                             )}
                         </div>
                     ))}
-                    <button
-                        className="add-option"
-                        onClick={handleAddOption}
-                    >
+                    <button className="add-option" onClick={handleAddOption}>
                         + Añadir opción
                     </button>
                 </div>
 
-                <button className="modal-btn modal-btn-green w-100 mt-3" onClick={() => crearVotacion()}>Crear Encuesta</button>
-
+                <button
+                    className="modal-btn modal-btn-green w-100 mt-3"
+                    onClick={crearVotacion}
+                    disabled={loading}
+                >
+                    {loading ? 'Creando...' : 'Crear Encuesta'}
+                </button>
             </div>
-
         </div>
     );
 };
