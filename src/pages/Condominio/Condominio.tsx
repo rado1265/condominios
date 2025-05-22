@@ -1426,7 +1426,7 @@ const Condominio = () => {
 
     const handleLike = (id: any, like: any, esPantallaComentario: boolean) => {
         if (usuario.nombre.length > 0) {
-            DarQuitarLikeLogic(selDarQuitarLike, id, like)
+            DarQuitarLikeLogic(selDarQuitarLike, id, usuario.id, usuario.nombre)
         }
         if (esPantallaComentario) {
             setVerDetalle(true)
