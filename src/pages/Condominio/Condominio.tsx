@@ -167,7 +167,7 @@ const Condominio = () => {
     const [encuesta, setEncuesta] = useState(false)
     const [menuOpciones, setMenuOpciones] = useState(false)
     const [dataVotaciones, setDataVotaciones] = useState([{ cabecera: "", opcionesVotacion: [] }])
-    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: 0, organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false, imgOrganizador: "" })
+    const [dataDetalle, setDataDetalle] = useState({ cabecera: "", descripcion: "", amedida: "", id: "", telefono: "", likes: [], organizador: "", fechaDesde: new Date(), fechaHasta: new Date(), comentarios: [], esVideo: false, imgOrganizador: "" })
     const [verDetalle, setVerDetalle] = useState(false)
     const menuRef = useRef(null);
     const [nombreComunidad, setNombreComunidad] = useState("")
@@ -1429,7 +1429,7 @@ const Condominio = () => {
             DarQuitarLikeLogic(selDarQuitarLike, id, usuario.id, usuario.nombre)
         }
         if (esPantallaComentario) {
-            setVerDetalle(true)
+            setLoading(true);
             ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, dataDetalle.id)
         }
     };
@@ -1617,6 +1617,7 @@ const Condominio = () => {
                             newData.esVideo = esVideo;
                             setDataDetalle(newData);
                             setLoading(false);
+                            setVerDetalle(true);
                         })
                         .catch((err) => {
                             console.error(err);
@@ -1627,6 +1628,7 @@ const Condominio = () => {
                     newData.esVideo = esVideo;
                     setDataDetalle(newData);
                     setLoading(false);
+                    setVerDetalle(true);
                 }
             }
         } catch (er) {
@@ -2505,8 +2507,7 @@ const Condominio = () => {
                                         onEliminar={EliminarAnuncio}
                                         onDeshabilitar={DeshabilitarAnuncio}
                                         onVerDetalle={(anuncio: any) => {
-                                            setDataDetalle(anuncio);
-                                            setVerDetalle(true);
+                                            setLoading(true);
                                             ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
                                         }}
                                         onLike={(id: any) => handleLike(id, true, false)}
@@ -2531,8 +2532,7 @@ const Condominio = () => {
                                             onEliminar={EliminarAnuncio}
                                             onDeshabilitar={DeshabilitarAnuncio}
                                             onVerDetalle={(anuncio: any) => {
-                                                setDataDetalle(anuncio);
-                                                setVerDetalle(true);
+                                                setLoading(true);
                                                 ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
                                             }}
                                             onLike={(id: any) => handleLike(id, true, false)}

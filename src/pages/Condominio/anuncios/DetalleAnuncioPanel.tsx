@@ -2,6 +2,7 @@ import React, { ChangeEventHandler, useEffect, useState } from 'react';
 import iconborrar from './../../../components/utils/img/iconborrar.png'
 import iconvolver from './../../../components/utils/img/volver.png'
 import volverWhite from './../../../components/utils/img/volverWhite.png'
+import corazonVacio from '../../../components/utils/img/corazonVacio.png';
 
 interface Comentario {
     id: number;
@@ -18,7 +19,7 @@ interface AnuncioDetalle {
     telefono: string;
     amedida: string;
     esVideo: boolean;
-    likes: number;
+    likes: any;
     comentarios: Comentario[];
     fechaDesde: Date;
     fechaHasta: Date;
@@ -30,7 +31,7 @@ interface Props {
     comentario: string;
     onChangeComentario: (e: any) => void;
     onComentar: () => void;
-    onLike: () => void;
+    onLike: (id: number) => void;
     onCerrar: () => void;
     loading?: boolean;
     imgError: string;
@@ -53,32 +54,33 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     arrayImgUsers
 }) => {
     const [imgAnuncio, setImgAnuncio] = useState("");
+    const [newComentariosAnuncio, setNewComentariosAnuncio] = useState(anuncio.comentarios);
 
     useEffect(() => {
-        console.log(anuncio);
+        let newComentarios = anuncio.comentarios;
         const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === anuncio.imgOrganizador);
         if (matchArchivo) {
             setImgAnuncio(matchArchivo.url);
         } else if (anuncio.imgOrganizador.includes("https")) {
             setImgAnuncio(anuncio.imgOrganizador);
         }
-
-        if (anuncio.comentarios) {
-            anuncio.comentarios.map((a: any) => {
+        
+        if (newComentarios) {
+            newComentarios.map((a: any) => {
                 const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === a.imgUsuario);
                 if (matchArchivo) {
                     a.imgUsuario = matchArchivo.url;
                 }
             })
+
+            setNewComentariosAnuncio(newComentarios);
         }
     }, [])
-
-
 
     return <>{!loading &&
         <div className="mx-3">
             <button type="button" className="iconoVolver volverPublicaciones mb-4 mt-2" onClick={onCerrar}>
-                <img width={30} height={30} src={volverWhite} style={{marginRight:'10px'}}/>
+                <img width={30} height={30} src={volverWhite} style={{ marginRight: '10px' }} />
                 Volver a publicaciones
             </button>
             <h4 className="mt-3 mb-4 text-center" style={{ fontSize: '1.7rem', fontWeight: '700' }}>{anuncio.cabecera}</h4>
@@ -110,15 +112,23 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                 <small className="anuncio-fecha" style={{ position: 'relative', marginLeft: '20px', bottom: '0', fontSize: '12px' }}>
                     Fecha publicación: {new Date(anuncio.fechaDesde).toLocaleDateString() + " " + new Date(anuncio.fechaDesde).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 </small>
-                <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }}>
-                    <svg className="like-icon" viewBox="0 0 24 24" onClick={onLike}>
+                <div className="anuncio-like" style={{ position: 'relative', marginRight: '20px', bottom: '0' }} onClick={(e) => e.stopPropagation()}>
+                {anuncio.likes.find((e: any) => e.idUsuario == user.id ) ?
+                    <svg
+                        className="v2-like-icon"
+                        viewBox="0 0 24 24"
+                        onClick={() => onLike(anuncio.id)}
+                    >
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-                     2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
-                     C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
-                     22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09 
+                  C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 
+                  22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
-                    <span className="like-count">{anuncio.likes === 0 ? "" : anuncio.likes}</span>
-                </div>
+                    :
+                    <img src={corazonVacio} onClick={() => onLike(anuncio.id)}/>
+                }
+                <span className="like-count">{anuncio.likes.length}</span>
+            </div>
             </div>
             <div className="comments-container">
                 <h2 className="comments-title">Comentarios</h2>
