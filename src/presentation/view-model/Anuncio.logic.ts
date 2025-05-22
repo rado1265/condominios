@@ -24,8 +24,8 @@ export const SuscribirNotificaciones2Logic = (selListado: any, idCondominio: any
 export const DessuscribirNotificacionesLogic = (selListado: any, idUsuario: any, tipoSuscripcion: any) => {
     return DesscribirNotificaciones(selListado, idUsuario, tipoSuscripcion);
 }
-export const DarQuitarLikeLogic = (selListado: any, idAnuncio: any, like: any) => {
-    return DarQuitarLike(selListado, idAnuncio, like);
+export const DarQuitarLikeLogic = (selListado: any, idAnuncio: any, idUsuario: any, nombreUsuario: string) => {
+    return DarQuitarLike(selListado, idAnuncio, idUsuario, nombreUsuario);
 }
 export const ObtenerVotacionesLogic = (selListado: any, idCondominio: string, idUsuario: any) => {
     return ObtenerVotaciones(selListado, idCondominio, idUsuario);

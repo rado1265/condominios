@@ -215,10 +215,10 @@ export class SVCAnuncio {
         return sr;
     }
 
-    public static async DarQuitarLike(idAnuncio: any, like: any): Promise<IServiceResult<any>> {
+    public static async DarQuitarLike(idAnuncio: any, idUsuario: any, nombreUsuario: string): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
-        const url: string = _ruta + "Condominios/darLike?idAnuncio=" + idAnuncio + "&like=" + like
+        const url: string = _ruta + "Condominios/darLike?idAnuncio=" + idAnuncio + "&idUsuario=" + idUsuario + "&nombreUsuario=" + nombreUsuario
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
         await axios.post(url, [], {
