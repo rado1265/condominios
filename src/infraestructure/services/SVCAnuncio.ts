@@ -190,13 +190,13 @@ export class SVCAnuncio {
 
         return sr;
     }
-    public static async DesscribirNotificaciones(idUsuario: any, tipoSuscripcion: any): Promise<IServiceResult<any>> {
+    public static async DesscribirNotificaciones(idUsuario: any, tipoSuscripcion: any, subscription: any): Promise<IServiceResult<any>> {
         let _ruta: string = con.RetornaRuta();
 
         const url: string = _ruta + "Condominios/eliminarSus?idUsuario=" + idUsuario + "&tipoSuscripcion=" + tipoSuscripcion
         let sr: ServiceResult<any> = new ServiceResult<any>();
         sr.errorMessage = "Inicializando invocación";
-        await axios.post(url, [], {
+        await axios.post(url, subscription, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 "x-community-id": "2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79",

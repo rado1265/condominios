@@ -2190,16 +2190,22 @@ const Condominio = () => {
         setMenuOpciones(false);
         setLoading(true);
         if (tieneSuscripcion) {
-            DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion)
+            /* DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion) */
+            Dessuscripcion(tipoSuscripcion)
         } else {
             Suscripcion(tipoSuscripcion)
         }
     }
     async function Suscripcion(tipoSuscripcion: any) {
         var result: any = await solicitarPermisoNotificaciones()
-        console.log(result)
         if (result) {
             SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result, true)
+        }
+    }
+    async function Dessuscripcion(tipoSuscripcion: any) {
+        var result: any = await solicitarPermisoNotificaciones()
+        if (result) {
+            DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion, result)
         }
     }
     async function SuscripcionTotal(tipoSuscripcion: any, _usuario: any) {
