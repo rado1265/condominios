@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
+import "dayjs/locale/es";
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { toast } from 'react-toastify';
+import iconeditar from './../../../components/utils/img/editar.png'
+import iconborrar from './../../../components/utils/img/iconborrar.png'
+import iconNotificacion from './../../../components/utils/img/notificacion.png'
 
 import {
     fetchTiposAviso,
@@ -30,6 +34,8 @@ interface Props {
 const AvisoPanel: React.FC<Props> = ({ usuario }) => {
     const dispatch = useDispatch<AppDispatch>()
 
+    dayjs.locale("es");
+
     const {
         avisos,
         tiposAviso,
@@ -51,6 +57,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
         if (idCondominio) {
             dispatch(fetchTiposAviso());
             dispatch(fetchAvisos({ mes, año, idCondominio }));
+            getObtenerAvisosDia(new Date().getDate(), mes);
         }
     }, [dispatch, mes, año, idCondominio]);
 
@@ -65,7 +72,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
 
     // Seleccionar día y filtrar avisos
     const getObtenerAvisosDia = (dia: any, mesSeleccionado: any) => {
-        dispatch(setAvisoActual({ name: "fecha", value: new Date(año, (mesSeleccionado-1), dia) }));
+        dispatch(setAvisoActual({ name: "fecha", value: new Date(año, (mesSeleccionado - 1), dia) }));
         dispatch(setDiaMesSelect({ dia, mes: mesSeleccionado, año }));
         const avisosDeHoy = avisos.filter(
             (a: any) =>
@@ -87,7 +94,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                 { position: 'bottom-left' }
             );
             dispatch(fetchAvisos({ mes, año, idCondominio }));
-        } catch(error) {
+        } catch (error) {
             toast.error('Error al intentar crear/eliminar aviso.', {
                 position: 'bottom-left',
             });
@@ -143,7 +150,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                 <div
                     key={`dia-${dia}`}
                     className="dia"
-                    onClick={() => getObtenerAvisosDia(dia, mes)}
+                    onClick={() => { getObtenerAvisosDia(dia, mes) }}
                     style={{ cursor: 'pointer' }}
                 >
                     <div
@@ -195,10 +202,15 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                         aria-label="Izquierda"
                         className="iconFlecha"
                     >
-                        &#8592;
+                        <svg fill="#9a9a9a" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 330 330">
+                            <path id="XMLID_92_" d="M111.213,165.004L250.607,25.607c5.858-5.858,5.858-15.355,0-21.213c-5.858-5.858-15.355-5.858-21.213,0.001
+	l-150,150.004C76.58,157.211,75,161.026,75,165.004c0,3.979,1.581,7.794,4.394,10.607l150,149.996
+	C232.322,328.536,236.161,330,240,330s7.678-1.464,10.607-4.394c5.858-5.858,5.858-15.355,0-21.213L111.213,165.004z"/>
+                        </svg>
                     </button>
                     <h4 className="m-0 titulocalendarioAviso">
-                        {dayjs(new Date(año, mes - 1)).format('MMMM YYYY')}
+                        {dayjs(new Date(año, mes - 1)).format('MMMM YYYY').charAt(0).toUpperCase() + dayjs(new Date(año, mes - 1)).format('MMMM YYYY').slice(1)}
                     </h4>
                     <button
                         onClick={() => {
@@ -209,7 +221,12 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                         aria-label="Derecha"
                         className="iconFlecha"
                     >
-                        &#8594;
+                        <svg fill="#9a9a9a" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 330.002 330.002">
+                            <path id="XMLID_103_" d="M233.252,155.997L120.752,6.001c-4.972-6.628-14.372-7.97-21-3c-6.628,4.971-7.971,14.373-3,21
+	l105.75,140.997L96.752,306.001c-4.971,6.627-3.627,16.03,3,21c2.698,2.024,5.856,3.001,8.988,3.001
+	c4.561,0,9.065-2.072,12.012-6.001l112.5-150.004C237.252,168.664,237.252,161.33,233.252,155.997z"/>
+                        </svg>
                     </button>
                 </div>
                 <div className="calendario h-md-50">{generarCalendario()}</div>
@@ -217,7 +234,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
             <div className="col-12 col-md-5">
                 <div className="container-title-eventosdelDia">
                     <h5 className="title-eventosdeldia">
-                        Eventos {diaMesSelect.dia} de {dayjs(new Date(año, mes - 1)).format('MMMM YYYY')}
+                        Eventos {diaMesSelect.dia} de {dayjs(new Date(año, mes - 1)).format('MMMM YYYY').charAt(0).toUpperCase() + dayjs(new Date(año, mes - 1)).format('MMMM YYYY').slice(1)}
                     </h5>
                     {usuario.rol === 'ADMINISTRADOR' && (
                         <button
@@ -225,7 +242,10 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                             title="Agregar Evento"
                             onClick={() => dispatch(setCrearEvento(true))}
                         >
-                            +
+                            <svg width="25" height="25" viewBox="0 0 18 18" fill="none">
+                                <circle cx="9" cy="9" r="9" fill="#336699" />
+                                <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
                         </button>
                     )}
                 </div>
@@ -235,37 +255,36 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                     <div
                         key={i}
                         className="avisos-dia"
-                        style={{
-                            borderBottom: `4px solid ${a.color}`,
-                            background: `${a.color}12`,
-                            color: a.color,
-                            marginBottom: '10px',
-                            padding: '5px',
-                        }}
-                    >
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <div>
-                                <strong>{a.cabecera}</strong>
-                                <p>{a.mensaje}</p>
-                                <small>{dayjs(a.fecha).format('DD/MM/YYYY')}</small>
+                        style={{ borderBottom: `4px solid ${a.color}`, background: `${a.color}12`, color: a.color }}>
+                        {a.idReserva === 0 && usuario.rol === 'ADMINISTRADOR' && (
+                            <div style={{ float: 'right', display: 'flex', alignItems: 'center', marginTop: '-5px' }}>
+                                <button
+                                    onClick={() => onEnviarNotificacion(`${a.cabecera}: ${a.mensaje}`)}
+                                    className='iconoVolver'
+                                    title="Enviar Notificación"
+                                >
+                                    <img width={20} height={20} src={iconNotificacion} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="iconoVolver"
+                                    onClick={() => { dispatch(setEditarEvento(true)); dispatch(setAvisoActual(a));}}
+                                    aria-label="Editar Aviso"
+                                >
+                                    <img src={iconeditar} />
+                                </button>
+                                <button
+                                    onClick={() => onCrearEliminarAviso(a, true)}
+                                    className='iconoVolver'
+                                    title="Eliminar Aviso"
+                                >
+                                    <img width={20} height={20} src={iconborrar} />
+                                </button>
                             </div>
-                            {a.idReserva === 0 && usuario.rol === 'ADMINISTRADOR' && (
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <button
-                                        onClick={() => onEnviarNotificacion(`${a.cabecera}: ${a.mensaje}`)}
-                                        title="Enviar Notificación"
-                                    >
-                                        🔔
-                                    </button>
-                                    <button
-                                        onClick={() => onCrearEliminarAviso(a, true)}
-                                        title="Eliminar Aviso"
-                                    >
-                                        🗑️
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        )}
+                        <strong>{a.cabecera}</strong>
+                        <p>{a.mensaje}</p>
+                        <small>{dayjs(a.fecha).format('DD/MM/YYYY')}</small>
                     </div>
                 ))}
                 <div className={`modal-overlay ${crearEvento || editarEvento ? "" : "d-none"}`}>

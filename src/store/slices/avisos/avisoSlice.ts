@@ -45,7 +45,6 @@ export const fetchAvisos = createAsyncThunk(
 export const postCrearAviso = createAsyncThunk(
     'aviso/postCrearAviso',
     async ({ aviso, eliminar }: { aviso: any, eliminar: any }) => {
-        debugger
         // Lógica para crear o eliminar aviso según eliminar booleano
         // Usa el endpoint correspondiente
         const response = await axios.post(`${baseURL}Condominios/crearAviso?eliminar=${eliminar}`, aviso, { headers });

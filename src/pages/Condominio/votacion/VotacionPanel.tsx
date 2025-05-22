@@ -29,7 +29,6 @@ const VotacionPanel: React.FC<Props> = ({ usuario = '', arrayImgUsers }) => {
             dataListado.forEach((b: any) => {
                 if (b.votaciones) {
                     b.votaciones.map((p: any) => {
-                        debugger
                         const matchArchivo = arrayImgUsers.find((x: any) => x.nombre === p.imgUsuario);
                         if (matchArchivo) {
                             /* p.imgUsuario = matchArchivo.url.toString(); */
