@@ -22,6 +22,20 @@ if(!urlActual.includes("www.") && !urlActual.includes("localhost")){
   window.location.href = "https://www.conexionresidencial.cl/"
 }
 
+
+window.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+
+window.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=')) {
+    e.preventDefault();
+  }
+});
+
 root.render(
   <BrowserRouter>
     <Routes>

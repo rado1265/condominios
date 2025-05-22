@@ -116,7 +116,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
 
     const handleImage = (files: any) => {
         if (files.target.files.length === 0) return;
-        const file = files.target.files[0];
+        //const file = files.target.files[0];
 
         setArchivoTemp(files.target.files[0]);
 
@@ -127,14 +127,14 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
             img.src = URL.createObjectURL(files.target.files[0]);
         }
 
-        const reader = new FileReader();
+        /*const reader = new FileReader();
 
         reader.onloadend = async () => {
             if (!reader.result || typeof reader.result !== 'string') {
                 return;
             }
 
-            const base64 = reader.result.split(',')[1];
+         const base64 = reader.result.split(',')[1];
 
             const body = {
                 requests: [
@@ -145,7 +145,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                 ],
             };
 
-            /* try {
+            try {
                 const response = await axios.post(
                     `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`,
                     body
@@ -161,10 +161,10 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
 
             } finally {
 
-            } */
+            } 
         };
 
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file);*/
     };
 
     const handleSubmit = (e: React.FormEvent) => {

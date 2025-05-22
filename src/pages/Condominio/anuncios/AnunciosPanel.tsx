@@ -68,7 +68,7 @@ const AnunciosPanel: React.FC<Props> = ({
     useEffect(() => {
         const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === anuncio.imgOrganizador);
         if (matchArchivo) {
-            setImgAnuncio(matchArchivo);
+            setImgAnuncio(matchArchivo.url);
         } else if (anuncio.imgOrganizador.includes("https")) {
             setImgAnuncio(anuncio.imgOrganizador);
         }

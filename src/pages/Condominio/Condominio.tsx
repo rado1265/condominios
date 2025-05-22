@@ -853,12 +853,12 @@ const Condominio = () => {
                 });
             }
             else {
-                toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
+                toast.info('Error al intentar crear publicación. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
         } catch (er) {
-            toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
+            toast.info('Error al intentar crear publicación. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
         }
@@ -901,7 +901,7 @@ const Condominio = () => {
                 });
             }
             else {
-                toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
+                toast.info('Error al intentar crear publicación. Comuníquese con el Administrador.', {
                     position: posicionAlertas,
                 });
             }
@@ -924,7 +924,7 @@ const Condominio = () => {
                 esVideo: false
             })
         } catch (er) {
-            toast.info('Error al intentar Crear Anuncio. Comuníquese con el Administrador.', {
+            toast.info('Error al intentar crear publicación. Comuníquese con el Administrador.', {
                 position: posicionAlertas,
             });
         }

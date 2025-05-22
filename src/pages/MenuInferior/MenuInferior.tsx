@@ -200,7 +200,7 @@ const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCrite
                                 <button
                                     className={`nav-button container-Opcion`}
                                     onClick={() => { onChangeMenu('crearAnuncio'); cerrarMenuInf() }}
-                                    aria-label="Crear Anuncio"
+                                    aria-label="Crear Publicación"
                                 >
                                     {icons.anunciosSelect}
                                     <span className='txtOpcion'>Crear <br></br>Anuncio</span>

@@ -220,8 +220,8 @@ const PerfilUsuario: React.FC<Props> = ({
                                 </div>
                                 {
                                     sinNotificaciones ?
-                                        <div className="container-dataPerfil">
-                                            <span>Para poder activar las notificaciones es necesario dar permisos para notificaciones a la app</span>
+                                        <div className="container-dataPerfil notDesactivadas">
+                                            <span style={{color: '#1565c0'}}>Para poder activar las notificaciones es necesario dar permisos para notificaciones a la aplicación.</span>
                                         </div>
                                         :
                                         <> <div className="container-dataPerfil">

@@ -31,7 +31,7 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPe
     return (
         <>
             <div className={enComunidad ? "w-100 p-3 mb-3 containerMenu" : "d-none"}>
-                <img src={back} onClick={onChangeAtras} />
+                <img style={{visibility: 'hidden'}} src={back} onClick={onChangeAtras} />
                 <span className='tituloMenu'>{nombre}</span>
                 <div className="huincha-profile-dropdown" ref={dropdownRef}>
                     <button

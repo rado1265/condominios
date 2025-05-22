@@ -58,7 +58,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
         console.log(anuncio);
         const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === anuncio.imgOrganizador);
         if (matchArchivo) {
-            setImgAnuncio(matchArchivo);
+            setImgAnuncio(matchArchivo.url);
         } else if (anuncio.imgOrganizador.includes("https")) {
             setImgAnuncio(anuncio.imgOrganizador);
         }
@@ -67,7 +67,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
             anuncio.comentarios.map((a: any) => {
                 const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === a.imgUsuario);
                 if (matchArchivo) {
-                    a.imgUsuario = matchArchivo;
+                    a.imgUsuario = matchArchivo.url;
                 }
             })
         }

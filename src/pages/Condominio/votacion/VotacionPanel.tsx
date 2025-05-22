@@ -34,7 +34,7 @@ const VotacionPanel: React.FC<Props> = ({ votaciones, onCambiarEstado, onCambiar
                     b.votaciones.map((p: any) => {
                         const matchArchivo = arrayImgUsers.find((b: any) => b.nombre === p.imgUsuario);
                         if (matchArchivo) {
-                            p.imgUsuari = matchArchivo;
+                            p.imgUsuari = matchArchivo.url;
                         } else if (p.imgUsuario && p.imgUsuario.includes("https")) {
                             p.imgUsuario = p.imgUsuario;
                         }
