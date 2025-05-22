@@ -73,8 +73,8 @@ export const SuscribirNotificaciones2 = (selListado: any, idCondominio: any, idU
         }
     });
 }
-export const DesscribirNotificaciones = (selListado: any, idUsuario: any, tipoSuscripcion: any) => {
-    SVCAnuncio.DesscribirNotificaciones(idUsuario, tipoSuscripcion).then((res: IServiceResult<any>) => {
+export const DesscribirNotificaciones = (selListado: any, idUsuario: any, tipoSuscripcion: any, subscription: any) => {
+    SVCAnuncio.DesscribirNotificaciones(idUsuario, tipoSuscripcion, subscription).then((res: IServiceResult<any>) => {
         if (res.result !== undefined) {
             let data: any = res.result;
             selListado(false, tipoSuscripcion.toString(), data);
