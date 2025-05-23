@@ -5,7 +5,7 @@ import disponibilidadEspacioComunReducer from '../store/slices/espacioComun/disp
 import historialReservasReducer from '../store/slices/espacioComun/historialReservasSlice'
 import reservaEspacioComunReducer from '../store/slices/espacioComun/reservaEspacioComunSlice'
 import condominioReducer from '../store/slices/condominio/condominioSlice';
-import userReducer from '../store/slices/perfil/userSlice';
+import userReducer from '../store/slices/perfil/perfilUsuarioSlice';
 import emergenciaReducer from '../store/slices/emergencia/emergenciaSlice';
 import votacionesReducer from '../store/slices/votacion/votacionesSlice';
 import crearVotacionesReducer from '../store/slices/votacion/crearVotacionesSlice';
