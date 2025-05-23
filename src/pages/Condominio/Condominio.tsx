@@ -120,24 +120,7 @@ const Condominio = () => {
     const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false }]);
     const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false });
     const [verUsuarioInd, setVerUserInd] = useState(false);
-    const [usuarioDetalle, setUsuarioDetalle] = useState({
-        nombre: "",
-        tieneSuscripcionMensajes: false,
-        tieneSuscripcionVotaciones: false,
-        tieneSuscripcionAnuncios: false,
-        tieneSuscripcionAvisos: false,
-        tieneSuscripcionEspacioComun: false,
-        rol: "",
-        id: 0,
-        activo: false,
-        direccion: '',
-        telefono: '',
-        fechaCaducidad: new Date(),
-        imagen: '',
-        clave: '',
-        mostrarDireccion: false,
-        mostrarTelefono: false
-    });
+
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
     const [arrayImgUsers, setArrayImgUsers] = useState([{ nombre: "", url: "" }]);
@@ -189,9 +172,8 @@ const Condominio = () => {
     const [verUsuarios, setVerUsuarios] = useState(false)
     const [diaMesSelect, setDiaMesSelect] = useState({ dia: 0, mes: 0, anio: 0 })
     const [verReglasNormas, setVerReglasNormas] = useState(false)
-    const [editarPerfil, setEditarPerfil] = useState(false)
     const [verAvisos, setVerAvisos] = useState(false)
-    
+
     const [verEmergencia, setVerEmergencia] = useState(false)
 
     const [verMisAnuncios, setVerMisAnuncios] = useState(false)
@@ -434,18 +416,7 @@ const Condominio = () => {
 
         return isSecure && hasServiceWorker && hasPushManager;
     }
-    async function Perfil() {
 
-        var result: any = await solicitarPermisoNotificaciones()
-        if (result) {
-            setLoading(true)
-            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
-            setSinNotificaciones(false)
-        } else {
-            ObtenerUsuarioPorIdSinNotificiacionesLogic(selObtenerUsuarioPorId, usuario.id.toString(), localStorage.getItem("idCondominio")!.toString());
-            setSinNotificaciones(true)
-        }
-    }
     async function registerPush() {
         if (!supportsPushNotifications()) {
             return;
@@ -595,13 +566,13 @@ const Condominio = () => {
                     if (new Date(condSelect[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
                     } else {
-                        setLoading(true);
+                        /* setLoading(true); */
                         setEnComunidad(true); ObtenerListadoAnuncioLogic(selListadoAnuncios, localStorage.getItem("idCondominio")!.toString())
                     }
                 } else {
                     if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) > new Date()) {
                         setEnComunidad(true);
-                        setLoading(true);
+                        /* setLoading(true); */
                         ObtenerListadoAnuncioLogic(selListadoAnuncios, data.condominios[0].id); localStorage.setItem("idCondominio", data.condominios[0].id)
                     } else if (data.condominios.length === 1 && new Date(data.condominios[0].fechaCaducidad) < new Date()) {
                         cerrarSesion();
@@ -615,7 +586,7 @@ const Condominio = () => {
                 cerrarMenu()
                 changeMenu(999)
                 setVerAvisos(true)
-                setLoading(true)
+                /* setLoading(true) */
                 /* ObtenerAvisosLogic(selListadoAvisos, (5 + 1).toString(), localStorage.getItem("idCondominio")!.toString(), "2025".toString()); */
                 /*FIN SE ABRE CALENDARIO COMO PRINCIPAL*/
                 obtenerImgenesPerfil();
@@ -694,9 +665,9 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    
 
-    
+
+
 
     const selCrearAnuncio = (error: Boolean, err: string, data: any) => {
         try {
@@ -821,50 +792,7 @@ const Condominio = () => {
     }
 
 
-    const EditarPerfil = (archivoTemp: File | null) => {
-        let usuarioParse = usuarioDetalle;
-        if (archivoTemp) {
-            guardarArchivo(1, archivoTemp);
-            usuarioParse.imagen = archivoTemp.name
-        }
-        try {
-            setLoading(true);
-            EditUsuarioPorIdLogic(selEditarPerfil, usuarioParse)
-        } catch (er) {
-        }
-    }
-    async function PerfilEditar() {
 
-        var result: any = await solicitarPermisoNotificaciones()
-        if (result) {
-            ObtenerUsuarioPorIdLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString(), result);
-            setEditarPerfil(false);
-            setSinNotificaciones(false)
-        } else {
-            setSinNotificaciones(true)
-            ObtenerUsuarioPorIdSinNotificiacionesLogic(selObtenerUsuarioPorId, usuarioDetalle.id.toString(), localStorage.getItem("idCondominio")!.toString());
-            setEditarPerfil(false);
-        }
-    }
-    const selEditarPerfil = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                PerfilEditar()
-                toast.success('Perfil editado correctamente', {
-                    position: posicionAlertas,
-                });
-            }
-            else {
-                toast.info('Error al editar perfil. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            toast.info('Error al editar perfil. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
 
     const selListadoAnuncios = (error: Boolean, err: string, data: any) => {
         try {
@@ -937,7 +865,6 @@ const Condominio = () => {
             case "perfil":
                 cerrarMenu()
                 setVerPerfil(true)
-                Perfil()
                 break;
             case "mispublicaciones":
                 cerrarMenu();
@@ -1033,27 +960,6 @@ const Condominio = () => {
             [name]: value
         }));
     };
-    const handleChangePerfil = (e: any) => {
-        const { name, value } = e.target;
-        setUsuarioDetalle(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-    const handleChangePerfilDireccion = (e: boolean) => {
-        console.log(e)
-        setUsuarioDetalle(prev => ({
-            ...prev,
-            ["mostrarDireccion"]: e
-        }));
-    };
-    const handleChangePerfilTelefono = (e: boolean) => {
-        console.log(e)
-        setUsuarioDetalle(prev => ({
-            ...prev,
-            ["mostrarTelefono"]: e
-        }));
-    };
 
     const changeMenu = (a: number) => {
         window.scrollTo(0, 0);
@@ -1067,7 +973,6 @@ const Condominio = () => {
         setEncuesta(false);
         setVerDetalle(false)
         setVerPerfil(false);
-        setEditarPerfil(false);
         setVerUsuarios(false);
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
@@ -1253,32 +1158,7 @@ const Condominio = () => {
         } catch (er) {
         }
     }
-    const selObtenerUsuarioPorId = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                let newData = data;
-                if (newData.imagen) {
-                    const imageRef = ref(storage, `perfiles/${newData.imagen}`);
 
-                    getDownloadURL(imageRef)
-                        .then((url) => {
-                            newData.imagen = url;
-                            setUsuarioDetalle(newData);
-                            setLoading(false);
-                        })
-                        .catch((err) => {
-                            setUsuarioDetalle(newData);
-                            console.error(err);
-                            setLoading(false);
-                        });
-                } else {
-                    setUsuarioDetalle(newData);
-                    setLoading(false);
-                }
-            }
-        } catch (er) {
-        }
-    }
     const selObtenerUsuarios = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -1699,72 +1579,12 @@ const Condominio = () => {
         setUsuarioComunidad(false);
     }
 
-    const selSuscribir2 = (error: Boolean, err: string, data: any, notificar: boolean) => {
-        setLoading(false);
-        try {
-            if (data) {
-                if (notificar) {
-                    toast.success('Su suscripción a las notificaciones fue realizada correctamente.', {
-                        position: posicionAlertas,
-                    });
-                    let newData = data;
-                    if (newData.imagen && !newData.imagen.includes("https")) {
-                        const imageRef = ref(storage, `perfiles/${newData.imagen}`);
 
-                        getDownloadURL(imageRef)
-                            .then((url) => {
-                                newData.imagen = url;
-                                setUsuarioDetalle(newData);
-                                setLoading(false);
-                            })
-                            .catch((err) => {
-                                setUsuarioDetalle(newData);
-                                console.error(err);
-                                setLoading(false);
-                            });
-                    } else {
-                        setUsuarioDetalle(newData);
-                        setLoading(false);
-                    }
-                }
-            }
-            else {
-                if (notificar)
-                    toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
-                        position: posicionAlertas,
-                    });
-            }
-        } catch (er) {
-            if (notificar)
-                toast.info('Error al crear suscripción. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-        }
-    }
     const changeComentario = (ev: any) => {
         setNewComentario(ev)
     }
 
-    const selDesSuscribir = (error: Boolean, err: string, data: any) => {
-        setLoading(false);
-        try {
-            if (data) {
-                toast.info('Su desuscribipción a las notificaciones fue realizada correctamente.', {
-                    position: posicionAlertas,
-                });
-                Perfil()
-            }
-            else {
-                toast.info('Error al quitar suscripción. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            toast.info('Error al quitar suscripción. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
+
 
     useEffect(() => {
         if (!menuOpciones) return;
@@ -1773,7 +1593,6 @@ const Condominio = () => {
             if (menuRef.current && !(menuRef.current as any).contains(event.target)) {
                 if (event.target.id !== "iconoMenuSup") {
                     setMenuOpciones(false);
-                    setOpenNotificaciones(false);
                 }
             }
         };
@@ -1784,40 +1603,20 @@ const Condominio = () => {
         };
     }, [menuOpciones]);
 
-    const createSuscripcion = (tieneSuscripcion: boolean, tipoSuscripcion: any, ev: any) => {
-        ev.preventDefault();
-        setOpenNotificaciones(false);
-        setMenuOpciones(false);
-        setLoading(true);
-        if (tieneSuscripcion) {
-            /* DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion) */
-            Dessuscripcion(tipoSuscripcion)
-        } else {
-            Suscripcion(tipoSuscripcion)
-        }
-    }
-    async function Suscripcion(tipoSuscripcion: any) {
-        var result: any = await solicitarPermisoNotificaciones()
-        if (result) {
-            SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), usuario.id, tipoSuscripcion, result, true)
-        }
-    }
-    async function Dessuscripcion(tipoSuscripcion: any) {
-        var result: any = await solicitarPermisoNotificaciones()
-        if (result) {
-            DessuscribirNotificacionesLogic(selDesSuscribir, usuario.id, tipoSuscripcion, result)
-        }
-    }
     async function SuscripcionTotal(tipoSuscripcion: any, _usuario: any) {
         var result: any = await solicitarPermisoNotificaciones()
         if (result && localStorage.getItem("idCondominio")) {
             SuscribirNotificaciones2Logic(selSuscribir2, localStorage.getItem("idCondominio")!.toString(), _usuario.id, tipoSuscripcion, result, false)
         }
     }
+    const selSuscribir2 = (error: Boolean, err: string, data: any, notificar: boolean) => {
+        try {
+        } catch (er) {
+        }
+    }
 
     const [openCrear, setOpenCrear] = useState(false);
 
-    const [openNotificaciones, setOpenNotificaciones] = useState(false);
 
     const inputBuscarRef = useRef(null);
 
@@ -1996,16 +1795,7 @@ const Condominio = () => {
                         {verPerfil &&
                             <>
                                 <PerfilUsuario
-                                    usuario={usuarioDetalle}
-                                    onChange={handleChangePerfil}
-                                    onChangedireccion={handleChangePerfilDireccion}
-                                    onChangetelefono={handleChangePerfilTelefono}
-                                    onCancelar={() => setEditarPerfil(false)}
-                                    loading={loading}
-                                    onGuardar={(archivo: any) => {
-                                        EditarPerfil(archivo);
-                                    }}
-                                    onChangeCreateSub={createSuscripcion}
+                                    usuario={usuario}
                                     sinNotificaciones={sinNotificaciones}
                                 />
                             </>
