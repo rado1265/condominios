@@ -7,13 +7,11 @@ import HistorialReservas from './HistorialReservas';
 interface Props {
     onSelect: () => void;
     usuario: any;
-    listadoUsuarios: any;
 }
 
 const EspacioComun: React.FC<Props> = ({
     onSelect,
-    usuario,
-    listadoUsuarios
+    usuario
 }) => {
     const [eleccion, setEleccion] = useState("");
 
@@ -26,7 +24,7 @@ const EspacioComun: React.FC<Props> = ({
             case "verEspacio":
                 return <ListaEspacios onCancelar={() => setEleccion("")} />
             case "MisReservas":
-                return <HistorialReservas usuario={usuario} listadoUsuarios={listadoUsuarios} onCancelar={() => setEleccion("")} />
+                return <HistorialReservas usuario={usuario} onCancelar={() => setEleccion("")} />
             default: break;
         }
     }

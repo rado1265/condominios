@@ -11,6 +11,7 @@ import votacionesReducer from '../store/slices/votacion/votacionesSlice';
 import crearVotacionesReducer from '../store/slices/votacion/crearVotacionesSlice';
 import authReducer from '../store/slices/login/authSlice';
 import avisoReducer from '../store/slices/avisos/avisoSlice'
+import usuariosReducer from '../store/slices/perfil/usuariosSlice'
 export const store = configureStore({
     reducer: {
         crearEspacioComun: crearEspacioComunReducer,
@@ -24,7 +25,8 @@ export const store = configureStore({
         emergencia: emergenciaReducer,
         votaciones: votacionesReducer,
         auth: authReducer,
-        aviso: avisoReducer
+        aviso: avisoReducer,
+        usuarios: usuariosReducer
     }, middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {

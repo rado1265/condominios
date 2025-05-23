@@ -3,7 +3,7 @@ import Loading from "../../components/utils/loading";
 import './Condominio.css';
 import { CambiarEstadoVotacionLogic, CambiarNormasLogic, CrearAnuncioLogic, CrearAvisosLogic, CrearComentarioAnuncioLogic, CrearEmergenciaLogic, CrearUsuarioLogic, CrearVotacionLogic, DarQuitarLikeLogic, DessuscribirNotificacionesLogic, EditUsuarioPorIdLogic, EliminarAnuncioLogic, EnviarNotifAvisoLogic, LoginLogic, ObteneCondominioLogic, ObtenerAnuncioPorIdLogic, ObtenerAvisosLogic, ObtenerEmergenciasLogic, ObtenerListadoAnuncioLogic, ObtenerMisAnuncioLogic, ObtenerUsuarioPorIdLogic, ObtenerUsuarioPorIdSinNotificiacionesLogic, ObtenerUsuariosLogic, ObtenerVotacionesLogic, SuscribirNotificaciones2Logic, SuscribirNotificacionesLogic, VotarLogic } from "../../presentation/view-model/Anuncio.logic";
 import { ConfirmMessage } from "../../components/utils/messages";
-import volver from './../../components/utils/img/volver.png';
+
 import axios from 'axios';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage';
@@ -27,6 +27,7 @@ import CryptoJS from "crypto-js";
 import EspacioComun from "./espacioComun/EspacioComun";
 import iconClose from '../../components/utils/img/menuInferior/close.png';
 import iconBuscar from '../../components/utils/img/menuInferior/buscar-select.png';
+import PanelUsuarios from "./usuarios/PanelUsuarios";
 
 interface SafeSearchAnnotation {
     adult: string;
@@ -35,7 +36,7 @@ interface SafeSearchAnnotation {
     medical: string;
     racy: string;
 }
-
+const posicionAlertas = "bottom-left";
 const API_KEY = 'AIzaSyCdexoCXGuhE2--pejbSZgTeiIUBjE_UyM';
 
 const chileTime = new Intl.DateTimeFormat("es-CL", {
@@ -74,7 +75,6 @@ const Condominio = () => {
     const storage = getStorage(app);
     const [buscarDataFull, setBuscarDataFull] = useState("");
     const [imagenPerfil, setImagenPerfil] = useState("");
-    const [agregarUsuario, setAgregarUsuario] = useState(false);
 
     const [editarTextRich, setEditarTextRich] = useState(false);
     const [actualizarData, setActualizarData] = useState(false);
@@ -102,10 +102,10 @@ const Condominio = () => {
         avisosHoy: false,
         esVideo: false
     });
-    const [misAnuncios, setMisAnuncios] = useState<any[]>([]);
-    const [actualizarMisAnuncios, setActualizarMisAnuncios] = useState(false);
+
+
     const [tipo, setTipo] = useState(4)
-    const [cupoUsuarios, setCupoUsuarios] = useState({ usados: 0, cupo: 0 })
+
     const [usuario, setUsuario] = useState({
         usuario: '',
         nombre: "",
@@ -116,17 +116,14 @@ const Condominio = () => {
         rol: "",
         id: 0
     });
-    const [listadousuarios, setUsuarios] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false }]);
-    const [listadousuariosParse, setUsuariosParse] = useState([{ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false }]);
-    const [dataUserSelect, setDataUserSelect] = useState({ id: 0, usuario: '', clave: '', nombre: "", rol: "", fechaCaducidad: "", activo: false, direccion: "", telefono: "", tieneSuscripcionAnuncios: false, tieneSuscripcionMensajes: false, tieneSuscripcionVotaciones: false, tieneSuscripcionAvisos: false, tieneSuscripcionEspacioComun: false, imagen: "", mostrarDireccion: false, mostrarTelefono: false });
-    const [verUsuarioInd, setVerUserInd] = useState(false);
+
 
     const [activeFilter, setActiveFilter] = useState("fechaDesde");
     const [buscarenmenu, setBuscarEnMenu] = useState(false);
     const [arrayImgUsers, setArrayImgUsers] = useState([{ nombre: "", url: "" }]);
 
     const [sinNotificaciones, setSinNotificaciones] = useState(false)
-    const posicionAlertas = "bottom-left";
+
     const [logueado, setLogueado] = useState(false)
     /*
         1 - Información / Celeste - Defecto
@@ -176,9 +173,8 @@ const Condominio = () => {
 
     const [verEmergencia, setVerEmergencia] = useState(false)
 
-    const [verMisAnuncios, setVerMisAnuncios] = useState(false)
+
     const [verPuntosInteres, setVerPuntosInteres] = useState(false)
-    const [usuarioComunidad, setUsuarioComunidad] = useState(false)
     const [emergencia, setEmergencia] = useState({
         id: 0,
         descripcion: '',
@@ -187,14 +183,7 @@ const Condominio = () => {
         direccion: ''
     })
 
-    const [newUser, setNewUser] = useState({
-        id: 0,
-        usuario: '',
-        nombre: '',
-        clave: '',
-        rol: '',
-        idCondominio: 0
-    })
+
     const [verEspacioComun, setVerEspacioComun] = useState(false)
     const [serviceWorker, setServiceWorker] = useState({})
 
@@ -495,13 +484,13 @@ const Condominio = () => {
                     position: posicionAlertas,
                 });
             }
-            if (verMisAnuncios) {
+            /* if (verMisAnuncios) {
                 ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString())
-            } else {
-                setDataFull(data);
-                setActualizarData(true);
-                setLoading(false);
-            }
+            } else { */
+            setDataFull(data);
+            setActualizarData(true);
+            setLoading(false);
+            /* } */
         } catch (er) {
             toast.error('Error al eliminar anuncio", "Favor intentarlo nuevamente en unos minutos', {
                 position: posicionAlertas,
@@ -726,7 +715,7 @@ const Condominio = () => {
             }
             if (tipo === 8) {
                 setLoading(true);
-                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString());
+                /*  ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString()); */
             } else {
                 setDataFull(data);
                 setActualizarData(true);
@@ -740,56 +729,7 @@ const Condominio = () => {
         }
     }
 
-    const CrearUsuario = (eliminar: boolean) => {
-        try {
-            if (newUser.nombre.length > 0 && newUser.usuario.length > 3 && newUser.clave.length > 3) {
-                setLoading(true);
-                CrearUsuarioLogic(selCrearUsuario, newUser, eliminar)
-            }
-        } catch (er) {
-        }
-    }
-    const EliminarUsuario = (user: any) => {
-        try {
-            if (user.id > 0) {
-                setLoading(true);
-                setVerUserInd(false)
-                CrearUsuarioLogic(selCrearUsuario, user, true)
-            }
-        } catch (er) {
-        }
-    }
 
-    const selCrearUsuario = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
-                setAgregarUsuario(false);
-                setNewUser({
-                    id: 0,
-                    usuario: '',
-                    nombre: '',
-                    clave: '',
-                    rol: '',
-                    idCondominio: 0
-                })
-                toast.success(err ? 'Usuario eliminado correctamente' : 'Usuario creado correctamente', {
-                    position: posicionAlertas,
-                });
-            }
-            else {
-                setLoading(false);
-                toast.info(err ? 'Error al eliminar usuario. Comuníquese con el Administrador.' : 'Error al crear usuario. Comuníquese con el Administrador.', {
-                    position: posicionAlertas,
-                });
-            }
-        } catch (er) {
-            setLoading(false);
-            toast.info('Error al crear usuario. Comuníquese con el Administrador.', {
-                position: posicionAlertas,
-            });
-        }
-    }
 
 
 
@@ -826,16 +766,7 @@ const Condominio = () => {
         setEnComunidad(false)
     };
 
-    const selMisAnuncios = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                setMisAnuncios(data);
-                setActualizarMisAnuncios(true);
-            }
-            setLoading(false);
-        } catch (er) {
-        }
-    }
+
     /* const selListadoAvisos = (error: Boolean, err: string, data: any) => {
         try {
             if (data) {
@@ -868,17 +799,13 @@ const Condominio = () => {
                 break;
             case "mispublicaciones":
                 cerrarMenu();
-                setVerMisAnuncios(true)
+                /* setVerMisAnuncios(true) */
                 setTipo(8);
-                setLoading(true);
-                ObtenerMisAnuncioLogic(selMisAnuncios, usuario.id.toString(), usuario.id.toString());
                 break;
             case "comunidad":
                 cerrarMenu()
                 changeMenu(999);
                 setVerUsuarios(true)
-                setLoading(true);
-                ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
                 break;
             case "crearAnuncio":
                 setTipo(4);
@@ -929,9 +856,6 @@ const Condominio = () => {
                 cerrarMenu();
                 changeMenu(999);
                 setVerEspacioComun(true);
-                if (usuario.rol === "ADMINISTRADOR") {
-                    ObtenerUsuariosLogic(selObtenerUsuarios, localStorage.getItem("idCondominio")!.toString());
-                }
                 break;
             default:
 
@@ -953,13 +877,7 @@ const Condominio = () => {
             [name]: value
         }));
     };
-    const handleChangeNewUser = (e: any) => {
-        const { name, value } = e.target;
-        setNewUser(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+
 
     const changeMenu = (a: number) => {
         window.scrollTo(0, 0);
@@ -976,8 +894,6 @@ const Condominio = () => {
         setVerUsuarios(false);
         setVerReglasNormas(false);
         setVerDetalleAvisos(false);
-        setVerMisAnuncios(false);
-        setAgregarUsuario(false);
         if (a === 5) {
             setVotaciones(true);
         } else {
@@ -1159,41 +1075,10 @@ const Condominio = () => {
         }
     }
 
-    const selObtenerUsuarios = (error: Boolean, err: string, data: any) => {
-        try {
-            if (data) {
-                let usuariosParse = data.usuarios;
-                setCupoUsuarios({ usados: data.cantUsuario, cupo: data.totalUsuario })
-                const cargarDatos = async () => {
-
-                    const archivos = await obtenerArchivosPerfil();
-
-                    if (archivos && archivos.length > 0) {
-                        usuariosParse.map((a: any) => {
-                            const nombreBuscado = a.imagen?.replace("video-", "").replace("img-", "") || "";
-                            const matchArchivo = archivos.find((b: any) => b.nombre === nombreBuscado);
-                            if (matchArchivo) {
-                                a.imagen = matchArchivo.url;
-                            }
-                        });
-                    }
-
-                    setLoading(false);
-                    setUsuarios(usuariosParse);
-                    setUsuariosParse(usuariosParse);
-                };
-
-                cargarDatos();
-            }
-        } catch (er) {
-        }
-    }
 
 
-    const filtrarUsuarios = (ev: any) => {
-        let parselistadoUser = listadousuarios.filter((e) => e.nombre.toLocaleLowerCase().includes(ev.target.value.toLocaleLowerCase()));
-        setUsuariosParse(parselistadoUser);
-    }
+
+
 
     const filtrarDataFull = (ev: any) => {
         const texto = ev.target.value.toLowerCase();
@@ -1213,235 +1098,6 @@ const Condominio = () => {
     const noFiltrar = () => {
         setDataFullParse(dataFull);
         setBuscarEnMenu(false);
-    }
-
-
-    const panelUsuarios = () => {
-        return <>
-            {!loading &&
-                <div className="w-100 px-3">
-                    {
-                        agregarUsuario ?
-                            <>
-                                <div className="w-100 px-3 mt-2">
-                                    <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
-                                        setVerUserInd(false); setAgregarUsuario(false);
-                                    }}>
-                                        <img width={35} src={volver} alt="Icono volver" />
-                                    </button>
-                                    <div className="login-box py-3">
-                                        <h2 className="text-center">Agregar Usuario</h2>
-                                        <label htmlFor="textfield" className="search-label-admin">
-                                            Usuario
-                                        </label>
-                                        <input
-                                            name="usuario"
-                                            className="search-input"
-                                            value={newUser.usuario}
-                                            onChange={(e: any) => handleChangeNewUser(e)}
-                                        />
-                                        <label htmlFor="textfield" className="search-label-admin">
-                                            Nombre
-                                        </label>
-                                        <input
-                                            name="nombre"
-                                            className="search-input"
-                                            value={newUser.nombre}
-                                            onChange={(e: any) => handleChangeNewUser(e)}
-                                        />
-                                        <label htmlFor="textfield" className="search-label-admin" defaultValue={""}>
-                                            Clave
-                                        </label>
-                                        <input
-                                            name="clave"
-                                            className="search-input"
-                                            value={newUser.clave}
-                                            onChange={(e: any) => handleChangeNewUser(e)}
-                                        />
-                                        <label htmlFor="textfield" className="search-label-admin">
-                                            Rol
-                                        </label>
-                                        <select id="rol" className="typeDate" name="rol" onChange={(e: any) => { handleChangeNewUser(e) }}>
-                                            <option value="VECINO" selected>Vecino</option>
-                                            <option value="ADMINISTRADOR">Administrador</option>
-                                        </select>
-                                        <div className="modal-actions mt-3">
-                                            <button type="button"
-                                                onClick={() => CrearUsuario(false)}
-                                                className="modal-btn modal-btn-green">
-                                                Aceptar
-                                            </button>
-
-                                            <button className="modal-btn modal-btn-close" onClick={() => setAgregarUsuario(false)}>
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </> :
-                            !verUsuarioInd ?
-                                <>
-                                    <div className="usuariosContainer">
-                                        <h2 className="usuarios-title">Listado Usuarios</h2>
-                                        {(cupoUsuarios.cupo > cupoUsuarios.usados) ?
-                                            <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }} onClick={() => {
-                                                if (usuario.rol === "ADMINISTRADOR") {
-                                                    setAgregarUsuario(true); setNewUser({ id: 0, usuario: '', nombre: "", clave: "", rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) });
-                                                }
-                                            }}>
-                                                {
-                                                    usuario.rol === "ADMINISTRADOR" && <button className="cupo-usuarios-add" title="Agregar usuario">
-                                                        <svg width="30" height="30" viewBox="0 0 18 18" fill="none">
-                                                            <circle cx="9" cy="9" r="9" fill="#009688" />
-                                                            <path d="M9 5v8M5 9h8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-                                                        </svg>
-                                                    </button>
-                                                }
-
-                                                <span className="cupo-usuarios">
-                                                    {cupoUsuarios.usados}/{cupoUsuarios.cupo}
-                                                </span>
-                                            </div>
-                                            :
-                                            <div className="cupo-usuarios-container" style={{ cursor: 'pointer' }}>
-                                                <span className="cupo-usuarios">
-                                                    {cupoUsuarios.usados}/{cupoUsuarios.cupo}
-                                                </span>
-                                            </div>
-                                        }
-                                        <div className="buscaruser-search-container">
-                                            <label className="buscaruser-search-label">Buscar Usuario</label>
-                                            <input
-                                                type="search"
-                                                id="buscar-usuario"
-                                                className="buscaruser-search-input"
-                                                placeholder="Escribe para buscar..."
-                                                onChange={(ev) => { filtrarUsuarios(ev) }}
-                                            />
-                                        </div>
-                                        <div>
-                                            {listadousuariosParse.map((a, idx) => (
-                                                <div className="usuarios-listado" key={idx} onClick={() => { setLoading(true); setDataUserSelect(a); setVerUserInd(true); setVerMisAnuncios(true); ObtenerMisAnuncioLogic(selMisAnuncios, a.id.toString(), usuario.id.toString()); setUsuarioComunidad(true); }}>
-                                                    <div className="usuarios-item">
-                                                        <span className="usuarios-item-title">Nombre</span>
-                                                        <span className="usuarios-item-value">{a.nombre}</span>
-                                                    </div>
-                                                    <div className="usuarios-item">
-                                                        <span className="usuarios-item-title">Rol</span>
-                                                        <span className="usuarios-item-value">{a.rol}</span>
-                                                    </div>
-                                                    {
-                                                        usuario.rol === "ADMINISTRADOR" && <>
-                                                            <div className="usuarios-item">
-                                                                <span className="usuarios-item-title">Fecha Caducidad</span>
-                                                                <span className="usuarios-item-value">{new Date(a.fechaCaducidad).toLocaleDateString()}</span>
-                                                            </div>
-                                                            <div className="usuarios-item">
-                                                                <span className="usuarios-item-title">Estado</span>
-                                                                <span className={a.activo ? "usuarios-item-value user-activo" : "usuarios-item-value user-inactivo"}>{a.activo ? "Activo" : "Inactivo"}</span>
-                                                            </div>
-                                                        </>
-                                                    }
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </>
-                                :
-                                <div className="perfil-box w-100" style={{ padding: '20px' }}>
-                                    <button type="button" className="iconoVolver" style={{ position: 'absolute', left: '15px', top: '15px', zIndex: '1' }} onClick={() => {
-                                        setVerUserInd(false)
-                                        setVerMisAnuncios(false);
-                                        setUsuarioComunidad(false);
-                                    }}>
-                                        <img width={35} src={volver} alt="Icono volver" />
-                                    </button>
-                                    {
-                                        usuario.rol === "ADMINISTRADOR" && <> <button
-                                            type="button"
-                                            className="perfil-edit-btn"
-                                            onClick={() => { EliminarUsuario({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
-                                            aria-label="Editar perfil"
-                                        >
-                                            <img src={iconborrar} />
-                                        </button>
-                                            <button
-                                                type="button"
-                                                className="perfil-edit-btn mr-5"
-                                                onClick={() => { setAgregarUsuario(true); setNewUser({ id: dataUserSelect.id, usuario: dataUserSelect.usuario, nombre: dataUserSelect.nombre, clave: dataUserSelect.clave, rol: "VECINO", idCondominio: parseInt(localStorage.getItem("idCondominio")!.toString()) }) }}
-                                                aria-label="Editar perfil"
-                                            >
-                                                <img src={iconeditar} />
-                                            </button></>
-                                    }
-
-                                    <div className="perfil-avatar">
-                                        {dataUserSelect.imagen ? (
-                                            <img
-                                                id="imgPerfilSelect1"
-                                                src={dataUserSelect.imagen}
-                                                alt="Vista previa"
-                                            />
-                                        ) : (
-                                            <svg width="72" height="72" fill="#e0e0e0" viewBox="0 0 24 24">
-                                                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-                                            </svg>
-                                        )}
-                                    </div>
-                                    <h4 className="perfil-nombre">{dataUserSelect.nombre}</h4>
-                                    <div className="perfil-info">
-                                        <div className="w-100">
-                                            <div className="container-dataPerfil">
-                                                <span>Rol</span>
-                                                {dataUserSelect.rol && <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.rol}</span>}
-                                            </div>
-                                            {
-                                                dataUserSelect.mostrarDireccion && <div className="container-dataPerfil">
-                                                    <span>Dirección</span>
-                                                    {dataUserSelect.direccion ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.direccion}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
-                                                </div>
-                                            }
-                                            {
-                                                dataUserSelect.mostrarTelefono &&
-                                                <div className="container-dataPerfil">
-                                                    <span>Teléfono</span>
-                                                    {dataUserSelect.telefono ? <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.telefono}</span> : <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>Sin Datos</span>}
-                                                </div>
-                                            }
-                                            {
-                                                usuario.rol === "ADMINISTRADOR" && <>
-                                                    <div className="container-dataPerfil">
-                                                        <span>Notif. Anuncios</span>
-                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAnuncios ? "Activa" : "Inactiva"}</span>
-                                                    </div>
-                                                    <div className="container-dataPerfil">
-                                                        <span>Notif. Mensajes</span>
-                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionMensajes ? "Activa" : "Inactiva"}</span>
-                                                    </div>
-                                                    <div className="container-dataPerfil">
-                                                        <span>Notif. Votaciones</span>
-                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionVotaciones ? "Activa" : "Inactiva"}</span>
-                                                    </div>
-                                                    <div className="container-dataPerfil">
-                                                        <span>Notif. Calendario</span>
-                                                        <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{dataUserSelect.tieneSuscripcionAvisos ? "Activa" : "Inactiva"}</span>
-                                                    </div>
-                                                    <div className="container-dataPerfil">
-                                                        <span>Fecha Caducidad</span>
-                                                        {dataUserSelect.fechaCaducidad && (
-                                                            <span style={{ marginLeft: '30px', textAlign: 'end', fontWeight: '700' }}>{new Date(dataUserSelect.fechaCaducidad).toLocaleDateString()}</span>
-                                                        )}
-                                                    </div>
-                                                </>
-                                            }
-
-                                        </div>
-                                    </div>
-                                </div>
-                    }
-                </div>
-            }
-        </>
     }
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -1560,7 +1216,7 @@ const Condominio = () => {
         setAlertaCerrada(false);
         setMenuOpciones(false)
         setVerPerfil(false)
-        setVerMisAnuncios(false);
+        /* setVerMisAnuncios(false); */
         setCrear(false)
         setEditar(false)
         setVerUsuarios(false);
@@ -1569,14 +1225,10 @@ const Condominio = () => {
         setVerPuntosInteres(false)
         setVerEmergencia(false)
         setVotaciones(false);
-        setAgregarUsuario(false);
         setOpenCrear(false);
         setEncuesta(false);
         setVerEspacioComun(false);
         noFiltrar();
-        setVerUserInd(false)
-        setVerMisAnuncios(false);
-        setUsuarioComunidad(false);
     }
 
 
@@ -1803,11 +1455,14 @@ const Condominio = () => {
                         {
                             verUsuarios &&
                             <>
-                                {panelUsuarios()}
+                                {/* {panelUsuarios()} */}
+                                <PanelUsuarios
+                                    usuario={usuario}
+                                />
                             </>
                         }
                         {
-                            verReglasNormas &&
+                           /*  verReglasNormas &&
                             <>
                                 <ReglasNormasPanel
                                     normas={dataFull.normas}
@@ -1826,7 +1481,7 @@ const Condominio = () => {
                                     handleBlur={handleBlur}
                                     newTextRich={newTextRich}
                                 />
-                            </>
+                            </> */
                         }
                         {(verDetalle) &&
                             <>
@@ -1858,29 +1513,29 @@ const Condominio = () => {
                             </>
                         }
                         {
-                            (verMisAnuncios && !verDetalle) &&
-                            <>
-                                <h2 className="col-12 text-center mt-4">{usuarioComunidad ? "PUBLICACIONES" : "MIS PUBLICACIONES"}</h2>
-                                {misAnuncios !== null && !loading && ordenarListado(misAnuncios).map((a: any, i: any) => (
-                                    <AnunciosPanel
-                                        key={i}
-                                        anuncio={a}
-                                        usuarioId={usuario.id}
-                                        usuarioRol={usuario.rol}
-                                        arrayImgUsers={arrayImgUsers}
-                                        onEditar={cargarAnuncioParaEdit}
-                                        onEliminar={EliminarAnuncio}
-                                        onDeshabilitar={DeshabilitarAnuncio}
-                                        onVerDetalle={(anuncio: any) => {
-                                            setLoading(true);
-                                            ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
-                                        }}
-                                        onLike={(id: any) => handleLike(id, true, false)}
-                                        imgErrorUrl={imgError}
-                                        loading={loading}
-                                    />
-                                ))}
-                            </>
+                            /*  (verMisAnuncios && !verDetalle) &&
+                             <>
+                                 <h2 className="col-12 text-center mt-4">{usuarioComunidad ? "PUBLICACIONES" : "MIS PUBLICACIONES"}</h2>
+                                 {misAnuncios !== null && !loading && ordenarListado(misAnuncios).map((a: any, i: any) => (
+                                     <AnunciosPanel
+                                         key={i}
+                                         anuncio={a}
+                                         usuarioId={usuario.id}
+                                         usuarioRol={usuario.rol}
+                                         arrayImgUsers={arrayImgUsers}
+                                         onEditar={cargarAnuncioParaEdit}
+                                         onEliminar={EliminarAnuncio}
+                                         onDeshabilitar={DeshabilitarAnuncio}
+                                         onVerDetalle={(anuncio: any) => {
+                                             setLoading(true);
+                                             ObtenerAnuncioPorIdLogic(selObtenerAnuncioPorId, a.id);
+                                         }}
+                                         onLike={(id: any) => handleLike(id, true, false)}
+                                         imgErrorUrl={imgError}
+                                         loading={loading}
+                                     />
+                                 ))}
+                             </> */
                         }
                         {
                             (tipo <= 4 && !iniciarSesion && !encuesta && !verPerfil && !crear && !editar && enComunidad && !verDetalle && !verEspacioComun) &&
@@ -1911,7 +1566,7 @@ const Condominio = () => {
                     </div>
                     {
                         verEspacioComun &&
-                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} listadoUsuarios={listadousuarios} />
+                        <EspacioComun onSelect={() => setVerEspacioComun(false)} usuario={usuario} /* listadoUsuarios={listadousuarios} */ />
                     }
                 </div>
                 <ToastContainer />
