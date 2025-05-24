@@ -229,6 +229,9 @@ const anuncioSlice = createSlice({
         setChangeTipo(state: any, action) {
             state.dataFullParse = state.dataFull.filter((u: Anuncio) => u.idTipo === action.payload || action.payload === 4);
         },
+        setNuevoComentario(state: any, action) {
+            state.dataDetalle.comentarios.push(action.payload);
+        },
     },
     extraReducers: builder => {
         builder
@@ -316,13 +319,11 @@ const anuncioSlice = createSlice({
             })
             .addCase(fetchComentarioCrear.fulfilled, (state, action: any) => {
                 state.loading = false;
-                state.dataDetalle = action.payload;
                 state.newComentario = "";
             })
             .addCase(fetchComentarioCrear.rejected, (state: any, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                state.dataDetalle = {};
             })
 
 
@@ -345,6 +346,7 @@ export const {
     setTipoSubir,
     setNewComentario,
     setDataDetalle,
-    setChangeTipo
+    setChangeTipo,
+    setNuevoComentario
 } = anuncioSlice.actions;
 export default anuncioSlice.reducer;

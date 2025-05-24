@@ -37,7 +37,6 @@ window.addEventListener('keydown', function (e) {
     e.preventDefault();
   }
 });
-
 root.render(
   <Provider store={store}>
     <BrowserRouter>

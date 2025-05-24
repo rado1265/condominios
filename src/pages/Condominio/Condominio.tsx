@@ -33,9 +33,11 @@ import { fetchUsuarios } from "../../store/slices/perfil/usuariosSlice";
 import { fetchEmergencias } from "../../store/slices/emergencia/emergenciaSlice";
 import { fetchReservas } from "../../store/slices/espacioComun/historialReservasSlice";
 import { cargarEspacios } from "../../store/slices/espacioComun/listadoEspacioComunSlice";
+import { useSignalR } from "../../components/utils/useSignalR";
 const posicionAlertas = "bottom-left";
 
 const Condominio = () => {
+    useSignalR();
     const dispatch = useDispatch<AppDispatch>()
     const { active, comunidad, mostrar, sinNotificaciones, loading } = useSelector((state: RootState) => state.comunidad);
     const { usuario } = useSelector((state: RootState) => state.auth);
@@ -110,7 +112,6 @@ const Condominio = () => {
         }
     };
     useEffect(() => {
-        dispatch(setLoading(true as any))
         if (navigator.onLine) {
             if ((localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") && localStorage.getItem("ZXN0byBlcyBzZWNyZXRv") != 'undefined')) {
                 loguearStorage()
