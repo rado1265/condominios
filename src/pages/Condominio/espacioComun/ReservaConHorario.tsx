@@ -19,7 +19,6 @@ export default function ReservaConHorario(props: any) {
   const [unidadesDisponibles, setUnidadesDisponibles] = useState<{ id: number; numero: number }[]>([]);
   const [verDisp, setVerDisp] = useState(false);
   const [userSelect, setUserSelect] = useState(0);
-
   useEffect(() => {
     axios.get(_ruta + "EspacioComun?idCondominio=" + localStorage.getItem("idCondominio")!.toString(), {
       headers: {

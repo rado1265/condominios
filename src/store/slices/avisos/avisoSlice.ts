@@ -148,6 +148,30 @@ const avisoSlice = createSlice({
             const { name, value } = action.payload;
             state.avisoActual[name] = value;
         },
+        setAvisoACompleto(state: any, action) {
+            state.avisoActual = action.payload;
+        },
+        setCreaAviso(state: any, action) {
+            const existsInFull = state.avisos.find(
+                (avisos: any) => avisos.id === action.payload.id
+            );
+            if (action.payload.eliminar) {
+                state.avisos = state.avisos.filter(
+                    (avisos: any) => avisos.id !== action.payload.id
+                )
+            } else if (existsInFull) {
+                const index = state.avisos.findIndex(
+                    (avisos: any) => avisos.id === action.payload.id
+                );
+                if (index !== -1) {
+                    state.avisos[index] = action.payload;
+                } else {
+                    state.avisos.push(action.payload);
+                }
+            } else {
+                state.avisos.push(action.payload);
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -176,12 +200,11 @@ const avisoSlice = createSlice({
                 state.error = action.error.message;
             })
             .addCase(postCrearAviso.pending, (state) => {
-                state.loading = true;
+                /* state.loading = true; */
                 state.error = null;
             })
             .addCase(postCrearAviso.fulfilled, (state, action) => {
                 state.loading = false;
-                state.avisos = action.payload;
                 state.crearEvento = false;
                 state.crearTipoEvento = false;
                 state.editarEvento = false;
@@ -191,7 +214,7 @@ const avisoSlice = createSlice({
                 state.error = action.error.message;
             })
             .addCase(postTipoAviso.pending, (state) => {
-                state.loading = true;
+                /* state.loading = true; */
                 state.error = null;
             })
             .addCase(postTipoAviso.fulfilled, (state, action) => {
@@ -215,7 +238,9 @@ export const {
     setEditarEvento,
     setTipoAvisoActual,
     setAvisoActual,
-    setDia
+    setDia,
+    setCreaAviso,
+    setAvisoACompleto
 } = avisoSlice.actions;
 
 export default avisoSlice.reducer;

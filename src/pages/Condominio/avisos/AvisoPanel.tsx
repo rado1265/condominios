@@ -24,6 +24,7 @@ import {
     setAvisoActual,
     postTipoAviso,
     setDia,
+    setAvisoACompleto,
 } from "../../../store/slices/avisos/avisoSlice"
 import { AppDispatch, RootState } from '../../../store/store';
 
@@ -276,7 +277,7 @@ const AvisoPanel: React.FC<Props> = ({ }) => {
                                 <button
                                     type="button"
                                     className="iconoVolver"
-                                    onClick={() => { dispatch(setEditarEvento(true)); dispatch(setAvisoActual(a)); }}
+                                    onClick={() => { dispatch(setEditarEvento(true)); dispatch(setAvisoACompleto(a));}}
                                     aria-label="Editar Aviso"
                                 >
                                     <img src={iconeditar} />

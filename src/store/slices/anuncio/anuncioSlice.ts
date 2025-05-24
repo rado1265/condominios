@@ -241,7 +241,95 @@ const anuncioSlice = createSlice({
             state.dataFullParse = state.dataFull.filter((u: Anuncio) => u.idTipo === action.payload || action.payload === 4);
         },
         setNuevoComentario(state: any, action) {
-            state.dataDetalle.comentarios.push(action.payload);
+            if (action.payload.eliminar) {
+                const idAEliminar = action.payload.id;
+                state.dataDetalle.comentarios = state.dataDetalle.comentarios.filter(
+                    (comentario: any) => comentario.id !== idAEliminar
+                )
+            }
+            else {
+                state.dataDetalle.comentarios.push(action.payload);
+            }
+        },
+        setEliminarAnuncio(state: any, action) {
+            state.dataFullParse = state.dataFullParse.filter(
+                (anuncio: any) => anuncio.id !== action.payload
+            )
+            state.dataFull = state.dataFull.filter(
+                (anuncio: any) => anuncio.id !== action.payload
+            )
+        },
+        setCrearAnuncio(state: any, action) {
+            const existsInFull = state.dataFullParse.find(
+                (anuncio: any) => anuncio.id === action.payload.id
+            );
+
+            if (existsInFull) {
+                const index = state.dataFullParse.findIndex(
+                    (anuncio: any) => anuncio.id === action.payload.id
+                );
+
+                if (index !== -1) {
+                    state.dataFullParse[index] = action.payload;
+                } else {
+                    state.dataFullParse.push(action.payload);
+                }
+            }
+        },
+        setLikes(state: any, action) {
+            /* debugger */
+            if (action.payload.eliminar) {
+                const idAEliminar = action.payload.id;
+                state.dataDetalle.likes = state.dataDetalle.id > 0 ? state.dataDetalle.likes.filter(
+                    (comentario: any) => comentario.id !== idAEliminar
+                ) : []
+                const existsInFull = state.dataFullParse.find(
+                    (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                );
+                if (existsInFull) {
+                    const index = state.dataFullParse.findIndex(
+                        (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                    );
+                    state.dataFullParse[index].likes = state.dataFullParse[index].likes.filter(
+                        (like: any) => like.id !== idAEliminar
+                    )
+                    state.dataFullParse[index].cantLikes -= 1;
+                }
+                const exists = state.dataFull.find(
+                    (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                );
+                if (exists) {
+                    const index = state.dataFull.findIndex(
+                        (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                    );
+                    state.dataFull[index].likes = state.dataFull[index].likes.filter(
+                        (like: any) => like.id !== idAEliminar
+                    )
+                    state.dataFull[index].cantLikes -= 1;
+                }
+            }
+            else {
+                const existsInFull = state.dataFullParse.find(
+                    (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                );
+                if (existsInFull) {
+                    const index = state.dataFullParse.findIndex(
+                        (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                    );
+                    state.dataFullParse[index].likes.push(action.payload);
+                    state.dataFullParse[index].cantLikes += 1;
+                }
+                const exists = state.dataFull.find(
+                    (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                );
+                if (exists) {
+                    const index = state.dataFull.findIndex(
+                        (anuncio: any) => anuncio.id === action.payload.idAnuncio
+                    );
+                    state.dataFull[index].likes.push(action.payload);
+                    state.dataFull[index].cantLikes += 1;
+                }
+            }
         },
     },
     extraReducers: builder => {
@@ -264,15 +352,10 @@ const anuncioSlice = createSlice({
                 state.dataFull = [];
             })
             .addCase(fetchLike.pending, state => {
-                state.loading = true;
+                /* state.loading = true; */
             })
             .addCase(fetchLike.fulfilled, (state, action: any) => {
                 state.loading = false;
-                action.payload.anuncios.forEach((element: Anuncio) => {
-                    element.cantLikes = element.likes.length;
-                });
-                state.dataFullParse = action.payload.anuncios;
-                state.dataFull = action.payload.anuncios;
             })
             .addCase(fetchLike.rejected, (state: any, action) => {
                 state.loading = false;
@@ -298,11 +381,6 @@ const anuncioSlice = createSlice({
             })
             .addCase(fetchAnuncioEliminar.fulfilled, (state, action: any) => {
                 state.loading = false;
-                action.payload.anuncios.forEach((element: Anuncio) => {
-                    element.cantLikes = element.likes.length;
-                });
-                state.dataFullParse = action.payload.anuncios;
-                state.dataFull = action.payload.anuncios;
             })
             .addCase(fetchAnuncioEliminar.rejected, (state: any, action) => {
                 state.loading = false;
@@ -315,25 +393,20 @@ const anuncioSlice = createSlice({
                 state.loading = false;
                 state.crear = false;
                 state.editar = false;
-                action.payload.anuncios.forEach((element: Anuncio) => {
-                    element.cantLikes = element.likes.length;
-                });
-                state.dataFullParse = action.payload.anuncios;
-                state.dataFull = action.payload.anuncios;
             })
             .addCase(fetchAnuncioCrear.rejected, (state: any, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
             .addCase(fetchComentarioCrear.pending, state => {
-                state.loading = true;
+                /* state.loading = true; */
             })
             .addCase(fetchComentarioCrear.fulfilled, (state, action: any) => {
                 state.loading = false;
                 state.newComentario = "";
             })
             .addCase(fetchComentarioCrear.rejected, (state: any, action) => {
-                state.loading = false;
+                /* state.loading = false; */
                 state.error = action.payload;
             })
 
@@ -358,6 +431,9 @@ export const {
     setNewComentario,
     setDataDetalle,
     setChangeTipo,
-    setNuevoComentario
+    setNuevoComentario,
+    setEliminarAnuncio,
+    setCrearAnuncio,
+    setLikes
 } = anuncioSlice.actions;
 export default anuncioSlice.reducer;
