@@ -26,7 +26,7 @@ const Login: React.FC<Props> = ({ onLogin }) => {
         if (loginThunk.fulfilled.match(result)) {
             const user = result.payload;
             toast.success('Inicio de sesión exitoso', { position: posicionAlertas });
-            dispatch(suscribirPushThunk({ idCondominio: localStorage.getItem('idCondominio')!, idUsuario: user.id }));
+            /* dispatch(suscribirPushThunk({ idCondominio: localStorage.getItem('idCondominio')!, idUsuario: user.id })); */
             dispatch(setCambiarMenu({ mostrar: "verAvisos", tipo: 999 } as any))
         } else {
             toast.error('Credenciales incorrectas', { position: posicionAlertas });
