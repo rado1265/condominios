@@ -61,7 +61,9 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
     const handleConfirmMessage = async (a: any) => {
         const msg: any = await ConfirmMessage(`Eliminar anuncio`, `¿Esta seguro de querer eliminar el anuncio?`);
         if (msg) {
-            dispatch(fetchAnuncioEliminar(a))
+            dispatch(fetchComentarioCrear({
+                comentario: a, idCondominio: localStorage.getItem("idCondominio")!.toString(), eliminar: true
+            }))
         }
     }
     const onComentar = () => {
@@ -136,7 +138,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                 {dataDetalle.comentarios ? dataDetalle.comentarios.map((j: any) => {
                     return <div key={j.id} className={`comment-box shadow ${j.idUsuario === usuario.id || usuario.rol === "ADMINISTRADOR" ? "pt-4" : ""}`}>
                         {(j.idUsuario === usuario.id || usuario.rol === "ADMINISTRADOR") && (
-                            <button type="button" className="iconoVolver icon-deleteComentario" onClick={() => onEliminar(j.id)}>
+                            <button type="button" className="iconoVolver icon-deleteComentario" onClick={() => onEliminar(j)}>
                                 <img width={20} height={20} src={iconborrar} />
                             </button>
                         )}

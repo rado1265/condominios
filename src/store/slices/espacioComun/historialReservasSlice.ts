@@ -28,7 +28,7 @@ const initialState: ReservasState = {
 
 export const fetchReservas = createAsyncThunk(
   "reservas/fetchReservas",
-  async ({ idUsuario }: { idUsuario: number }) => {
+  async ({ idUsuario }: { idUsuario: any }) => {
     const _ruta = con.RetornaRuta()
     const idCondominio = localStorage.getItem("idCondominio")!;
     const res = await axios.get(`${_ruta}EspacioComun/mis-reservas?idUsuario=${idUsuario}&idCondominio=${idCondominio}`, {
@@ -44,15 +44,16 @@ export const fetchReservas = createAsyncThunk(
 
 export const cancelarReserva = createAsyncThunk(
   "reservas/cancelarReserva",
-  async (id: number, { dispatch }) => {
-    const rutaBase = localStorage.getItem("rutaBackend")!;
+  async (id: number) => {
+    const _ruta = con.RetornaRuta()
     const idCondominio = localStorage.getItem("idCondominio")!;
-    await axios.delete(`${rutaBase}EspacioComun/cancelar?id=${id}&idCondominio=${idCondominio}`, {
+    await axios.delete(`${_ruta}EspacioComun/cancelar?id=${id}&idCondominio=${idCondominio}`, {
       headers: {
-        "x-community-id": "token_aqui",
+        'Access-Control-Allow-Origin': '*',
+        'x-community-id':
+          '2b2463d9f3b093b61be6ce0adbdcc4a0f7e56776502d173a4cf4bb0a8f5d0e79'
       }
     });
-    dispatch(fetchReservas({ idUsuario: parseInt(localStorage.getItem("idUsuario")!) }));
   }
 );
 
