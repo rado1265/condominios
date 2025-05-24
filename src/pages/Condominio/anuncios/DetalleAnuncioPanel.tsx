@@ -88,7 +88,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
             <div className="anuncio-body" dangerouslySetInnerHTML={{ __html: dataDetalle.descripcion }} />
             <div className="anuncio-footer">
                 <div className="anuncio-organizador">
-                    <img className="imgUserAnuncio shadow" src={dataDetalle.amedida} />
+                    <div className="divUserAnuncio shadow" style={{background: `url(${dataDetalle.imgOrganizador}) no-repeat center center/cover`}}></div>
                     <span className="ml-1">{dataDetalle.organizador}</span>
                 </div>
                 <span className="anuncio-telefono">{dataDetalle.telefono}</span>
@@ -141,7 +141,7 @@ const DetalleAnuncioPanel: React.FC<Props> = ({
                             </button>
                         )}
                         <div className="comment-header">
-                            <span className="comment-author"><img className="imgUserAnuncio shadow mr-1" src={j.imgUsuario} />{j.nombreUsuario}</span>
+                            <span className="comment-author"><div className="divUserAnuncio shadow mr-1" style={{background: `url(${j.imgUsuario}) no-repeat center center/cover`}}></div>{j.nombreUsuario}</span>
                             <div>
                                 <span className="comment-date">{new Date(j.fecha).toLocaleDateString()}</span>
                                 <span className="comment-date ml-2">{new Date(j.fecha).toLocaleTimeString().split(":").slice(0, 2).join(":")}</span>

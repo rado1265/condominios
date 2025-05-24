@@ -104,7 +104,13 @@ export const fetchAnuncios = createAsyncThunk(
     async (idCondominio: string, { rejectWithValue }) => {
         return new Promise((resolve, reject) => {
             ObtenerListadoAnuncioLogic((error: any, err: any, data: any) => {
-                if (data) resolve(data);
+                if (data) {
+                    let newData = data;
+                    newData.anuncios.map((a: any) => {
+                        a.esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)/i.test(a.amedida)
+                    })
+                    resolve(newData);
+                }
                 else rejectWithValue(err);
             }, idCondominio);
         });
@@ -126,7 +132,12 @@ export const fetchAnuncioPorId = createAsyncThunk(
     async (id: any, { rejectWithValue }) => {
         return new Promise((resolve, reject) => {
             ObtenerAnuncioPorIdLogic((error: any, err: any, data: any) => {
-                if (data) resolve(data);
+                if (data) {
+                    let newData = data;
+                    newData.esVideo = /\.(mp4|webm|ogg|mov|avi|mkv)/i.test(newData.amedida)
+                    console.log(newData);
+                    resolve(newData);
+                }
                 else rejectWithValue(err);
             }, id);
         });

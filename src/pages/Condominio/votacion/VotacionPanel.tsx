@@ -123,7 +123,7 @@ const VotacionPanel: React.FC<Props> = ({ }) => {
                                 <h5>{b.descripcion}</h5>
                                 {b.votaciones?.map((p: any, i: number) => (
                                     <li key={i} style={{ marginBottom: '10px' }}>
-                                        <img className="imgUserAnuncio shadow mr-2" src={p.imgUsuario} alt="Usuario" />
+                                        <div className="divUserAnuncio shadow mr-2" style={{background: `url(${p.imgUsuario}) no-repeat center center/cover`}}></div>
                                         {p.nombreUsuario}
                                     </li>
                                 ))}

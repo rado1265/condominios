@@ -10,9 +10,11 @@ import { fetchAnuncioCrear, setAnuncioCrear, setArchivoTemp, setLimpiarAnuncioCr
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../config';
 import { setCambiarMenu } from '../../../store/slices/comunidad/comunidadSlice';
+import imageCompression from "browser-image-compression";
 
 interface Props {
 }
+
 const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
 const AnunciosCrear: React.FC<Props> = ({ }) => {
     const dispatch = useDispatch<AppDispatch>()
@@ -51,36 +53,41 @@ const AnunciosCrear: React.FC<Props> = ({ }) => {
             activo: data.activo ?? true
         };
     };
-    const guardarArchivo = async (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+    const guardarArchivo = async (tipoArchivo: number = 1, archivoAsubir: File) => {
         let randomNumero = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
         let urlSubida = "";
-        if (archivoAsubir && !(archivoAsubir.size > 100000000)) {
+        let tipoLoad = archivoAsubir.type.split("/")[0];
+        let compressedFile: string | File | Blob | Buffer;
+
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+        };
+
+        if (tipoLoad === "image") {
+            compressedFile = await imageCompression(archivoAsubir!, options);
+        } else {
+            compressedFile = archivoAsubir;
+        }
+
+        if (compressedFile && !(compressedFile.size > 100000000)) {
             if (tipoArchivo === 4) {
-                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name + randomNumero}`);
-                const snapshot = await uploadBytes(storageRef, archivoAsubir);
+                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir!.name + randomNumero}`);
+                const snapshot = await uploadBytes(storageRef, compressedFile);
                 urlSubida = await getDownloadURL(snapshot.ref);
 
             } else {
-                const storageRef = ref(storage, `perfiles/${archivoAsubir.name + randomNumero}`);
-                const snapshot = await uploadBytes(storageRef, archivoAsubir);
+                const storageRef = ref(storage, `perfiles/${archivoAsubir!.name + randomNumero}`);
+                const snapshot = await uploadBytes(storageRef, compressedFile);
                 urlSubida = await getDownloadURL(snapshot.ref);
             }
 
-            //dispatch(setAnuncioCrear({ name: "amedida", value: urlSubida }))
-        } else if (archivoAsubir && (archivoAsubir.size > 100000000)) {
+        } else if (compressedFile && (compressedFile.size > 100000000)) {
             alert("El archivo pesa mas de 100 MB")
         }
         return urlSubida;
     }
-    /* useEffect(() => {
-        if (archivoTemp) {
-            const url = URL.createObjectURL(archivoTemp);
-            setPreview(url);
-            return () => URL.revokeObjectURL(url);
-        } else {
-            setPreview(null);
-        }
-    }, [archivoTemp]); */
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -102,6 +109,7 @@ const AnunciosCrear: React.FC<Props> = ({ }) => {
 
     const uploadVideo = (files: any) => {
         const file = files[0];
+        console.log(file);
         dispatch(setArchivoTemp(file));
 
         if (!file) return;
@@ -118,7 +126,7 @@ const AnunciosCrear: React.FC<Props> = ({ }) => {
 
     const handleImage = (files: any) => {
         if (files.target.files.length === 0) return;
-
+        console.log(files.target.files[0]);
         dispatch(setArchivoTemp(files.target.files[0]));
 
         document.getElementById('containerViewImg')?.classList.remove("d-none");

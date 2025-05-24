@@ -2123,3 +2123,32 @@ a:hover {
   background-size: cover;
   border-radius: 50%;
 }
+
+.divUserAnuncio {
+  width: 20px;
+  height: 20px;
+  border-radius: 15px;
+  border: 1px solid var(--colorSecundario);
+  display: inline-flex;
+  margin-bottom: -4px;
+}
+
+.iconDescargarImg {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 50%;
+  background: #013b37;
+  border: 2px solid #75fb4c;
+}
+
+.containerIconDescargarImg {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+}

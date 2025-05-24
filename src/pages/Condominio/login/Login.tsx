@@ -56,7 +56,7 @@ const Login: React.FC<Props> = ({ onLogin }) => {
                         value={loguear.clave}
                         onChange={handleChange}
                     />
-                    <button type="submit" className="search-button">
+                    <button type="submit" className="modal-btn modal-btn-green">
                         {loading ? 'Ingresando...' : 'Ingresar'}
                     </button>
                 </div>

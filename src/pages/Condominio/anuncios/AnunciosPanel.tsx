@@ -10,6 +10,7 @@ import { ConfirmMessage } from '../../../components/utils/messages';
 import iconAdmin from './../../../components/utils/img/admin.png';
 import corazonVacio from './../../../components/utils/img/corazonVacio.png';
 import { setCambiarMenu } from '../../../store/slices/comunidad/comunidadSlice';
+import descargarIcon from './../../../components/utils/img/descargar.png';
 
 interface Props {
 }
@@ -176,7 +177,7 @@ const AnunciosPanel: React.FC<Props> = ({
                 }
 
                 <div className="v2-anuncio-footer">
-                    <span className='d-flex'> <img className="imgUserAnuncio shadow mr-1" src={a.imgOrganizador} /> {a.organizador}
+                    <span className='d-flex'> <div className="divUserAnuncio shadow mr-1" style={{ background: `url(${a.imgOrganizador}) no-repeat center center/cover` }}></div> {a.organizador}
                         {a.rolOrganizador == "ADMINISTRADOR" && (
                             <img title='Administrador' alt='Administrador' className="imgUserAnuncio ml-1" src={iconAdmin} style={{ border: 'none' }} />
                         )}
@@ -236,6 +237,7 @@ const AnunciosPanel: React.FC<Props> = ({
                 {modalOpenImg && (
                     <div className="vi-modal-overlay" onClick={closeModalImg}>
                         <div className="vi-modal-content shadow" onClick={e => e.stopPropagation()}>
+                            <a title='Descargar imagen' download href={imgSelect} className='containerIconDescargarImg'><img className='iconDescargarImg' src={descargarIcon} /></a>
                             <button className="vi-close-btn" onClick={closeModalImg}>&times;</button>
                             <img src={imgSelect ?? ""}
                                 alt="Imagen Ampliada" />
