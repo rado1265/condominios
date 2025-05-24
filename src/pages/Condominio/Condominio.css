@@ -1526,7 +1526,7 @@ a:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: #74868496;
+  background: #74868412;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2114,4 +2114,12 @@ a:hover {
   font-size: 12px;
   box-shadow: 0 0 10px #90caf9;
   margin: 5px 0;
+}
+
+.newImgPerfilUsuario {
+  height: 100%;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
 }

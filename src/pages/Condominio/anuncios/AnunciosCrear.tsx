@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { AppDispatch, RootState } from "../../../store/store";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchAnuncioCrear, setAnuncioCrear, setArchivoTemp, setLimpiarAnuncioCrear, setTipoSubir } from "../../../store/slices/anuncio/anuncioSlice"
-import { ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../config';
 import { setCambiarMenu } from '../../../store/slices/comunidad/comunidadSlice';
 
@@ -20,14 +20,13 @@ const AnunciosCrear: React.FC<Props> = ({ }) => {
     const { usuario } = useSelector((state: RootState) => state.auth);
 
     const onGuardar = async (form: any, archivoTemp: File | null) => {
-        let anuncioParse = form;
+        var resultImg = "";
         if (archivoTemp) {
-            guardarArchivo(4, archivoTemp);
-            anuncioParse.amedida = archivoTemp.name
+            resultImg = await guardarArchivo(4, archivoTemp);
         }
         try {
-            if (anuncioParse.cabecera.length > 0) {
-                const result = await dispatch(fetchAnuncioCrear(normalizarAnuncio(anuncioParse)))
+            if (anuncioCrear.cabecera.length > 0) {
+                const result = await dispatch(fetchAnuncioCrear(normalizarAnuncio(anuncioCrear, resultImg)))
                 if (fetchAnuncioCrear.fulfilled.match(result)) {
                     dispatch(setCambiarMenu({ mostrar: "verPublicacion", tipo: 4 } as any));
                     dispatch(setLimpiarAnuncioCrear());
@@ -36,7 +35,7 @@ const AnunciosCrear: React.FC<Props> = ({ }) => {
         } catch (er) {
         }
     }
-    const normalizarAnuncio = (data: any) => {
+    const normalizarAnuncio = (data: any, imgGuardada: string) => {
         return {
             id: data.id ?? 0,
             idCondominio: localStorage.getItem("idCondominio"),
@@ -44,26 +43,34 @@ const AnunciosCrear: React.FC<Props> = ({ }) => {
             descripcion: data.descripcion ?? "",
             organizador: usuario.nombre,
             telefono: data.telefono ?? "",
-            amedida: data.amedida ?? "",
-            fechaDesde: data.fechaDesde ?? new Date(),
+            amedida: imgGuardada != "" ? imgGuardada : data.amedida ?? "",
+            fechaDesde: data.fechaDesde != "" ? data.fechaDesde : new Date(),
             fechaHasta: data.fechaHasta ?? new Date(),
             idTipo: data.idTipo ?? 1,
             idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario,
             activo: data.activo ?? true
         };
     };
-    const guardarArchivo = (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+    const guardarArchivo = async (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+        let randomNumero = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+        let urlSubida = "";
         if (archivoAsubir && !(archivoAsubir.size > 100000000)) {
             if (tipoArchivo === 4) {
-                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name}`);
-                const uploadTask = uploadBytes(storageRef, archivoAsubir);
+                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name + randomNumero}`);
+                const snapshot = await uploadBytes(storageRef, archivoAsubir);
+                urlSubida = await getDownloadURL(snapshot.ref);
+
             } else {
-                const storageRef = ref(storage, `perfiles/${archivoAsubir.name}`);
-                const uploadTask = uploadBytes(storageRef, archivoAsubir);
+                const storageRef = ref(storage, `perfiles/${archivoAsubir.name + randomNumero}`);
+                const snapshot = await uploadBytes(storageRef, archivoAsubir);
+                urlSubida = await getDownloadURL(snapshot.ref);
             }
+
+            //dispatch(setAnuncioCrear({ name: "amedida", value: urlSubida }))
         } else if (archivoAsubir && (archivoAsubir.size > 100000000)) {
             alert("El archivo pesa mas de 100 MB")
         }
+        return urlSubida;
     }
     /* useEffect(() => {
         if (archivoTemp) {

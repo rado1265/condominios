@@ -42,9 +42,9 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, imagenPerfil, onChangeM
                         type="button"
                     >
                         { imagenPerfil != "" ?
-                            <img src={imagenPerfil} />
+                            <div className='newImgPerfilUsuario' style={{ backgroundImage: `url(${imagenPerfil})` }}></div>
                             :
-                            <img src={personFull} />
+                            <div className='newImgPerfilUsuario' style={{ backgroundImage: `url(${personFull})` }}></div>
                         }
                     </button>
 

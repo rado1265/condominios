@@ -12,7 +12,7 @@ import {
     eliminarSuscripcion
 } from "../../../store/slices/perfil/perfilUsuarioSlice"
 import type { RootState, AppDispatch } from "../../../store/store";
-import { ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../config';
 import { toast } from 'react-toastify';
 
@@ -111,14 +111,12 @@ const PerfilUsuario: React.FC<{ }> = ({
         }
     }
     async function EditarPerfil(archivoTemp: File | null) {
+        var resultImg = "";
         if (archivoTemp) {
-            guardarArchivo(1, archivoTemp);
-            dispatch(setUsuarioDetalle({ name: "imagen", value: archivoTemp.name }));
+            resultImg = await guardarArchivo(1, archivoTemp);
         }
         try {
-
-            const resultAction = await dispatch(editarUsuario(usuarioDetalle))
-
+            const resultAction = await dispatch(editarUsuario(normalizarPerfil(usuarioDetalle, resultImg)))
             if (editarUsuario.fulfilled.match(resultAction)) {
                 Perfil()
             } else {
@@ -127,18 +125,47 @@ const PerfilUsuario: React.FC<{ }> = ({
         } catch (er) {
         }
     }
-    const guardarArchivo = (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+
+    const normalizarPerfil = (data: any, imgGuardada: string) => {
+        return {
+            activo: data.activo,
+            clave: data.clave,
+            direccion: data.direccion,
+            email: data.email,
+            fechaCaducidad: data.fechaCaducidad,
+            id: data.id,
+            imagen: imgGuardada != "" ? imgGuardada : data.imagen ?? "",
+            mostrarDireccion: data.mostrarDireccion,
+            mostrarTelefono: data.mostrarTelefono,
+            nombre: data.nombre,
+            rol: data.rol,
+            telefono: data.telefono,
+            tieneSuscripcionAnuncios: data.tieneSuscripcionAnuncios,
+            tieneSuscripcionAvisos: data.tieneSuscripcionAvisos,
+            tieneSuscripcionEspacioComun: data.tieneSuscripcionEspacioComun,
+            tieneSuscripcionMensajes: data.tieneSuscripcionMensajes,
+            tieneSuscripcionVotaciones: data.tieneSuscripcionVotaciones,
+            usuario: data.usuario
+        };
+    };
+
+    const guardarArchivo = async (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+        let randomNumero = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+        let urlSubida = "";
         if (archivoAsubir && !(archivoAsubir.size > 100000000)) {
             if (tipoArchivo === 4) {
-                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name}`);
-                const uploadTask = uploadBytes(storageRef, archivoAsubir);
+                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name + randomNumero}`);
+                const snapshot = await uploadBytes(storageRef, archivoAsubir);
+                urlSubida = await getDownloadURL(snapshot.ref);
             } else {
-                const storageRef = ref(storage, `perfiles/${archivoAsubir.name}`);
-                const uploadTask = uploadBytes(storageRef, archivoAsubir);
+                const storageRef = ref(storage, `perfiles/${archivoAsubir.name + randomNumero}`);
+                const snapshot = await uploadBytes(storageRef, archivoAsubir);
+                urlSubida = await getDownloadURL(snapshot.ref);
             }
         } else if (archivoAsubir && (archivoAsubir.size > 100000000)) {
             alert("El archivo pesa mas de 100 MB")
         }
+        return urlSubida;
     }
     useEffect(() => {
         if (usuarioDetalle != null && usuarioDetalle.imagen) {
