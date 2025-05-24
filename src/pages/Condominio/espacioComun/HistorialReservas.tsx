@@ -7,13 +7,14 @@ import ReservaConHorario from "./ReservaConHorario";
 export default function HistorialReservas(props: any) {
   const dispatch: AppDispatch = useDispatch();
   const { reservas, loading } = useSelector((state: RootState) => state.historialReservas);
+  const { listadousuarios } = useSelector((state: RootState) => state.usuarios);
   const [crearNuevo, setCrearNuevo] = useState(false);
 
-  useEffect(() => {
+ /*  useEffect(() => {
     if (props.usuario?.id) {
       dispatch(fetchReservas({ idUsuario: props.usuario.id }));
     }
-  }, [props.usuario]);
+  }, [props.usuario]); */
 
   return (!crearNuevo) ? (
     <div className="p-4 p-md-5 rounded mt-2 mt-md-5 shadow mx-auto col-md-8">
@@ -48,6 +49,6 @@ export default function HistorialReservas(props: any) {
       <button className="modal-btn modal-btn-close" onClick={props.onCancelar}>Volver</button>
     </div>
   ) : (
-    <ReservaConHorario onCancelar={() => { setCrearNuevo(false); dispatch(fetchReservas({ idUsuario: props.usuario.id })) }} usuario={props.usuario} listadoUsuarios={props.listadoUsuarios} />
+    <ReservaConHorario onCancelar={() => { setCrearNuevo(false); dispatch(fetchReservas({ idUsuario: props.usuario.id })) }} usuario={props.usuario} listadoUsuarios={listadousuarios} />
   );
 }

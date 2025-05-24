@@ -4,7 +4,6 @@ import listadoEspacioComunReducer from '../store/slices/espacioComun/listadoEspa
 import disponibilidadEspacioComunReducer from '../store/slices/espacioComun/disponibilidadEspacioComunSlice'
 import historialReservasReducer from '../store/slices/espacioComun/historialReservasSlice'
 import reservaEspacioComunReducer from '../store/slices/espacioComun/reservaEspacioComunSlice'
-import condominioReducer from '../store/slices/condominio/condominioSlice';
 import userReducer from '../store/slices/perfil/perfilUsuarioSlice';
 import emergenciaReducer from '../store/slices/emergencia/emergenciaSlice';
 import votacionesReducer from '../store/slices/votacion/votacionesSlice';
@@ -12,6 +11,9 @@ import crearVotacionesReducer from '../store/slices/votacion/crearVotacionesSlic
 import authReducer from '../store/slices/login/authSlice';
 import avisoReducer from '../store/slices/avisos/avisoSlice'
 import usuariosReducer from '../store/slices/perfil/usuariosSlice'
+import anuncioReducer from '../store/slices/anuncio/anuncioSlice';
+import comunidadReducer from '../store/slices/comunidad/comunidadSlice';
+
 export const store = configureStore({
     reducer: {
         crearEspacioComun: crearEspacioComunReducer,
@@ -20,13 +22,14 @@ export const store = configureStore({
         historialReservas: historialReservasReducer,
         reservaEspacioComun: reservaEspacioComunReducer,
         crearVotaciones: crearVotacionesReducer,
-        condominio: condominioReducer,
         user: userReducer,
         emergencia: emergenciaReducer,
         votaciones: votacionesReducer,
         auth: authReducer,
         aviso: avisoReducer,
-        usuarios: usuariosReducer
+        usuarios: usuariosReducer,
+        anuncio: anuncioReducer,
+        comunidad: comunidadReducer
     }, middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {

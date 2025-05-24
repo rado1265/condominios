@@ -70,6 +70,21 @@ export const loginThunk = createAsyncThunk(
         }
     }
 );
+export const loginStorage = createAsyncThunk(
+    'auth/loginStorage',
+    async (paquete: any, { rejectWithValue }) => {
+        try {
+            return new Promise<any>((resolve, reject) => {
+                LoginLogic((error: any, errMsg: any, user: any) => {
+                    if (user?.nombre) resolve(user);
+                    else reject(rejectWithValue('Credenciales incorrectas'));
+                }, paquete, false);
+            });
+        } catch (error) {
+            return rejectWithValue('Error inesperado');
+        }
+    }
+);
 
 export const suscribirPushThunk = createAsyncThunk(
     'auth/suscribir',
@@ -108,6 +123,18 @@ const authSlice = createSlice({
             })
             .addCase(loginThunk.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(loginStorage.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(loginStorage.fulfilled, (state, action) => {
+                /* state.loading = false; */
+                state.usuario = action.payload;
+            })
+            .addCase(loginStorage.rejected, (state, action) => {
+                /* state.loading = false; */
                 state.error = action.payload as string;
             });
     }

@@ -23,17 +23,17 @@ import {
     setCrearTipoEvento,
     setAvisoActual,
     postTipoAviso,
+    setDia,
 } from "../../../store/slices/avisos/avisoSlice"
-import { AppDispatch } from '../../../store/store';
+import { AppDispatch, RootState } from '../../../store/store';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 interface Props {
-    usuario: any;
 }
-const AvisoPanel: React.FC<Props> = ({ usuario }) => {
+const AvisoPanel: React.FC<Props> = ({ }) => {
     const dispatch = useDispatch<AppDispatch>()
-
+    const { usuario } = useSelector((state: RootState) => state.auth);
     dayjs.locale("es");
 
     const {
@@ -49,17 +49,18 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
         editarEvento,
         tipoAvisoActual,
         avisoActual,
+        dia
     } = useSelector((state: any) => state.aviso);
 
     const idCondominio: any = localStorage.getItem('idCondominio');
 
     useEffect(() => {
         if (idCondominio) {
-            dispatch(fetchTiposAviso());
-            dispatch(fetchAvisos({ mes, año, idCondominio }));
-            getObtenerAvisosDia(new Date().getDate(), mes);
+            /* dispatch(fetchTiposAviso());
+            dispatch(fetchAvisos({ mes, año, idCondominio })); */
+            getObtenerAvisosDia(dia, mes);
         }
-    }, [dispatch, mes, año, idCondominio]);
+    }, [dispatch, dia, mes, año, idCondominio, avisos]);
 
     // Cambiar mes y año
     const onCambiarMes = (nuevoMes: any, nuevoAño: any) => {
@@ -79,21 +80,28 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                 dayjs(a.fecha).format('YYYY-MM-DD') ===
                 dayjs(`${año}-${mesSeleccionado}-${dia}`).format('YYYY-MM-DD')
         );
-        // Ordenar por fecha ascendente
-        /* const avisosOrdenados = [...avisosDeHoy].sort(
-            (a: any, b: any) => new Date(a.fecha) - new Date(b.fecha)
-        ); */
         dispatch(setAvisosDiaSeleccionado(avisosDeHoy));
     };
-
+    const normalizarAviso = (data: any) => {
+        return {
+            id: data.id ?? 0,
+            idCondominio: localStorage.getItem("idCondominio"),
+            cabecera: data.cabecera ?? "",
+            color: data.color ?? "",
+            fecha: data.fecha ?? new Date(),
+            idReserva: 0,
+            idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario,
+            mensaje: data.mensaje ?? ""
+        };
+    };
     const onCrearEliminarAviso = async (aviso: any, eliminar: any = false) => {
         try {
-            await dispatch(postCrearAviso({ aviso, eliminar })).unwrap();
-            toast.success(
+            await dispatch(postCrearAviso({ aviso: normalizarAviso(aviso), eliminar })).unwrap();
+            /* toast.success(
                 `Aviso ${eliminar ? 'eliminado' : 'creado'} correctamente.`,
                 { position: 'bottom-left' }
-            );
-            dispatch(fetchAvisos({ mes, año, idCondominio }));
+            ); */
+            /* dispatch(fetchAvisos({ mes, año, idCondominio })); */
         } catch (error) {
             toast.error('Error al intentar crear/eliminar aviso.', {
                 position: 'bottom-left',
@@ -150,7 +158,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                 <div
                     key={`dia-${dia}`}
                     className="dia"
-                    onClick={() => { getObtenerAvisosDia(dia, mes) }}
+                    onClick={() => { dispatch(setDia(dia)) /* getObtenerAvisosDia(dia, mes)  */ }}
                     style={{ cursor: 'pointer' }}
                 >
                     <div
@@ -268,7 +276,7 @@ const AvisoPanel: React.FC<Props> = ({ usuario }) => {
                                 <button
                                     type="button"
                                     className="iconoVolver"
-                                    onClick={() => { dispatch(setEditarEvento(true)); dispatch(setAvisoActual(a));}}
+                                    onClick={() => { dispatch(setEditarEvento(true)); dispatch(setAvisoActual(a)); }}
                                     aria-label="Editar Aviso"
                                 >
                                     <img src={iconeditar} />

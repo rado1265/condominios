@@ -7,15 +7,14 @@ import { AppDispatch, RootState } from '../../../store/store';
 import { crearVotacionAsync, resetVotacionCreacion } from "../../../store/slices/votacion/crearVotacionesSlice";
 
 interface Props {
-    usuario: any;
 }
 
 const posicionAlertas = 'bottom-left';
 
-const VotacionCrear: React.FC<Props> = ({ usuario }) => {
+const VotacionCrear: React.FC<Props> = ({  }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error } = useSelector((state: RootState) => state.crearVotaciones);
-
+    const { usuario } = useSelector((state: RootState) => state.auth);
     const [cabecera, setCabecera] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [options, setOptions] = useState([

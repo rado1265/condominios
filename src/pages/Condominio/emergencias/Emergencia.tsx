@@ -16,18 +16,17 @@ import {
 } from "../../../store/slices/emergencia/emergenciaSlice"
 
 interface Props {
-    rolUsuario?: string;
 }
 
 const posicionAlertas = "bottom-left";
 
-const Emergencia: React.FC<Props> = ({ rolUsuario }) => {
+const Emergencia: React.FC<Props> = ({  }) => {
     const dispatch = useDispatch<AppDispatch>()
     const { lista, actual, editar, loading } = useSelector((state: RootState) => state.emergencia);
-
-    useEffect(() => {
+    const { usuario } = useSelector((state: RootState) => state.auth);
+    /* useEffect(() => {
         dispatch(fetchEmergencias());
-    }, [dispatch]);
+    }, [dispatch]); */
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -100,7 +99,7 @@ const Emergencia: React.FC<Props> = ({ rolUsuario }) => {
                             <span><strong>{e.descripcion}</strong></span><br />
                             <span>{e.direccion}</span>
                             <a href={`tel:${e.telefono}`} className="d-block">{e.telefono}</a>
-                            {rolUsuario === "ADMINISTRADOR" && (
+                            {usuario.rol === "ADMINISTRADOR" && (
                                 <>
                                     <button type="button" className="iconoVolver" style={{ marginTop: '-75px', float: 'right' }} onClick={() => { dispatch(setActual(e)); dispatch(setEditar(true)) }}>
                                         <img src={iconeditar} />
@@ -112,7 +111,7 @@ const Emergencia: React.FC<Props> = ({ rolUsuario }) => {
                             )}
                         </div>
                     ))}
-                    {rolUsuario === "ADMINISTRADOR" && (
+                    {usuario.rol === "ADMINISTRADOR" && (
                         <button type="button" className="modal-btn modal-btn-green mt-2" onClick={() => dispatch(resetActual()) || dispatch(setEditar(true))}>
                             Crear número de emergencia
                         </button>

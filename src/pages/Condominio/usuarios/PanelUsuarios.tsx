@@ -8,24 +8,23 @@ import { AppDispatch, RootState } from "../../../store/store";
 import { toast } from 'react-toastify';
 
 interface PanelUsuariosProps {
-    usuario: any
 }
 const posicionAlertas = "bottom-left";
 
-const PanelUsuarios: React.FC<PanelUsuariosProps> = ({ usuario }) => {
+const PanelUsuarios: React.FC<PanelUsuariosProps> = ({ }) => {
     const dispatch = useDispatch<AppDispatch>();
 
     const { listadousuarios, listadousuariosParse, dataUserSelect,
         verMisAnuncios, loading, agregarUsuario, verUsuarioInd, newUser,
         cupoUsuarios, usuarioComunidad, misAnuncios, actualizarMisAnuncios,
         error } = useSelector((state: RootState) => state.usuarios);
-
-    useEffect(() => {
+    const { usuario } = useSelector((state: RootState) => state.auth);
+    /* useEffect(() => {
         const idCondominio = localStorage.getItem('idCondominio');
         if (idCondominio) {
             dispatch(fetchUsuarios(idCondominio));
         }
-    }, [dispatch]);
+    }, [dispatch]); */
 
     const ChangeNewUser = (e: any) => {
         const { name, value } = e.target;

@@ -16,12 +16,9 @@ import { ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../../config';
 import { toast } from 'react-toastify';
 
-const PerfilUsuario: React.FC<{ usuario: any; sinNotificaciones: boolean }> = ({
-    usuario,
-    sinNotificaciones,
+const PerfilUsuario: React.FC<{ }> = ({
 }) => {
     const dispatch = useDispatch<AppDispatch>();
-    console.log(usuario)
     useEffect(() => {
         Perfil()
     }, [])
@@ -31,7 +28,8 @@ const PerfilUsuario: React.FC<{ usuario: any; sinNotificaciones: boolean }> = ({
         archivoTemp,
         editar
     } = useSelector((state: RootState) => state.user);
-
+    const { usuario } = useSelector((state: RootState) => state.auth);
+    const { sinNotificaciones } = useSelector((state: RootState) => state.comunidad);
     const posicionAlertas = "bottom-left";
 
     function urlBase64ToUint8Array(base64String: string) {

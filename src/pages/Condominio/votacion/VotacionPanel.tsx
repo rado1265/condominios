@@ -6,40 +6,21 @@ import iconList from '../../../components/utils/img/menuInferior/list.png';
 import { toast } from 'react-toastify';
 
 interface Props {
-    usuario?: any;
-    arrayImgUsers: any[];
 }
 
 const posicionAlertas = 'bottom-left';
 
-const VotacionPanel: React.FC<Props> = ({ usuario = '', arrayImgUsers }) => {
+const VotacionPanel: React.FC<Props> = ({ }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { votaciones, loading } = useSelector((state: RootState) => state.votaciones);
-
+    const { usuario } = useSelector((state: RootState) => state.auth);
     const [verListadoVotantes, setVerListadoVotantes] = useState(false);
     const [dataListado, setDataListado] = useState([]);
 
-    useEffect(() => {
+    /* useEffect(() => {
         const idCondominio = localStorage.getItem('idCondominio')!;
         dispatch(obtenerVotaciones({ idCondominio, idUsuario: usuario.id }));
-    }, [dispatch, usuario.id]);
-
-    useEffect(() => {
-        if (dataListado) {
-            dataListado.forEach((b: any) => {
-                if (b.votaciones) {
-                    b.votaciones.map((p: any) => {
-                        const matchArchivo = arrayImgUsers.find((x: any) => x.nombre === p.imgUsuario);
-                        if (matchArchivo) {
-                            /* p.imgUsuario = matchArchivo.url.toString(); */
-                        } else if (p.imgUsuario && p.imgUsuario.includes('https')) {
-                            /* p.imgUsuario = p.imgUsuario; */
-                        }
-                    });
-                }
-            });
-        }
-    }, [dataListado, arrayImgUsers]);
+    }, [dispatch, usuario.id]); */
 
     const onCambiarEstado = (votacion: number, activo: boolean) => {
         dispatch(cambiarEstadoVotacion({

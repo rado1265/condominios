@@ -9,11 +9,10 @@ interface Props {
     enComunidad: boolean;
     imagenPerfil: string;
     nombre: string;
-    onChangeAtras: () => void;
     onChangeMenu: (e: string) => void;
 }
 
-const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPerfil, onChangeMenu, nombre }) => {
+const HuinchaSuperior: React.FC<Props> = ({ enComunidad, imagenPerfil, onChangeMenu, nombre }) => {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -31,7 +30,7 @@ const HuinchaSuperior: React.FC<Props> = ({ enComunidad, onChangeAtras, imagenPe
     return (
         <>
             <div className={enComunidad ? "w-100 p-3 mb-3 containerMenu" : "d-none"}>
-                <img style={{visibility: 'hidden'}} src={back} onClick={onChangeAtras} />
+                <img style={{visibility: 'hidden'}} src={back} />
                 <span className='tituloMenu'>{nombre}</span>
                 <div className="huincha-profile-dropdown" ref={dropdownRef}>
                     <button

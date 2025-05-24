@@ -27,7 +27,6 @@ import EspacioComun from '../../components/utils/img/menuInferior/comunes.png';
 import EspacioComunSelect from '../../components/utils/img/menuInferior/comunesSelect.png';
 interface Props {
     active: string;
-    orden: string;
     onChangeMenu: (e: string) => void;
     onChangeCriterio: (e: string) => void;
     onFiltrarDataFull: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -119,7 +118,7 @@ const icons = {
     ),
 };
 
-const BottomNav: React.FC<Props> = ({ active, orden, onChangeMenu, onChangeCriterio, onFiltrarDataFull, onChangeOrden, usuario }) => {
+const BottomNav: React.FC<Props> = ({ active, onChangeMenu, onChangeCriterio, onFiltrarDataFull, onChangeOrden, usuario }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const containerRef = useRef(null);
 

@@ -5,12 +5,10 @@ import ListaEspacios from './ListaEspacios';
 import HistorialReservas from './HistorialReservas';
 
 interface Props {
-    onSelect: () => void;
     usuario: any;
 }
 
 const EspacioComun: React.FC<Props> = ({
-    onSelect,
     usuario
 }) => {
     const [eleccion, setEleccion] = useState("");

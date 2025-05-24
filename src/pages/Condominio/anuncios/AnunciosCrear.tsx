@@ -1,67 +1,71 @@
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import iconeditar from './../../../components/utils/img/editar.png';
+import iconborrar from './../../../components/utils/img/iconborrar.png';
+import { ConfirmMessage } from '../../../components/utils/messages';
 import { toast } from 'react-toastify';
-
-interface Anuncio {
-    id: number;
-    cabecera: string;
-    descripcion: string;
-    telefono: string;
-    amedida: string;
-    organizador: string;
-    fechaDesde: Date;
-    fechaHasta: Date;
-    idTipo: number;
-    esVideo: boolean;
-    idUsuario: number;
-    activo: boolean;
-    idCondominio: any;
-}
+import { AppDispatch, RootState } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchAnuncioCrear, setAnuncioCrear, setArchivoTemp, setLimpiarAnuncioCrear, setTipoSubir } from "../../../store/slices/anuncio/anuncioSlice"
+import { ref, uploadBytes } from 'firebase/storage';
+import { storage } from '../../../config';
+import { setCambiarMenu } from '../../../store/slices/comunidad/comunidadSlice';
 
 interface Props {
-    anuncio?: Anuncio; // null para nuevo, lleno para editar
-    onGuardar: (anuncio: Anuncio, archivoAdjunto: File | null) => void;
-    onCancelar: () => void;
-    usuario: any;
-    crear: boolean;
-    editar: boolean;
-    imgError: string;
 }
+const imgError = "https://media1.tenor.com/m/Ord0OyTim_wAAAAC/loading-windows11.gif";
+const AnunciosCrear: React.FC<Props> = ({ }) => {
+    const dispatch = useDispatch<AppDispatch>()
+    const { dataDetalle, archivoTemp, tipoSubir, anuncioCrear, crear, editar } = useSelector((state: RootState) => state.anuncio);
+    const { usuario } = useSelector((state: RootState) => state.auth);
 
-const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancelar, crear, editar, imgError }) => {
-    const [form, setForm] = useState<Anuncio>({
-        id: 0,
-        cabecera: '',
-        descripcion: '',
-        telefono: '',
-        organizador: usuario.nombre,
-        amedida: '',
-        fechaDesde: new Date(),
-        fechaHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-        idTipo: 1,
-        esVideo: false,
-        ...(anuncio || {}),
-        idCondominio: localStorage.getItem("idCondominio"),
-        idUsuario: usuario.id,
-        activo: true,
-    });
-    /* const [archivo, setArchivo] = useState<File | null>(null); */
-    const [preview, setPreview] = useState<string | null>(null);
-    const [tipoSubir, setTipoSubir] = useState(1);
-    const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
-    console.log(usuario)
-    useEffect(() => {
-        if (anuncio != null && anuncio?.id > 0) {
-            setForm(anuncio)
+    const onGuardar = async (form: any, archivoTemp: File | null) => {
+        let anuncioParse = form;
+        if (archivoTemp) {
+            guardarArchivo(4, archivoTemp);
+            anuncioParse.amedida = archivoTemp.name
         }
-    }, [anuncio])
+        try {
+            if (anuncioParse.cabecera.length > 0) {
+                const result = await dispatch(fetchAnuncioCrear(normalizarAnuncio(anuncioParse)))
+                if (fetchAnuncioCrear.fulfilled.match(result)) {
+                    dispatch(setCambiarMenu({ mostrar: "verPublicacion", tipo: 4 } as any));
+                    dispatch(setLimpiarAnuncioCrear());
+                }
+            }
+        } catch (er) {
+        }
+    }
+    const normalizarAnuncio = (data: any) => {
+        return {
+            id: data.id ?? 0,
+            idCondominio: localStorage.getItem("idCondominio"),
+            cabecera: data.cabecera ?? "",
+            descripcion: data.descripcion ?? "",
+            organizador: usuario.nombre,
+            telefono: data.telefono ?? "",
+            amedida: data.amedida ?? "",
+            fechaDesde: data.fechaDesde ?? new Date(),
+            fechaHasta: data.fechaHasta ?? new Date(),
+            idTipo: data.idTipo ?? 1,
+            idUsuario: data.idUsuario === 0 ? usuario.id : data.idUsuario,
+            activo: data.activo ?? true
+        };
+    };
+    const guardarArchivo = (tipoArchivo: number = 1, archivoAsubir: File | null = null) => {
+        if (archivoAsubir && !(archivoAsubir.size > 100000000)) {
+            if (tipoArchivo === 4) {
+                const storageRef = ref(storage, `comunidad-${localStorage.getItem("idCondominio")}/${archivoAsubir.name}`);
+                const uploadTask = uploadBytes(storageRef, archivoAsubir);
+            } else {
+                const storageRef = ref(storage, `perfiles/${archivoAsubir.name}`);
+                const uploadTask = uploadBytes(storageRef, archivoAsubir);
+            }
+        } else if (archivoAsubir && (archivoAsubir.size > 100000000)) {
+            alert("El archivo pesa mas de 100 MB")
+        }
+    }
     /* useEffect(() => {
-        setForm(prev => ({
-            ...prev,
-            ["telefono"]: usuario.telefono
-        }));
-    }, []) */
-    useEffect(() => {
         if (archivoTemp) {
             const url = URL.createObjectURL(archivoTemp);
             setPreview(url);
@@ -69,14 +73,11 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         } else {
             setPreview(null);
         }
-    }, [archivoTemp]);
+    }, [archivoTemp]); */
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        dispatch(setAnuncioCrear({ name, value }))
     };
 
     /* const handleArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,15 +95,9 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
 
     const uploadVideo = (files: any) => {
         const file = files[0];
-        setArchivoTemp(file);
+        dispatch(setArchivoTemp(file));
 
         if (!file) return;
-
-        /*setAnuncio(prev => ({
-            ...prev,
-            // eslint-disable-next-line
-            ["amedida"]: 'video-' + file.name
-        }));*/
 
         document.getElementById('containerViewVideo')?.classList.remove("d-none");
 
@@ -116,9 +111,8 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
 
     const handleImage = (files: any) => {
         if (files.target.files.length === 0) return;
-        //const file = files.target.files[0];
 
-        setArchivoTemp(files.target.files[0]);
+        dispatch(setArchivoTemp(files.target.files[0]));
 
         document.getElementById('containerViewImg')?.classList.remove("d-none");
 
@@ -128,14 +122,14 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
         }
 
         /*const reader = new FileReader();
-
+ 
         reader.onloadend = async () => {
             if (!reader.result || typeof reader.result !== 'string') {
                 return;
             }
-
+ 
          const base64 = reader.result.split(',')[1];
-
+ 
             const body = {
                 requests: [
                     {
@@ -144,7 +138,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     },
                 ],
             };
-
+ 
             try {
                 const response = await axios.post(
                     `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`,
@@ -158,23 +152,23 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     });
                 }
             } catch (err) {
-
+ 
             } finally {
-
+ 
             } 
         };
-
+ 
         reader.readAsDataURL(file);*/
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onGuardar(form, archivoTemp);
+        onGuardar(anuncioCrear, archivoTemp);
     };
 
     return (
         <form onSubmit={handleSubmit} className="anuncio-form">
-            <h2 className="mb-4 text-center">{anuncio != null && anuncio.id > 0 ? 'Editar Anuncio' : 'Nuevo Anuncio'}</h2>
+            <h2 className="mb-4 text-center">{dataDetalle != null && dataDetalle.id > 0 ? 'Editar Anuncio' : 'Nuevo Anuncio'}</h2>
             <div className="login-box py-3 px-3" style={{ boxShadow: '0 0 0 1px #e5e5e5', borderRadius: '10px' }}>
                 <label htmlFor="textfield" className="search-label-admin">
                     Cabecera
@@ -183,7 +177,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     type="text"
                     name="cabecera"
                     className="search-input"
-                    value={form.cabecera}
+                    value={anuncioCrear.cabecera}
                     onChange={handleChange}
                 />
                 <label htmlFor="textfield" className="search-label-admin">
@@ -194,7 +188,7 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     cols={50}
                     name="descripcion"
                     className="search-input"
-                    value={form.descripcion}
+                    value={anuncioCrear.descripcion}
                     onChange={handleChange}
                 />
                 <label htmlFor="textfield" className="search-label-admin">
@@ -204,19 +198,9 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     type="text"
                     name="organizador"
                     className="search-input"
-                    value={usuario.nombre/* form.organizador */}
+                    value={usuario.nombre}
                     disabled
                 />
-                {/* <label htmlFor="textfield" className="search-label-admin">
-                    Teléfono
-                </label>
-                <input
-                    type="text"
-                    name="telefono"
-                    className="search-input"
-                    value={form.telefono}
-                    onChange={handleChange}
-                /> */}
                 <label htmlFor="textfield" className="search-label-admin mt-3">
                     Fecha Hasta
                 </label>
@@ -224,54 +208,42 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                     type="date"
                     name="fechaHasta"
                     className="typeDate"
-                    value={form.fechaHasta ? form.fechaHasta.toString().substring(0, 10) : ''}
+                    value={anuncioCrear.fechaHasta ? anuncioCrear.fechaHasta.toString().substring(0, 10) : ''}
                     onChange={handleChange}
                     style={{ padding: '8px', fontSize: '16px' }}
                 />
 
-                {/* <label>Imagen o Video</label>
-                <input type="file" accept="image/*,video/*" onChange={handleArchivo} />
-
-                {preview && (
-                    form.esVideo ? (
-                        <video src={preview} controls width={300} />
-                    ) : (
-                        <img src={preview} alt="Preview" width={300} />
-                    )
-                )} */}
-                {/* //////////////////////////////////////////////////////////////////////////// */}
-
-                {(crear || (!crear && !form.amedida)) && (
+                {(crear || (!crear && !anuncioCrear.amedida)) && (
                     <div>
                         <label>Subir archivo</label>
                         <div className="radio-group">
                             <label className="radio-label">
-                                <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => setTipoSubir(1)} />
+                                <input type="radio" name="fileType" className="radio-input" value="image" onClick={e => dispatch(setTipoSubir(1))} />
                                 <span>🖼️</span>
                                 <span className="text">Imagen</span>
                             </label>
 
                             <label className="radio-label">
-                                <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => setTipoSubir(2)} />
+                                <input type="radio" name="fileType" className="radio-input" value="video" onClick={e => dispatch(setTipoSubir(2))} />
                                 <span>🎥</span>
                                 <span className="text">Video</span>
                             </label>
                         </div>
                     </div>
                 )}
-                {(tipoSubir === 1 || (editar && (form.amedida && !form.esVideo))) && (
+                {(tipoSubir === 1 || (editar && (anuncioCrear.amedida && !anuncioCrear.esVideo))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar imagen
                     </label>)}
 
-                {(tipoSubir === 1 || (editar && (form.amedida && !form.esVideo))) && (
+                {(tipoSubir === 1 || (editar && (anuncioCrear.amedida && !anuncioCrear.esVideo))) && (
                     <input type="file" accept="image/*" className="w-100" onChange={handleImage} />
                 )}
-                <div id="containerViewImg" className={form.amedida && !form.esVideo ? "" : "d-none"}>
+                <div id="containerViewImg" className={anuncioCrear.amedida && !anuncioCrear.esVideo ? "" : "d-none"}>
                     <h3>Vista previa Imagen:</h3>
                     <img
                         id="visualizadorImg"
-                        src={!crear ? form.amedida : ""}
+                        src={!crear ? anuncioCrear.amedida : ""}
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.onerror = null;
@@ -281,37 +253,33 @@ const AnunciosCrear: React.FC<Props> = ({ anuncio, usuario, onGuardar, onCancela
                         style={{ maxWidth: '300px', marginTop: '10px' }}
                     />
                 </div>
-                {(tipoSubir === 2 || (editar && (form.amedida && form.esVideo))) && (
+                {(tipoSubir === 2 || (editar && (anuncioCrear.amedida && anuncioCrear.esVideo))) && (
                     <label htmlFor="textfield" className="search-label-admin mt-3">
                         Cargar video
                     </label>
                 )}
-                {(tipoSubir === 2 || (editar && (form.amedida && form.esVideo))) && (
+                {(tipoSubir === 2 || (editar && (anuncioCrear.amedida && anuncioCrear.esVideo))) && (
                     <input type="file" accept="video/*" className="w-100" onChange={e => uploadVideo(e.target.files)} />
                 )}
-                <div id="containerViewVideo" className={form.amedida && form.esVideo ? "" : "d-none"}>
+                <div id="containerViewVideo" className={anuncioCrear.amedida && anuncioCrear.esVideo ? "" : "d-none"}>
                     <h3>Vista previa Video:</h3>
-                    <video id="visualizadorVideo" src={!crear ? form.amedida : ""} controls width="300" />
+                    <video id="visualizadorVideo" src={!crear ? anuncioCrear.amedida : ""} controls width="300" />
                 </div>
-
-
-
-                {/* //////////////////////////////////////////////////////////////////////////// */}
                 <label htmlFor="textfield" className="search-label mt-3">
                     Tipo
                 </label>
-                <select id="miCombo" value={form.idTipo} className="typeDate" name="idTipo" onChange={handleChange}>
+                <select id="miCombo" value={anuncioCrear.idTipo} className="typeDate" name="idTipo" onChange={handleChange}>
                     <option value="1">Anuncio</option>
                     <option value="0">Ventas</option>
                     <option value="2">Reclamos</option>
                 </select>
 
                 <div className="modal-actions">
-                    <button type="submit" className="modal-btn modal-btn-green">{anuncio != null && anuncio.id > 0 ? "Editar" : "Crear"}</button>
-                    <button className="modal-btn modal-btn-close" onClick={onCancelar}>Cancelar</button>
+                    <button type="submit" className="modal-btn modal-btn-green">{anuncioCrear != null && dataDetalle.id > 0 ? "Editar" : "Crear"}</button>
+                    <button className="modal-btn modal-btn-close" onClick={() => { dispatch(setLimpiarAnuncioCrear()); dispatch(setCambiarMenu({ mostrar: "verPublicacion", tipo: 4 } as any)) }}>Cancelar</button>
                 </div>
             </div>
-        </form>
+        </form >
     );
 };
 

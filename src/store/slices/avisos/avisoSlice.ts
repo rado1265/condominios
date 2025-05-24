@@ -59,6 +59,7 @@ const initialState = {
     error: null,
     año: new Date().getFullYear(),
     mes: new Date().getMonth() + 1, // Mes 1-12
+    dia: new Date().getDate(),
     diaMesSelect: { dia: 0, mes: 0, año: 0 },
     avisosDiaSeleccionado: [],
     crearEvento: false,
@@ -68,7 +69,7 @@ const initialState = {
         id: 0,
         descripcion: '',
         color: '',
-        idCondominio: localStorage.getItem("idCondominio")!.toString()
+        idCondominio: ""/* localStorage.getItem("idCondominio")!.toString() */
     },
     avisoActual: {
         id: 0,
@@ -76,7 +77,7 @@ const initialState = {
         fecha: '',
         color: '',
         cabecera: '',
-        idCondominio: localStorage.getItem("idCondominio")!.toString(),
+        idCondominio: "",/* localStorage.getItem("idCondominio")!.toString(), */
         idReserva: 0,
         idUsuario: 0,
     },
@@ -91,6 +92,9 @@ const avisoSlice = createSlice({
         },
         setAño(state, action) {
             state.año = action.payload;
+        },
+        setDia(state, action) {
+            state.dia = action.payload;
         },
         setDiaMesSelect(state, action) {
             state.diaMesSelect = action.payload;
@@ -211,6 +215,7 @@ export const {
     setEditarEvento,
     setTipoAvisoActual,
     setAvisoActual,
+    setDia
 } = avisoSlice.actions;
 
 export default avisoSlice.reducer;

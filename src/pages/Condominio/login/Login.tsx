@@ -3,13 +3,13 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { loginThunk, suscribirPushThunk } from '../../../store/slices/login/authSlice';
 import { toast } from 'react-toastify';
 import logo from './../../../components/utils/img/logo.png';
+import { setCambiarMenu } from '../../../store/slices/comunidad/comunidadSlice';
 
 const posicionAlertas = 'bottom-left';
 interface Props {
     onLogin: () => void
-    logueado: () => void
 }
-const Login: React.FC<Props> = ({ onLogin, logueado }) => {
+const Login: React.FC<Props> = ({ onLogin }) => {
     const dispatch = useAppDispatch();
     const { loading, error } = useAppSelector(state => state.auth);
 
@@ -27,7 +27,7 @@ const Login: React.FC<Props> = ({ onLogin, logueado }) => {
             const user = result.payload;
             toast.success('Inicio de sesión exitoso', { position: posicionAlertas });
             dispatch(suscribirPushThunk({ idCondominio: localStorage.getItem('idCondominio')!, idUsuario: user.id }));
-            logueado()
+            dispatch(setCambiarMenu({ mostrar: "verAvisos", tipo: 999 } as any))
         } else {
             toast.error('Credenciales incorrectas', { position: posicionAlertas });
             onLogin()

@@ -13,9 +13,9 @@ export default function ListaEspacios(props: any) {
   const dispatch = useDispatch<AppDispatch>()
   const { espacios, espacioSeleccionado, modo } = useSelector((state: RootState) => state.listadoEspacioComun)
 
-  useEffect(() => {
+ /*  useEffect(() => {
     dispatch(cargarEspacios())
-  }, [dispatch])
+  }, [dispatch]) */
 
   if (modo !== 'lista') {
     return (
